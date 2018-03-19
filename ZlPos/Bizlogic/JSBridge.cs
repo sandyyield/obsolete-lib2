@@ -93,6 +93,7 @@ namespace ZlPos.Bizlogic
                         LoginEntity loginEntity = JsonConvert.DeserializeObject<LoginEntity>(json);
                         //只是为了调试加的
                         ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", resposeEntity });
+                        System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
                     }
                     catch (Exception e)
                     {
