@@ -103,3 +103,4 @@
 [0316/151104:WARNING:dns_config_service_win.cc(674)] Failed to read DnsConfig.
 [0316/151140:ERROR:audio_output_device.cc(384)] IO loop going away before the audio device has been stopped
 [0316/152707:ERROR:ipc_channel_win.cc(217)] pipe error: 109
+[0320/154606:ERROR:ipc_channel_win.cc(217)] pipe error: 109

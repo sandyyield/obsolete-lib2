@@ -13,7 +13,13 @@
 			"shopcode": "100000417",
 			"username": "1001",
 			"password": "96e79218965eb72c92a549dd5a330112"
-		}
+        }
+
+        var testEFormJson = {
+            "EmployeeID": "9527",
+            "FirstName": "老吴凡",
+            "LastName":"滑雪第一人"
+        }
 		// function asyncDivOk()
 		// {
 		// 	var call = "Async call (Divide 16 / 2): " + Date();
@@ -93,6 +99,11 @@
 			alert(json)
 		}
 
+		function testDBOrm(argument) {
+			// body...
+			HostApp.testORM(JSON.stringify(testEFormJson));
+		}
+
 
 	</script>
 </head>
@@ -102,7 +113,9 @@
 
 	<button onclick="invokeClassMethod2()">测试调用c#方法(兼容android调用方式）</button>
 
-	<button onclick="login()">debug login method 模拟</button>
+	<button onclick="login(loginJson)">debug login method 模拟</button>
+
+    <button onclick="testDBOrm(testEFormJson)">test database orm</button>
 
 	<input type="text"  id="inputStream"  name="inputStream" value="JS call c# method with return success!!">
 		<script type="text/javascript">

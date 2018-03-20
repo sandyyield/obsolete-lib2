@@ -8,6 +8,7 @@ using CefSharp.WinForms;
 using Newtonsoft.Json;
 using ZlPos.Bean;
 using ZlPos.Config;
+using ZlPos.Dao;
 using ZlPos.Models;
 
 namespace ZlPos.Bizlogic
@@ -104,6 +105,31 @@ namespace ZlPos.Bizlogic
 
             }
         }
+
+
+
+        public void TestORM(string json)
+        {
+            Employee employees = JsonConvert.DeserializeObject<Employee>(json);
+
+            try
+            {
+                using (var context = new DatabaseContext())
+                {
+                    context.Database.CreateIfNotExists();
+                    var empList = context.Employees.OrderBy(c => c.FirstName).ToList();
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+            //System.Windows.Forms.MessageBox.Show("ok");
+            return;
+        }
+
+
 
         private void CallbackMethod(object state)
         {
