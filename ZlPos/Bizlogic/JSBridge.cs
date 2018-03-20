@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using CefSharp;
 using CefSharp.WinForms;
+using NewTest.Dao;
 using Newtonsoft.Json;
 using ZlPos.Bean;
 using ZlPos.Config;
@@ -114,10 +115,15 @@ namespace ZlPos.Bizlogic
 
             try
             {
-                using (var context = new DatabaseContext())
+                //using (var context = new DatabaseContext())
+                //{
+                //    context.Database.CreateIfNotExists();
+                //    var empList = context.Employees.OrderBy(c => c.FirstName).ToList();
+                //}
+
+                using(var db = SugarDao.GetInstance())
                 {
-                    context.Database.CreateIfNotExists();
-                    var empList = context.Employees.OrderBy(c => c.FirstName).ToList();
+
                 }
             }
             catch(Exception ex)

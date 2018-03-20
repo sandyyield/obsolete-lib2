@@ -18,7 +18,7 @@ namespace NewTest.Dao
         {
             get
             {
-                string reval = "DataSource=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.sqlite"; ; //这里可以动态根据cookies或session实现多库切换
+                string reval = "DataSource=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.db"; ; //这里可以动态根据cookies或session实现多库切换
                 return reval;
             }
         }
