@@ -116,6 +116,7 @@
     <Compile Include="Models\CustomerShowConfigEntity.cs" />
     <Compile Include="Models\DeviceEntity.cs" />
     <Compile Include="Models\DisCountDetailEntity.cs" />
+    <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\JsonBaseResponseEntity.cs" />
     <Compile Include="Models\LoginEntity.cs" />
     <Compile Include="Models\MemberEntity.cs" />

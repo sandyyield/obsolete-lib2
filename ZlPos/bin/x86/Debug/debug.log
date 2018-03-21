@@ -104,3 +104,6 @@
 [0316/151140:ERROR:audio_output_device.cc(384)] IO loop going away before the audio device has been stopped
 [0316/152707:ERROR:ipc_channel_win.cc(217)] pipe error: 109
 [0320/154606:ERROR:ipc_channel_win.cc(217)] pipe error: 109
+[0320/204446:ERROR:ipc_channel_win.cc(217)] pipe error: 109
+[0320/204446:WARNING:raw_channel_win.cc(532)] WriteFile: 管道正在被关闭。 (0xE8)
+[0320/204446:WARNING:channel.cc(359)] RawChannel write error

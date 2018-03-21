@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using CefSharp;
 using CefSharp.WinForms;
@@ -9,7 +6,6 @@ using NewTest.Dao;
 using Newtonsoft.Json;
 using ZlPos.Bean;
 using ZlPos.Config;
-using ZlPos.Dao;
 using ZlPos.Models;
 
 namespace ZlPos.Bizlogic
