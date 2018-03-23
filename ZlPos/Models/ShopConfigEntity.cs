@@ -1,7 +1,11 @@
-﻿namespace ZlPos.Models
+﻿using SqlSugar;
+
+namespace ZlPos.Models
 {
     public class ShopConfigEntity
     {
+        [SugarColumn(IsNullable = false, IsPrimaryKey = true, IsIdentity = true)]
+        public int id { get; set; }
         /// <summary>
         /// 
         /// </summary>

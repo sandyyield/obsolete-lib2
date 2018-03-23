@@ -9,6 +9,7 @@ using ZlPos.Bean;
 using ZlPos.Config;
 using ZlPos.Models;
 using ZlPos.Manager;
+using log4net;
 
 namespace ZlPos.Bizlogic
 {
@@ -17,6 +18,8 @@ namespace ZlPos.Bizlogic
     /// </summary>
     class JSBridge
     {
+        private static ILog logger = null;
+
         private ChromiumWebBrowser browser;
 
         private static LoginUserManager _LoginUserManager;
@@ -112,7 +115,13 @@ namespace ZlPos.Bizlogic
                             {
                                 _LoginUserManager.Instance.Login = true;
                                 _LoginUserManager.Instance.UserEntity = userList[0];
-                                //TODO...
+                                UserVM userVM = new UserVM();
+                                UserEntity userEntity = userList[0];
+                                userVM.user_info = userEntity;
+                                List<ShopConfigEntity> configEntities = db.Queryable<ShopConfigEntity>().Where(
+                                                                        it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).ToList();
+                                //TODO...先去写saveOrUpadteUserInfo 再来完成这边login的逻辑
+
                             }
                         }
                     }
@@ -124,6 +133,29 @@ namespace ZlPos.Bizlogic
                 {
 
                 }
+            }
+        }
+
+        /// <summary>
+        /// 保存或更新用户信息
+        /// </summary>
+        /// <param name="json"></param>
+        public void SaveOrUpdateUserInfo(string json)
+        {
+            try
+            {
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
+                if(userVM != null)
+                {
+                    
+                    
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
 
