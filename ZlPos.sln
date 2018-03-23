@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZlPos", "ZlPos\ZlPos.csproj", "{89674A4C-DD90-491B-9035-7359DB01AD75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqliteSugar", "..\SqliteSugar\SqlSugar\SqliteSugar.csproj", "{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlSugar", "..\SqlSugar\Src\Asp.Net\SqlSugar\SqlSugar.csproj", "{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +23,14 @@ Global
 		{89674A4C-DD90-491B-9035-7359DB01AD75}.Release|Any CPU.Build.0 = Release|Any CPU
 		{89674A4C-DD90-491B-9035-7359DB01AD75}.Release|x86.ActiveCfg = Release|x86
 		{89674A4C-DD90-491B-9035-7359DB01AD75}.Release|x86.Build.0 = Release|x86
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Debug|x86.Build.0 = Debug|Any CPU
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Release|x86.ActiveCfg = Release|Any CPU
-		{46A17E67-7E3E-4369-9B1F-43BA34BBDAEF}.Release|x86.Build.0 = Release|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

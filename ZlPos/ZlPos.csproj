@@ -94,13 +94,18 @@
     <Compile Include="Core\ControlExtensions.cs" />
     <Compile Include="Bizlogic\JSBridge.cs" />
     <Compile Include="Core\InvokeEngine.cs" />
+    <Compile Include="Dao\DbManager.cs" />
+    <Compile Include="Dao\DbManagerImpl.cs" />
+    <Compile Include="Dao\DBUtils.cs" />
     <Compile Include="Dao\SugarDao.cs" />
+    <Compile Include="Enums\LoginTypeEnum.cs" />
     <Compile Include="Forms\PosForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\PosForm.Designer.cs">
       <DependentUpon>PosForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Manager\LoginUserManager.cs" />
     <Compile Include="Models\AssistantsEntity.cs" />
     <Compile Include="Models\BarCodeEntity.cs" />
     <Compile Include="Models\BillCommodityEntity.cs" />
@@ -135,6 +140,7 @@
     <Compile Include="Models\VersionVM.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\StringUtils.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -161,7 +167,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataBase\" />
-    <Folder Include="Enums\" />
     <Folder Include="respose\" />
   </ItemGroup>
   <ItemGroup>
@@ -176,9 +181,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SqliteSugar\SqlSugar\SqliteSugar.csproj">
-      <Project>{46a17e67-7e3e-4369-9b1f-43ba34bbdaef}</Project>
-      <Name>SqliteSugar</Name>
+    <ProjectReference Include="..\..\SqlSugar\Src\Asp.Net\SqlSugar\SqlSugar.csproj">
+      <Project>{489bb790-226c-4fad-8d1e-51d72a7ff8e5}</Project>
+      <Name>SqlSugar</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -80,7 +80,7 @@ namespace ZlPos.Core
                 //canExecuteJavaScriptAsync = true;
 #if DEBUG
                 //调试器
-                browser.ShowDevTools();
+                //browser.ShowDevTools();
 #endif
             }
 

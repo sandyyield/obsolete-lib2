@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SQLiteSugar;
-namespace NewTest.Dao
+﻿using SqlSugar;
+
+namespace ZlPos.Dao
 {
     /// <summary>
     /// SqlSugar
@@ -18,16 +16,22 @@ namespace NewTest.Dao
         {
             get
             {
-                string reval = "DataSource=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.db"; ; //这里可以动态根据cookies或session实现多库切换
+                //string reval = "DataSource=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.db"; //这里可以动态根据cookies或session实现多库切换
+                string reval = "Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.db;";
                 return reval;
             }
         }
         public static SqlSugarClient GetInstance()
         {
-        
-            var db = new SqlSugarClient(ConnectionString);
-            db.IsEnableLogEvent = true;//启用日志事件
-            db.LogEventStarting = (sql, par) => { Console.WriteLine(sql + " " + par+"\r\n"); };
+
+            SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
+            {
+                ConnectionString = ConnectionString,
+                DbType = DbType.Sqlite,
+                IsAutoCloseConnection = true,
+                InitKeyType = InitKeyType.Attribute
+            });
+
             return db;
         }
     }

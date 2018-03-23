@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using CefSharp;
 using CefSharp.WinForms;
-using NewTest.Dao;
+using ZlPos.Dao;
 using Newtonsoft.Json;
 using ZlPos.Bean;
 using ZlPos.Config;
 using ZlPos.Models;
+using ZlPos.Manager;
 
 namespace ZlPos.Bizlogic
 {
@@ -16,6 +18,8 @@ namespace ZlPos.Bizlogic
     class JSBridge
     {
         private ChromiumWebBrowser browser;
+
+        private static LoginUserManager _LoginUserManager;
 
         static JSBridge instance = null;
 
@@ -83,23 +87,43 @@ namespace ZlPos.Bizlogic
             }
             else
             {
-                //TODO：wait orm架构定下来再说
-                //using (var db = SugarDao.GetInstance())
+                try
                 {
-                    try
+                    // 将H5传过来的用户输入信息进行解析，用于离线登录匹配
+                    LoginEntity loginEntity = JsonConvert.DeserializeObject<LoginEntity>(json);
+                    DbManager dbManager = DBUtils.Instance.DbManager;
+                    if (loginEntity != null)
                     {
-                        LoginEntity loginEntity = JsonConvert.DeserializeObject<LoginEntity>(json);
-                        //只是为了调试加的
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", resposeEntity });
-                        System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
+                        using (var db = SugarDao.GetInstance())
+                        {
+                            List<UserEntity> userList;
+                            if (String.IsNullOrEmpty(loginEntity.account) || loginEntity.account == "0")
+                            {
+                                userList = db.Queryable<UserEntity>().Where(it => it.account == loginEntity.account
+                                                                            && it.password == loginEntity.password).ToList();
+                            }
+                            else
+                            {
+                                userList = db.Queryable<UserEntity>().Where(it => it.username == loginEntity.username
+                                                                            && it.shopcode == loginEntity.shopcode
+                                                                            && it.password == loginEntity.password) .ToList();
+                            }
+                            if(userList != null && userList.Count == 1)
+                            {
+                                _LoginUserManager.Instance.Login = true;
+                                _LoginUserManager.Instance.UserEntity = userList[0];
+                                //TODO...
+                            }
+                        }
                     }
-                    catch (Exception e)
-                    {
-
-                    }
+                    //只是为了调试加的
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", resposeEntity });
+                    System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
+                }
+                catch (Exception e)
+                {
 
                 }
-
             }
         }
 
@@ -111,20 +135,34 @@ namespace ZlPos.Bizlogic
 
             try
             {
-                //using (var context = new DatabaseContext())
-                //{
-                //    context.Database.CreateIfNotExists();
-                //    var empList = context.Employees.OrderBy(c => c.FirstName).ToList();
-                //}
 
-                using(var db = SugarDao.GetInstance())
+                DbManager dbManager = DBUtils.Instance.DbManager;
+
+                dbManager.SaveOrUpdate(employees);
+                using (var db = SugarDao.GetInstance())
                 {
+                    //db.CodeFirst.BackupTable().InitTables(typeof(Employee));
+                    //db.DbMaintenance.IsAnyTable(typeof(Employee).Name);
+                    //db.CodeFirst.InitTables(typeof(Employee));
 
+                    //db.Insertable(employees).ExecuteReturnEntity();
+
+
+                    //db.BeginTran();
+
+                    //db.IsEnableAttributeMapping = true;
+
+                    //no table ex
+                    //db.SqlBulkCopy(new List<Employee>(){ employees });
+
+                    //db.InsertOrUpdate(employees);
+
+                    //db.CommitTran();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-
+                string s = ex.StackTrace;
             }
 
             //System.Windows.Forms.MessageBox.Show("ok");

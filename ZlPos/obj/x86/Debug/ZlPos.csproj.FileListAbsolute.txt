@@ -44,10 +44,10 @@ E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\EntityFramework.dll
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\EntityFramework.SqlServer.dll
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\EntityFramework.xml
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\EntityFramework.SqlServer.xml
-E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\SqliteSugar.dll
-E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\SqliteSugar.pdb
-E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\SqliteSugar.xml
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\System.Data.SQLite.dll
-E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\System.Data.SQLite.xml
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\x64\SQLite.Interop.dll
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\x86\SQLite.Interop.dll
+E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\SqlSugar.dll
+E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\MySql.Data.dll
+E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\Oracle.ManagedDataAccess.dll
+E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\SqlSugar.pdb
