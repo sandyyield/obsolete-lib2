@@ -109,9 +109,9 @@ namespace ZlPos.Bizlogic
                             {
                                 userList = db.Queryable<UserEntity>().Where(it => it.username == loginEntity.username
                                                                             && it.shopcode == loginEntity.shopcode
-                                                                            && it.password == loginEntity.password) .ToList();
+                                                                            && it.password == loginEntity.password).ToList();
                             }
-                            if(userList != null && userList.Count == 1)
+                            if (userList != null && userList.Count == 1)
                             {
                                 _LoginUserManager.Instance.Login = true;
                                 _LoginUserManager.Instance.UserEntity = userList[0];
@@ -146,16 +146,38 @@ namespace ZlPos.Bizlogic
             {
                 DbManager dbManager = DBUtils.Instance.DbManager;
                 UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
-                if(userVM != null)
+                if (userVM != null)
                 {
-                    
-                    
+                    logger.Info("保存或更新用户信息,获取到的userVM：" + userVM.ToString());
+                    ShopConfigEntity config = userVM.config;
+                    UserEntity user_info = userVM.user_info;
+                    if (config != null && user_info != null)
+                    {
+                        config.id = int.Parse(user_info.branchcode) + int.Parse(user_info.shopcode);
+                        dbManager.SaveOrUpdate(config);
+                    }
+                    if (user_info != null)
+                    {
+                        dbManager.SaveOrUpdate(user_info);
+
+                        //TODO... 2018年3月23日 这里需要设计一个缓存来存一下shopcode
+                        //.... 这周已经周五了  双休日不加班~ 下周一写~
+                    }
+                    _LoginUserManager.Instance.Login = true;
+                    _LoginUserManager.Instance.UserEntity = user_info;
+
+                    logger.Info("保存或更新用户信息接口：用户在线登陆并保存用户信息成功");
+
+                }
+                else
+                {
+                    logger.Info("存或更新用户信息接口：用户登录成功但用户信息保存失败");
                 }
             }
             catch (Exception)
             {
-
-                throw;
+                logger.Info("保存或更新用户信息接口：保存数据库操作异常");
+                //throw;
             }
         }
 
