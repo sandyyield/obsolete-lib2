@@ -76,7 +76,10 @@ namespace ZlPos.Bizlogic
             return "json";
         }
 
-
+        /// <summary>
+        /// 离线登陆
+        /// </summary>
+        /// <param name="json"></param>
         public void Login(string json)
         {
             ResposeEntity resposeEntity = new ResposeEntity();
@@ -160,8 +163,7 @@ namespace ZlPos.Bizlogic
                     {
                         dbManager.SaveOrUpdate(user_info);
 
-                        //TODO... 2018年3月23日 这里需要设计一个缓存来存一下shopcode
-                        //.... 这周已经周五了  双休日不加班~ 下周一写~
+                        ContextCache.SetShopcode(user_info.shopcode);
                     }
                     _LoginUserManager.Instance.Login = true;
                     _LoginUserManager.Instance.UserEntity = user_info;

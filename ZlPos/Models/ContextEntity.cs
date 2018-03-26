@@ -17,5 +17,7 @@ namespace ZlPos.Models
 
 
         public String readCard { get; set; }
+
+        public String serialPort { get; set; }
     }
 }

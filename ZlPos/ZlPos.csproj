@@ -87,6 +87,7 @@
     <Compile Include="Bean\BaseData.cs" />
     <Compile Include="Bean\ResposeEntity.cs" />
     <Compile Include="Bizlogic\AppContext.cs" />
+    <Compile Include="Bizlogic\ContextCache.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
     <Compile Include="Config\ResponseCode.cs" />
     <Compile Include="Core\CallbackResponseStruct.cs" />
