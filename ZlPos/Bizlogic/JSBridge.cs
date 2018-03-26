@@ -784,6 +784,16 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        //目前可以不用考虑开发这个功能  直接给个提示框完事 (溜) 后面再来做这个事情
+        #region DeleteSaleBill
+        /// <summary>
+        /// 删除90天之前所有单据
+        /// </summary>
+        public void DeleteSaleBill()
+        {
+            System.Windows.Forms.MessageBox.Show("（伪）删除成功");
+        }
+        #endregion
 
 
 
