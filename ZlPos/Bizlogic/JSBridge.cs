@@ -740,7 +740,49 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region DeleteHangUpSaleBill
+        /// <summary>
+        /// 删除单个挂单
+        /// </summary>
+        /// <param name="ticketcode"></param>
+        public void DeleteHangUpSaleBill(string ticketcode)
+        {
+            if (string.IsNullOrEmpty(ticketcode))
+            {
+                return;
+            }
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
 
+                    BillEntity billEntity = db.Queryable<BillEntity>().Where(it => it.ticketcode == ticketcode).First();
+                    if(billEntity != null)
+                    {
+                        List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(it => it.ticketcode == ticketcode).ToList();
+                        List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(it => it.ticketcode == ticketcode).ToList();
+
+                        if (payDetailEntities != null)
+                        {
+                            foreach (PayDetailEntity payDetailEntity in payDetailEntities)
+                            {
+                                dbManager.Delete(payDetailEntity);
+                            }
+                        }
+                        dbManager.Delete(billEntity);
+                        logger.Info("删除单个挂单接口  成功");
+
+                    }
+                }
+
+            }
+            catch(Exception e)
+            {
+                logger.Info("删除单个挂单接口  数据库异常");
+            }
+        }
+        #endregion
 
 
 

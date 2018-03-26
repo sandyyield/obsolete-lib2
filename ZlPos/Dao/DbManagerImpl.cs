@@ -42,6 +42,25 @@ namespace ZlPos.Dao
             }
         }
 
+        [Obsolete]
+        public void Delete<T>(T entity) where T : class, new()
+        {
+            using(var db = SugarDao.GetInstance())
+            {
+                try
+                {
+                    //TODEBUG...
+                    db.Deleteable<T>().ExecuteCommand();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
+
+
+
         /// <summary>
         /// Single save
         /// </summary>

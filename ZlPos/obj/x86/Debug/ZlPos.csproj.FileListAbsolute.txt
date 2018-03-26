@@ -51,3 +51,5 @@ E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\SqlSugar.dll
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\MySql.Data.dll
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\Oracle.ManagedDataAccess.dll
 E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\SqlSugar.pdb
+E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\log4net.dll
+E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\log4net.xml
