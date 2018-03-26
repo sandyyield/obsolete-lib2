@@ -452,7 +452,47 @@ namespace ZlPos.Bizlogic
 
         }
 
+        /// <summary>
+        /// 获取最后更新时间
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public string GetLastRequestTime(string json)
+        {
+            String lastRequestTime = "";
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            if (_LoginUserManager.Instance.Login)
+            {
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        List<CommodityInfoVM> lastRequestTimeList = db.Queryable<CommodityInfoVM>()
+                                                                    .Where(it => it.shopcode == _LoginUserManager.Instance.UserEntity.shopcode
+                                                                    && it.branchcode == _LoginUserManager.Instance.UserEntity.branchcode).ToList();
+                        if(lastRequestTimeList != null && lastRequestTimeList.Count > 0)
+                        {
+                            CommodityInfoVM commodityInfoVM = lastRequestTimeList[lastRequestTimeList.Count - 1];
+                            if(commodityInfoVM != null)
+                            {
+                                lastRequestTime = commodityInfoVM.requesttime;
+                            }
+                        }
 
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.Message + ">>>" + e.StackTrace);
+                }
+            }
+            else
+            {
+
+            }
+
+            return lastRequestTime;
+        }
 
 
 
