@@ -758,7 +758,7 @@ namespace ZlPos.Bizlogic
                 {
 
                     BillEntity billEntity = db.Queryable<BillEntity>().Where(it => it.ticketcode == ticketcode).First();
-                    if(billEntity != null)
+                    if (billEntity != null)
                     {
                         List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(it => it.ticketcode == ticketcode).ToList();
                         List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(it => it.ticketcode == ticketcode).ToList();
@@ -777,7 +777,7 @@ namespace ZlPos.Bizlogic
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 logger.Info("删除单个挂单接口  数据库异常");
             }
@@ -795,6 +795,32 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region GetHangUpNumber
+        /// <summary>
+        /// 获取挂单数量
+        /// </summary>
+        /// <returns></returns>
+        public long GetHangUpNumber()
+        {
+            long number = 0;
+            using (var db = SugarDao.GetInstance())
+            {
+                try
+                {
+
+                    number = db.Queryable<BillEntity>().Where(it => it.ticketstatue == "hangup"
+                                                        && it.shopcode == _LoginUserManager.Instance.UserEntity.shopcode
+                                                        && it.branchcode == _LoginUserManager.Instance.UserEntity.branchcode).ToList().Count;
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.Message + e.StackTrace);
+                }
+
+            }
+            return number;
+        }
+        #endregion
 
 
 
