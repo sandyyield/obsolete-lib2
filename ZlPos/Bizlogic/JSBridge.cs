@@ -438,15 +438,21 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception)
                 {
-
+                    responseEntity.Code = ResponseCode.Failed;
+                    responseEntity.Msg = "数据异常";
                 }
             }
-
-
+            else
+            {
+                responseEntity.Code = ResponseCode.Failed;
+                responseEntity.Msg = "用户未登陆";
+            }
 
             return responseEntity;
 
         }
+
+
 
 
 
