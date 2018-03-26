@@ -566,7 +566,7 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Error(e.Message + e.StackTrace);
                 }
-                if(insertDate == DateTime.MinValue)
+                if (insertDate == DateTime.MinValue)
                 {
                     insertDate = DateTime.Now;
                 }
@@ -626,6 +626,66 @@ namespace ZlPos.Bizlogic
             return responseEntity;
         }
         #endregion
+
+        #region GetAllSaleBill
+        /// <summary>
+        /// 获取对应状态的单据信息
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public List<BillEntity> GetAllSaleBill(string state)
+        {
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            UserEntity userEntity = _LoginUserManager.Instance.UserEntity;
+            string shopcode = userEntity.shopcode;
+            string branchcode = userEntity.branchcode;
+
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(it => it.ticketstatue == state
+                                                                                && it.shopcode == shopcode
+                                                                                && it.branchcode == branchcode).ToList();
+                    if (billEntities != null)
+                    {
+                        logger.Info("获取对应状态的单据信息billEntities: " + billEntities.ToString());
+                        for (int i = 0; i < billEntities.Count; i++)
+                        {
+                            List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
+                            List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
+                            List<DisCountDetailEntity> disCountDetailEntities = db.Queryable<DisCountDetailEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
+
+                            if (billCommodityEntities == null)
+                            {
+                                billCommodityEntities = new List<BillCommodityEntity>();
+                            }
+                            if (disCountDetailEntities == null)
+                            {
+                                disCountDetailEntities = new List<DisCountDetailEntity>();
+                            }
+                            if (payDetailEntities == null)
+                            {
+                                payDetailEntities = new List<PayDetailEntity>();
+                            }
+                            billEntities[i].commoditys = billCommodityEntities;
+                            billEntities[i].paydetails = payDetailEntities;
+                            billEntities[i].discountdetails = disCountDetailEntities;
+                        }
+                        return billEntities;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message + e.StackTrace);
+            }
+            //有问题直接返回null
+            return null;
+        }
+        #endregion
+
+
 
 
 
