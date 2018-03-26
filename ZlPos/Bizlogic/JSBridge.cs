@@ -10,6 +10,7 @@ using ZlPos.Config;
 using ZlPos.Models;
 using ZlPos.Manager;
 using log4net;
+using System.Globalization;
 
 namespace ZlPos.Bizlogic
 {
@@ -76,6 +77,7 @@ namespace ZlPos.Bizlogic
             return "json";
         }
 
+        #region Login
         /// <summary>
         /// 离线登陆
         /// </summary>
@@ -138,7 +140,9 @@ namespace ZlPos.Bizlogic
                 }
             }
         }
+        #endregion
 
+        #region SaveOrUpdateUserInfo
         /// <summary>
         /// 保存或更新用户信息
         /// </summary>
@@ -182,7 +186,9 @@ namespace ZlPos.Bizlogic
                 //throw;
             }
         }
+        #endregion
 
+        #region SaveOrUpdateCommodityInfo
         /// <summary>
         /// 保存或更新商品信息
         /// </summary>
@@ -312,7 +318,9 @@ namespace ZlPos.Bizlogic
             return responseEntity;
 
         }
+        #endregion
 
+        #region GetCommodityInfo
         /// <summary>
         /// 获取所有商品和分类信息
         /// </summary>
@@ -451,7 +459,9 @@ namespace ZlPos.Bizlogic
             return responseEntity;
 
         }
+        #endregion
 
+        #region GetLastRequestTime
         /// <summary>
         /// 获取最后更新时间
         /// </summary>
@@ -470,10 +480,10 @@ namespace ZlPos.Bizlogic
                         List<CommodityInfoVM> lastRequestTimeList = db.Queryable<CommodityInfoVM>()
                                                                     .Where(it => it.shopcode == _LoginUserManager.Instance.UserEntity.shopcode
                                                                     && it.branchcode == _LoginUserManager.Instance.UserEntity.branchcode).ToList();
-                        if(lastRequestTimeList != null && lastRequestTimeList.Count > 0)
+                        if (lastRequestTimeList != null && lastRequestTimeList.Count > 0)
                         {
                             CommodityInfoVM commodityInfoVM = lastRequestTimeList[lastRequestTimeList.Count - 1];
-                            if(commodityInfoVM != null)
+                            if (commodityInfoVM != null)
                             {
                                 lastRequestTime = commodityInfoVM.requesttime;
                             }
@@ -493,6 +503,141 @@ namespace ZlPos.Bizlogic
 
             return lastRequestTime;
         }
+        #endregion
+
+        #region GetLastUserName
+        /// <summary>
+        /// 获取最后一次登录shopcode
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public string GetLastUserName(string json)
+        {
+            string shopcode = "";
+            try
+            {
+                shopcode = ContextCache.GetShopcode();
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message + e.StackTrace);
+            }
+            return shopcode;
+        }
+        #endregion
+
+        #region SaveOneSaleBill
+        /// <summary>
+        /// 保存销售单据接口
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public ResponseEntity SaveOneSaleBill(string json)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+
+            if (string.IsNullOrEmpty(json))
+            {
+                logger.Info("保存销售单据接口：空字符串");
+                responseEntity.Code = ResponseCode.Failed;
+                responseEntity.Msg = "参数不能为空";
+                return responseEntity;
+            }
+            DbManager dbManager = DBUtils.Instance.DbManager;
+
+            BillEntity billEntity = JsonConvert.DeserializeObject<BillEntity>(json);
+            if (billEntity == null)
+            {
+                logger.Info("保存销售单据接口：json解析失败");
+                responseEntity.Code = ResponseCode.Failed;
+                responseEntity.Msg = "参数格式错误";
+                return responseEntity;
+            }
+            try
+            {
+                DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+                dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+                DateTime insertDate = DateTime.MinValue;
+                try
+                {
+                    insertDate = Convert.ToDateTime(billEntity.saletime, dtFormat);
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.Message + e.StackTrace);
+                }
+                if(insertDate == DateTime.MinValue)
+                {
+                    insertDate = DateTime.Now;
+                }
+                billEntity.insertTime = Utils.DateUtils.ConvertDataTimeToLong(insertDate);
+
+                dbManager.SaveOrUpdate(billEntity);
+            }
+            catch (Exception e)
+            {
+                logger.Error("保存销售单据接口： 异常");
+            }
+            List<BillCommodityEntity> commoditys = billEntity.commoditys;
+            List<PayDetailEntity> paydetails = billEntity.paydetails;
+            if (commoditys == null || commoditys.Count == 0)
+            {
+                logger.Info("保存销售单据接口：该单据没有商品信息");
+            }
+            else
+            {
+                foreach (BillCommodityEntity billCommodityEntity in commoditys)
+                {
+                    try
+                    {
+                        billCommodityEntity.uid = billCommodityEntity
+                                .ticketcode
+                                + "_"
+                                + billCommodityEntity.id;
+                        dbManager.SaveOrUpdate(billCommodityEntity);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException");
+                    }
+                }
+            }
+
+            if (paydetails == null || paydetails.Count == 0)
+            {
+                logger.Info("保存销售单据接口：该单据没有付款方式信息");
+            }
+            else
+            {
+                foreach (PayDetailEntity payDetailEntity in paydetails)
+                {
+                    try
+                    {
+                        dbManager.SaveOrUpdate(payDetailEntity);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("保存销售单据接口： dbManager.saveOrUpdate(payDetailEntity)--DbException");
+                    }
+                }
+            }
+            responseEntity.Code = ResponseCode.SUCCESS;
+            responseEntity.Msg = "保存单据成功";
+            return responseEntity;
+        }
+        #endregion
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
