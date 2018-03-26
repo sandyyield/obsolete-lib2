@@ -183,6 +183,140 @@ namespace ZlPos.Bizlogic
             }
         }
 
+        /// <summary>
+        /// 保存或更新商品信息
+        /// </summary>
+        public ResposeEntity SaveOrUpdateCommodityInfo(string json)
+        {
+            ResposeEntity resposeEntity = new ResposeEntity();
+            using (var db = SugarDao.GetInstance())
+            {
+                if (_LoginUserManager.Instance.Login)
+                {
+                    string shopcode = _LoginUserManager.Instance.UserEntity.shopcode;
+                    string branchcode = _LoginUserManager.Instance.UserEntity.branchcode;
+                    try
+                    {
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        CommodityInfoVM commodityInfoVM = JsonConvert.DeserializeObject<CommodityInfoVM>(json);
+                        if(commodityInfoVM != null)
+                        {
+                            commodityInfoVM.shopcode = shopcode;
+                            commodityInfoVM.branchcode = branchcode;
+
+                            List<CategoryEntity> categoryEntities = commodityInfoVM.categorys;
+                            List<CommodityEntity> commoditys = commodityInfoVM.commoditys;
+                            List<MemberEntity> memberEntities = commodityInfoVM.memberlevels;
+                            List<PayTypeEntity> paytypes = commodityInfoVM.paytypes;
+                            List<AssistantsEntity> assistants = commodityInfoVM.assistants;
+                            List<CashierEntity> users = commodityInfoVM.users;
+                            List<SupplierEntity> suppliers = commodityInfoVM.suppliers;
+                            // add: 2018/2/27
+                            List<BarCodeEntity> barCodes = commodityInfoVM.barcodes;
+                            List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
+
+                            #region 循环saveorupdate 效率很慢 TODO...: 这里应该改造成bulksaveorupdate提高效率
+                            //保存商品分类信息
+                            if (categoryEntities != null)
+                            {
+                                foreach (CategoryEntity categoryEntity in categoryEntities)
+                                {
+                                    dbManager.SaveOrUpdate(categoryEntity);
+                                }
+                            }
+                            //保存商品信息
+                            if (commoditys != null)
+                            {
+                                foreach (CommodityEntity commodityEntity in commoditys)
+                                {
+                                    dbManager.SaveOrUpdate(commodityEntity);
+                                }
+                            }
+                            //保存会员等级信息
+                            if (memberEntities != null)
+                            {
+                                foreach (MemberEntity memberEntity in memberEntities)
+                                {
+                                    dbManager.SaveOrUpdate(memberEntity);
+                                }
+                            }
+                            //保存付款方式信息
+                            if (paytypes != null)
+                            {
+                                foreach (PayTypeEntity payTypeEntity in paytypes)
+                                {
+                                    dbManager.SaveOrUpdate(payTypeEntity);
+                                }
+                            }
+                            //保存收银员信息
+                            if (assistants != null)
+                            {
+                                foreach (AssistantsEntity assistantsEntity in assistants)
+                                {
+                                    dbManager.SaveOrUpdate(assistantsEntity);
+                                }
+                            }
+                            //保存收银员信息
+                            if (users != null)
+                            {
+                                foreach (CashierEntity cashierEntity in users)
+                                {
+                                    dbManager.SaveOrUpdate(cashierEntity);
+                                }
+                            }
+                            //保存供应商信息
+                            if (suppliers != null)
+                            {
+                                foreach (SupplierEntity supplierEntity in suppliers)
+                                {
+                                    dbManager.SaveOrUpdate(supplierEntity);
+                                }
+                            }
+                            // add: 2018/2/27
+                            //保存条码表信息
+                            if (barCodes != null)
+                            {
+                                foreach (BarCodeEntity barCodeEntity in barCodes)
+                                {
+                                    //由shopcode+commoditycode做联合主键,防止跨商户商品数据的commoditycode相同
+                                    barCodeEntity.uid = shopcode + "_" + barCodeEntity.commoditycode;
+                                    barCodeEntity.shopcode = shopcode;
+                                    dbManager.SaveOrUpdate(barCodeEntity);
+                                }
+                            }
+                            //保存调价表信息
+                            if (commodityPriceEntityList != null)
+                            {
+                                foreach (CommodityPriceEntity commodityPriceEntity in commodityPriceEntityList)
+                                {
+                                    dbManager.SaveOrUpdate(commodityPriceEntity);
+                                }
+                            }
+                            #endregion
+
+                            dbManager.SaveOrUpdate(commodityInfoVM);
+                            logger.Info("保存和更新商品信息接口：信息保存成功");
+                            resposeEntity.Code = ResponseCode.SUCCESS;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Info("保存和更新商品信息接口：" + e.StackTrace);
+                        resposeEntity.Code = ResponseCode.Failed;
+                    }
+                }
+                else
+                {
+                    logger.Info("保存和更新商品信息接口：用户未登录");
+                    resposeEntity.Code = ResponseCode.Failed;
+                }
+                logger.Info("数据保存成功");
+                return resposeEntity;
+            }
+        }
+
+
+
 
 
         public void TestORM(string json)
