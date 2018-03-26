@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ZlPos.Bean;
 
 namespace ZlPos.Models
 {
-    class CommodityInfoVM
+    class CommodityInfoVM : BaseData
     {
         public int id { get; set; }
         public String shopcode { get; set; }
