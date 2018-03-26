@@ -685,8 +685,60 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        //时间相关的操作方法先放一放  等确认调用参数结构
+        #region GetSelectTimeSaleBill
+        /// <summary>
+        /// 指定时间区间查询
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public List<BillEntity> GetSelectTimeSaleBill(string start, string end)
+        {
+            return null;
+        }
+        #endregion
 
+        #region UpdateSaleBill
+        /// <summary>
+        /// 更新销售单据状态接口
+        /// </summary>
+        /// <param name="json"></param>
+        public void UpdateSaleBill(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return;
+            }
+            DbManager dbManager = DBUtils.Instance.DbManager;
 
+            List<string> ticketcodeList = JsonConvert.DeserializeObject<List<string>>(json);
+            if (ticketcodeList != null)
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    foreach (string ticketcode in ticketcodeList)
+                    {
+                        try
+                        {
+                            BillEntity billEntity = db.Queryable<BillEntity>().Where(it => it.ticketcode == ticketcode).First();
+                            if (billEntity != null)
+                            {
+                                billEntity.ticketstatue = "updated";
+                                dbManager.SaveOrUpdate(billEntity);
+                                logger.Info("更新销售单据状态接口:成功");
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error("更新销售单据状态接口:异常");
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
 
 
 
