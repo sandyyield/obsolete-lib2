@@ -12,6 +12,7 @@ using ZlPos.Manager;
 using log4net;
 using System.Globalization;
 using ZlPos.Utils;
+using System.Collections;
 
 namespace ZlPos.Bizlogic
 {
@@ -861,6 +862,19 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        /// <summary>
+        /// 获取本机所有串口端口号 win专用
+        /// </summary>
+        /// <returns></returns>
+        public ArrayList GetPort()
+        {
+            List<string> a = new List<string>() { "com1", "com2" };
+            ArrayList arrRs = new ArrayList();
+            arrRs.Add(a);
+
+            return arrRs;
+            //return "com1";
+        }
 
 
 
@@ -868,7 +882,8 @@ namespace ZlPos.Bizlogic
 
 
 
-        public void TestORM(string json)
+
+        public string TestORM(string json)
         {
             Employee employees = JsonConvert.DeserializeObject<Employee>(json);
 
@@ -902,10 +917,11 @@ namespace ZlPos.Bizlogic
             catch (Exception ex)
             {
                 string s = ex.StackTrace;
+                return "数据处理异常";
             }
 
             //System.Windows.Forms.MessageBox.Show("ok");
-            return;
+            return "数据处理成功";
         }
 
 

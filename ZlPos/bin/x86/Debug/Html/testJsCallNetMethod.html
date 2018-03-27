@@ -101,8 +101,14 @@
 
 		function testDBOrm(argument) {
 			// body...
-			HostApp.testORM(JSON.stringify(testEFormJson));
-		}
+            var obj = HostApp.testORM(JSON.stringify(testEFormJson));
+            alert(obj);
+        }
+
+        function testGetPort() {
+            var lst = HostApp.getPort();
+            alert(lst);
+        }
 
 
 	</script>
@@ -116,6 +122,8 @@
 	<button onclick="login(loginJson)">debug login method 模拟</button>
 
     <button onclick="testDBOrm(testEFormJson)">test database orm</button>
+
+    <button onclick="testGetPort()">GetPort</button>
 
 	<input type="text"  id="inputStream"  name="inputStream" value="JS call c# method with return success!!">
 		<script type="text/javascript">
