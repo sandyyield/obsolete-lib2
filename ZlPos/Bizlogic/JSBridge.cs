@@ -11,6 +11,7 @@ using ZlPos.Models;
 using ZlPos.Manager;
 using log4net;
 using System.Globalization;
+using ZlPos.Utils;
 
 namespace ZlPos.Bizlogic
 {
@@ -784,7 +785,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        //目前可以不用考虑开发这个功能  直接给个提示框完事 (溜) 后面再来做这个事情
+        //目前可以不用考虑开发这个功能  直接给个提示框完事  后面再来做这个事情
         #region DeleteSaleBill
         /// <summary>
         /// 删除90天之前所有单据
@@ -822,7 +823,43 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-
+        #region GetCompleteNumber
+        public long GetCompleteNumber(string start, string end)
+        {
+            long number = 0;
+            if (string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end))
+            {
+                logger.Info("按时间区间查询单据，开始时间或结束时间为空：start:" + start + "end:" + end);
+                return number;
+            }
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+            dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+            //DateTime insertDate = DateTime.MinValue;
+            using (var db = SugarDao.GetInstance())
+            {
+                try
+                {
+                    DateTime startDate = Convert.ToDateTime(start, dtFormat);
+                    DateTime endDate = Convert.ToDateTime(end, dtFormat);
+                    long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
+                    long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
+                    number = db.Queryable<BillEntity>().Where(it => it.ticketstatue == "cached"
+                                                        || it.ticketstatue == "updated"
+                                                        && it.insertTime >= startDateTime
+                                                        && it.insertTime <= endDateTime
+                                                        && it.shopcode == _LoginUserManager.Instance.UserEntity.shopcode
+                                                        && it.branchcode == _LoginUserManager.Instance.UserEntity.branchcode).Count();
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.Message + e.StackTrace);
+                }
+                
+            }
+            number++;
+            return number;
+        }
+        #endregion
 
 
 
