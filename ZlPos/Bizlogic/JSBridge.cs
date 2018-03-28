@@ -48,6 +48,7 @@ namespace ZlPos.Bizlogic
         }
 
         public ChromiumWebBrowser Browser { get => browser; set => browser = value; }
+        public void DownLoadFile { get => this.downLoadFile; set => this.downLoadFile = value; }
 
 
         /// <summary>
@@ -863,6 +864,82 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+
+        /// <summary>
+        /// 根据商品id查询商品
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public List<CommodityEntity> GetCommodityById(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 根据商品barcode查询商品
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public List<CommodityEntity> GetCommodityByBarcode(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        public List<CommodityEntity> GetCommodityByCommoditycode(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 根据商品categoryCode查询商品,barcode倒叙，然后再分页
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public List<CommodityEntity> getCommodityByCategoryCode(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 根据商品mnemonic不区分大小写模糊查询商品
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public List<CommodityEntity> getCommodityByMnemonic(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 根据商品名称,商品条码,助记码（大小写兼容）查询商品
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public List<CommodityEntity> getCommodityByKeyword(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 获取支付优先级
+        /// </summary>
+        /// <returns></returns>
+        public ResponseEntity getPayPriority()
+        {
+            //TODO...
+            return null;
+        }
+
+
+
+
+        //IO 操作相关 ... 
         #region GetPort
         /// <summary>
         /// 获取本机所有串口端口号 win专用
@@ -876,13 +953,247 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        public void TestUsbPrint()
+        {
+            //TODO...
+        }
+
+        public void TestBlueTooth()
+        {
+            //TODO...
+        }
+
+        public void TestPortPrint()
+        {
+            //TODO...
+        }
+
+
+        public ResponseEntity StartBluetoothDeviceInquiry()
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity GetBluetoothDevices()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 获取到的是串行总线上(物理或逻辑上)的设备
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetComSystemDevices()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 获取上次保存的打印机设置
+        /// </summary>
+        /// <returns></returns>
+        public PrinterConfigEntity GetPrinter()
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity StartBluetoothSearch()
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity ReturnBluetoothSearch()
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity setPrinter()
+        {
+            //TODO...
+            return null;
+        }
+
+        public void SetNote(string json)
+        {
+            //TODO...
+        }
+
+        public ResponseEntity Print()
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity Print2()
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity PrintBill(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 开钱箱
+        /// </summary>
+        public bool OpenBox()
+        {
+            //TODO...
+            return true;
+        }
+
+        /// <summary>
+        /// 保存客显设置
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public ResponseEntity SetCustomerShow(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 获取客显设置信息
+        /// </summary>
+        /// <returns></returns>
+        public CustomerShowConfigEntity GetCustomerShow()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 推送到客显信息
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public ResponseEntity CustomerShow(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity SetReadCard2(string json)
+        {
+            //TODO...
+            return null;
+        }
+
+        public ResponseEntity GetReadCard2()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 获取会员卡信息
+        /// </summary>
+        /// <returns></returns>
+        public string GetCardNumber()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 获取电子秤
+        /// </summary>
+        /// <returns></returns>
+        public ResponseEntity GetScale()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 设置电子秤
+        /// </summary>
+        /// <returns></returns>
+        public ResponseEntity SetScale()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 获取重量
+        /// </summary>
+        /// <returns></returns>
+        public ResponseEntity GetWeight()
+        {
+            //TODO...
+            return null;
+        }
+
+        /// <summary>
+        /// 关闭电子秤
+        /// </summary>
+        /// <returns></returns>
+        public ResponseEntity closeWeighter()
+        {
+            //TODO...
+            return null;
+        }
+
+
+        /// <summary>
+        /// 获取数据库缓存数据大小
+        /// </summary>
+        /// <returns></returns>
+        public long GetDBSize()
+        {
+            return 1l;
+        }
+
+        /// <summary>
+        /// 获取磁盘空间大小
+        /// </summary>
+        /// <returns></returns>
+        public long GetSDSize()
+        {
+            return 1l;
+        }
+
+        /// <summary>
+        /// 获取磁盘可用空间大小
+        /// </summary>
+        /// <returns></returns>
+        public long GetSDAvaliableSize()
+        {
+            return 1l;
+        }
+
+        //？？？这里解决一下
+        ///// <summary>
+        ///// 视频广告下载
+        ///// </summary>
+        //public void DownLoadFile()
+        //{
+
+        //}
+
+        public void DownLoadFile2()
+        {
+
+        }
 
 
 
 
+        
 
 
-        public string TestORM(string json)
+            public string TestORM(string json)
         {
             Employee employees = JsonConvert.DeserializeObject<Employee>(json);
 
