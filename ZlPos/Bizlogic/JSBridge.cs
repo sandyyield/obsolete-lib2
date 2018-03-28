@@ -13,6 +13,7 @@ using log4net;
 using System.Globalization;
 using ZlPos.Utils;
 using System.Collections;
+using System.IO.Ports;
 
 namespace ZlPos.Bizlogic
 {
@@ -862,20 +863,18 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region GetPort
         /// <summary>
         /// 获取本机所有串口端口号 win专用
         /// </summary>
         /// <returns></returns>
-        public ArrayList GetPort()
+        public string[] GetPort()
         {
-            List<string> a = new List<string>() { "com1", "com2" };
-            ArrayList arrRs = new ArrayList();
-            arrRs.Add(a);
+            string[] arrSerial = SerialPort.GetPortNames();
 
-            return arrRs;
-            //return "com1";
+            return arrSerial;
         }
-
+        #endregion
 
 
 
