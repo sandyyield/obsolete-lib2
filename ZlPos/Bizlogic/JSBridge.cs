@@ -48,7 +48,7 @@ namespace ZlPos.Bizlogic
         }
 
         public ChromiumWebBrowser Browser { get => browser; set => browser = value; }
-        public void DownLoadFile { get => this.downLoadFile; set => this.downLoadFile = value; }
+        //public void DownLoadFile { get => this.downLoadFile; set => this.downLoadFile = value; }
 
 
         /// <summary>
