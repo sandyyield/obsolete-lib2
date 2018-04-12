@@ -88,7 +88,9 @@
     <Compile Include="Bean\ResposeEntity.cs" />
     <Compile Include="Bizlogic\AppContext.cs" />
     <Compile Include="Bizlogic\ContextCache.cs" />
+    <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
+    <Compile Include="Bizlogic\PrintHelper.cs" />
     <Compile Include="Config\ResponseCode.cs" />
     <Compile Include="Core\CallbackResponseStruct.cs" />
     <Compile Include="Core\ChromiumBrowserControl.cs">
