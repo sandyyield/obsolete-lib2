@@ -110,6 +110,10 @@
             alert(lst);
         }
 
+        function testPrint() {
+            HostApp.testUSBPrint();
+        }
+
 
 	</script>
 </head>
@@ -124,6 +128,8 @@
     <button onclick="testDBOrm(testEFormJson)">test database orm</button>
 
     <button onclick="testGetPort()">GetPort</button>
+
+    <button onclick="testPrint()">USBPrint</button>
 
 	<input type="text"  id="inputStream"  name="inputStream" value="JS call c# method with return success!!">
 		<script type="text/javascript">

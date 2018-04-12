@@ -14,6 +14,7 @@ using System.Globalization;
 using ZlPos.Utils;
 using System.Collections;
 using System.IO.Ports;
+using ZlPos.PrintServices;
 
 namespace ZlPos.Bizlogic
 {
@@ -857,7 +858,7 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Error(e.Message + e.StackTrace);
                 }
-                
+
             }
             number++;
             return number;
@@ -1190,10 +1191,14 @@ namespace ZlPos.Bizlogic
 
 
 
-        
+        public void TestUSBPrint()
+        {
+            USBPrinterService usbPrinterService = new USBPrinterService();
+            usbPrinterService.Print("hello");
+        }
 
 
-            public string TestORM(string json)
+        public string TestORM(string json)
         {
             Employee employees = JsonConvert.DeserializeObject<Employee>(json);
 

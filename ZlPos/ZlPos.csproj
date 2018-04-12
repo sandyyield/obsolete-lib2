@@ -90,7 +90,10 @@
     <Compile Include="Bizlogic\ContextCache.cs" />
     <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
-    <Compile Include="Bizlogic\PrintHelper.cs" />
+    <Compile Include="Enums\EnPrinterInstruction.cs" />
+    <Compile Include="Enums\EnPrinterPort.cs" />
+    <Compile Include="Enums\EnStateFlag.cs" />
+    <Compile Include="PrintServices\PrintBridge.cs" />
     <Compile Include="Config\ResponseCode.cs" />
     <Compile Include="Core\CallbackResponseStruct.cs" />
     <Compile Include="Core\ChromiumBrowserControl.cs">
@@ -146,6 +149,8 @@
     <Compile Include="Models\UserEntity.cs" />
     <Compile Include="Models\UserVM.cs" />
     <Compile Include="Models\VersionVM.cs" />
+    <Compile Include="PrintServices\IUSBPrinterService.cs" />
+    <Compile Include="PrintServices\USBPrinterService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\DateUtils.cs" />
@@ -185,6 +190,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Library\JsUsbDll.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Library\POS_SDK.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="x64\SQLite.Interop.dll">
