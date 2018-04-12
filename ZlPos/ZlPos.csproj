@@ -161,6 +161,9 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="DataBase\dbinit">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -173,7 +176,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DataBase\" />
     <Folder Include="respose\" />
   </ItemGroup>
   <ItemGroup>

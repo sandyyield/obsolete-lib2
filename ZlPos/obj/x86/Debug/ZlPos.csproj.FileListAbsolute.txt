@@ -53,3 +53,4 @@ E:\GitSource\Repos\CouldPos\ZlPos\obj\x86\Debug\ZlPos.csproj.CoreCompileInputs.c
 E:\GitSource\Repos\CouldPos\ZlPos\obj\x86\Debug\ZlPos.csproj.CopyComplete
 E:\GitSource\Repos\CouldPos\ZlPos\obj\x86\Debug\ZlPos.exe
 E:\GitSource\Repos\CouldPos\ZlPos\obj\x86\Debug\ZlPos.pdb
+E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\DataBase\dbinit
