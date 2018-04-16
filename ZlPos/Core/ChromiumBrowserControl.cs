@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using CefSharp.WinForms;
 using CefSharp;
 using ZlPos.Bizlogic;
+using System.Configuration;
 
 namespace ZlPos.Core
 {
@@ -31,7 +32,7 @@ namespace ZlPos.Core
         {
             //Text = "zlpos";
 
-            string htmlFile = System.AppDomain.CurrentDomain.BaseDirectory + "Html\\testJsCallNetMethod.html";
+            string htmlFile = System.AppDomain.CurrentDomain.BaseDirectory + "Html\\" + ConfigurationManager.AppSettings["HTML5FileName"];//testJsCallNetMethod.html";
             browser = new ChromiumWebBrowser(@"file:///" + htmlFile.Replace("\\", "/"))
             //browser = new ChromiumWebBrowser(@"file:///E:/ZlPos/newH5andorid/newH5/home.html")
             //browser = new ChromiumWebBrowser(@"https://zhonglunnet032001.oss-cn-shanghai.aliyuncs.com/attachment/20180110/2587e38d-411c-4d9c-b0dd-7fe3159d129e.mp4")
@@ -81,7 +82,7 @@ namespace ZlPos.Core
                 //canExecuteJavaScriptAsync = true;
 #if DEBUG
                 //调试器
-                // browser.ShowDevTools();
+                browser.ShowDevTools();
 #endif
             }
 
