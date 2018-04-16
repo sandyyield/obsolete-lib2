@@ -90,9 +90,220 @@
     <Compile Include="Bizlogic\ContextCache.cs" />
     <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\AdoProvider\AdoAccessory.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\AdoProvider\AdoProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\AopProvider\AopProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\CodeFirstProvider\CodeFirstProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbBindProvider\DbBindAccessory.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbBindProvider\DbBindProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbBindProvider\IDataReaderEntityBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbBindProvider\IDataRecordExtensions.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbFirstProvider\DbFirstProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbFirstProvider\DbFirstTemplate.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbMaintenanceProvider\Methods.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DbMaintenanceProvider\Properties.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\DeleteProvider\DeleteableProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\EntityMaintenance\EntityMaintenance.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\ExpressionableProvider\Expressionable.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\FilterProvider\FilterProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\InsertableProvider\InsertableProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\QueryableProvider\QueryableAccessory.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\QueryableProvider\QueryableProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\SqlBuilderProvider\DeleteBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\SqlBuilderProvider\InsertBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\SqlBuilderProvider\QueryBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\SqlBuilderProvider\SqlBuilderAccessory.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\SqlBuilderProvider\SqlBuilderProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\SqlBuilderProvider\SqlQueryBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\SqlBuilderProvider\UpdateBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Abstract\UpdateProvider\UpdateableProvider.cs" />
+    <Compile Include="Dao\SqlSugar\CacheScheme\CacheKeyBuider.cs" />
+    <Compile Include="Dao\SqlSugar\CacheScheme\CacheSchemeMain.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\CacheKey.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\ConditionalModel.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\ConnectionConfig.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\ConnMoreSettings.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\DbColumnInfo.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\DbResult.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\DbTableInfo.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\DefaultServices.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\EntityColumnInfo.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\EntityInfo.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\JoinQueryInfo.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\Mapping\IgnoreComumn.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\Mapping\MappingColumn.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\Mapping\MappingTable.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\Mapping\SugarMappingAttribute.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\ModelContext.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\PageModel.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\SchemaInfo.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\SlaveConnectionConfig.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\SqlFilter.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\SqlWith.cs" />
+    <Compile Include="Dao\SqlSugar\Entities\SugarList.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\ApplyType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\ConditionalType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\DbObjectType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\DbType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\InitKeyType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\JoinType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\OrderByType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\ProperyType.cs" />
+    <Compile Include="Dao\SqlSugar\Enum\WhereType.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\CaseWhen\CaseWhen.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\CaseWhen\CaseWhenResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\BinaryExpressionInfo.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\CommonTempDataType.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\DateType.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ErrorMessage.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ExpResolveAccessory.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ExpressionConst.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ExpressionParameter.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ExpressionResult.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ExpressionResultAcceptType.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ExpressionTool.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\MethodCallExpressionModel.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\ResolveExpressType.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Common\SugarParameter.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\DbMethods\DefaultDbMethod.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\DbMethods\IDbMethods.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\DbMethods\SqlFunc.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\DbMethods\SqlFuncExternal.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ExpressionContext.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\BaseResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\BinaryExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\BlockExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\ConditionalExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\ConstantExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\LambdaExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\MemberConstExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\MemberExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\MemberInitExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\MemberNewExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\MemberNoExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\MethodCallExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\NewArrayExpessionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\NewExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\TypeParameterExpressionReolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\ResolveItems\UnaryExpressionResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\ISubOperation.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubAnd.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubAny.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubAvg.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubBegin.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubCount.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubFromTable.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubGroupBy.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubLeftBracket.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubMax.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubMin.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubNotAny.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubOrderBy.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubRightBracket.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubSelect.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubSelectDefault.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubSum.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubTop.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Items\SubWhere.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\Subquerable.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\SubResolve.cs" />
+    <Compile Include="Dao\SqlSugar\ExpressionsToSql\Subquery\SubTools.cs" />
+    <Compile Include="Dao\SqlSugar\ExternalServiceInterface\ICacheService.cs" />
+    <Compile Include="Dao\SqlSugar\ExternalServiceInterface\ISerializeService.cs" />
+    <Compile Include="Dao\SqlSugar\Infrastructure\ContextMethods.cs" />
+    <Compile Include="Dao\SqlSugar\Infrastructure\DependencyManagement.cs" />
+    <Compile Include="Dao\SqlSugar\Infrastructure\InstanceFactory.cs" />
+    <Compile Include="Dao\SqlSugar\Infrastructure\SqlSugarAccessory.cs" />
+    <Compile Include="Dao\SqlSugar\IntegrationServices\CacheService.cs" />
+    <Compile Include="Dao\SqlSugar\IntegrationServices\SerializeService.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IAdo.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\ICodeFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IContextMethods.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IDbBind.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IDbFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IDbMaintenance.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IDeleteable.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IDMLBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IFilter.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\ILambdaExpressions.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\Insertable.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IQueryable.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\ISqlBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Interface\IUpdateable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\CodeFirst\MySqlCodeFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\DbBind\MySqlDbBind.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\DbFirst\MySqlDbFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\DbMaintenance\MySqlDbMaintenance.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\MySqlProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\Queryable\MySqlQueryable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\SqlBuilder\MySqlBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\SqlBuilder\MySqlDeleteBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\SqlBuilder\MySqlExpressionContext.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\SqlBuilder\MySqlInsertBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\SqlBuilder\MySqlQueryBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\MySql\SqlBuilder\MySqlUpdateBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\CodeFirst\OracleCodeFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\DbBind\OracleDbBind.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\DbFirst\OracleDbFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\DbMaintenance\OracleDbMaintenance.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\Deleteable\OracleDeleteable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\Insertable\OracleInsertable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\OracleProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\Queryable\OracleQueryable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\SqlBuilder\OracleBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\SqlBuilder\OracleDeleteBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\SqlBuilder\OracleExpressionContext.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\SqlBuilder\OracleInsertBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\SqlBuilder\OracleQueryBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\SqlBuilder\OracleUpdateBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Oracle\Updateable\OracleUpdateable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\PostgreSQL\CodeFirst\PostgreSQLCodeFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\PostgreSQL\DbBind\PostgreSQLDbBind.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\PostgreSQL\DbFirst\PostgreSQLDbFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\PostgreSQL\PostgreSQLProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\PostgreSQL\Queryable\PostgreSQLQueryable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\CodeFirst\SqliteCodeFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\DbBind\SqliteDbBind.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\DbFirst\SqliteDbFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\DbMaintenance\SqliteDbMaintenance.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\Queryable\SqliteQueryable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\SqlBuilder\SqliteBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\SqlBuilder\SqliteDeleteBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\SqlBuilder\SqliteExpressionContext.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\SqlBuilder\SqliteInsertBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\SqlBuilder\SqliteQueryBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\SqlBuilder\SqliteUpdateBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\Sqlite\SqliteProvider.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\CodeFirst\SqlServerCodeFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\DbBind\SqlServerDbBind.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\DbFirst\SqlServerDbFirst.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\DbMaintenance\SqlServerDbMaintenance.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\Queryable\SqlServerQueryable.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\SqlBuilder\SqlServerBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\SqlBuilder\SqlServerDeleteBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\SqlBuilder\SqlServerExpressionContext.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\SqlBuilder\SqlServerInsertBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\SqlBuilder\SqlServerQueryBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\SqlBuilder\SqlServerUpdateBuilder.cs" />
+    <Compile Include="Dao\SqlSugar\Realization\SqlServer\SqlServerProvider.cs" />
+    <Compile Include="Dao\SqlSugar\SimpleClient.cs" />
+    <Compile Include="Dao\SqlSugar\SqlSugarClient.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\CallContext.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\Check.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\DbExtensions.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\ErrorMessage.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\FileHelper.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\ReflectionExtensions.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\UtilConstants.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\UtilConvert.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\UtilExceptions.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\UtilMethods.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\UtilRandom.cs" />
+    <Compile Include="Dao\SqlSugar\Utilities\ValidateExtensions.cs" />
     <Compile Include="Enums\EnPrinterInstruction.cs" />
     <Compile Include="Enums\EnPrinterPort.cs" />
     <Compile Include="Enums\EnStateFlag.cs" />
+    <Compile Include="Enums\PrinterType.cs" />
     <Compile Include="PrintServices\PrintBridge.cs" />
     <Compile Include="Config\ResponseCode.cs" />
     <Compile Include="Core\CallbackResponseStruct.cs" />
@@ -150,6 +361,7 @@
     <Compile Include="Models\UserVM.cs" />
     <Compile Include="Models\VersionVM.cs" />
     <Compile Include="PrintServices\IUSBPrinterService.cs" />
+    <Compile Include="PrintServices\USBPrinter.cs" />
     <Compile Include="PrintServices\USBPrinterService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -182,10 +394,43 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
+  <!-- add by sVen 2018年4月16日 -->
+   <ItemGroup>
+    <Content Include="References\MySql.Data.dll" />
+    <Content Include="References\Newtonsoft.Json.dll" />
+    <Content Include="References\Oracle.ManagedDataAccess.dll" />
+    <Content Include="References\System.Data.SQLite.dll" />
+    
+    <Reference Include="MySql.Data, Version=6.2.1.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\MySql.Data.dll</HintPath>
+    </Reference>
+    <!-- <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\Newtonsoft.Json.dll</HintPath>
+    </Reference> -->
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>References\Oracle.ManagedDataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
   <ItemGroup>
+    <Folder Include="Dao\SqlSugar\Realization\PostgreSQL\DbMaintenance\" />
+    <Folder Include="Dao\SqlSugar\Realization\PostgreSQL\SqlBuilder\" />
     <Folder Include="respose\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Dao\SqlSugar\References\MySql.Data.dll" />
+    <Content Include="Dao\SqlSugar\References\Newtonsoft.Json.dll" />
+    <Content Include="Dao\SqlSugar\References\Oracle.ManagedDataAccess.dll" />
+    <Content Include="Dao\SqlSugar\References\System.Data.SQLite.dll" />
     <Content Include="Html\testJsCallNetMethod.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -201,12 +446,6 @@
     <Content Include="x86\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\SqlSugar\Src\Asp.Net\SqlSugar\SqlSugar.csproj">
-      <Project>{489bb790-226c-4fad-8d1e-51d72a7ff8e5}</Project>
-      <Name>SqlSugar</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\cef.redist.x64.3.2623.1396\build\cef.redist.x64.targets" Condition="Exists('..\packages\cef.redist.x64.3.2623.1396\build\cef.redist.x64.targets')" />

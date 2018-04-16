@@ -45,5 +45,15 @@ namespace ZlPos.PrintServices
         [DllImport("Library\\POS_SDK.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern int POS_Port_Close(IntPtr iPrinterID);
 
+        [DllImport("Library\\POS_SDK.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        public static extern int POS_Output_PrintFontStringW(IntPtr iPrinterID,
+                                                            int iFont,
+                                                            int iThick,
+                                                            int iWidth,
+                                                            int iHeight,
+                                                            int iUnderLine,
+                                                            string lpString);
+
+
     }
 }

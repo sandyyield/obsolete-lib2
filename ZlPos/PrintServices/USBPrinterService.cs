@@ -15,9 +15,12 @@ namespace ZlPos.PrintServices
                 return;
             }
 
+            //POS_SDK 
             //IntPtr h_Printer = PrintBridge.POS_Port_OpenW("SP-USB1", 1002, false, null);
 
-            //int i= PrintBridge.POS_Port_Close(h_Printer);
+            //PrintBridge.POS_Output_PrintFontStringW(h_Printer, 0, 0, 0, 0, 0, "POS_SDK DLL Print testing\r\n");
+
+            //long i = PrintBridge.POS_Port_Close(h_Printer);
 
             //if (i == 0)
             //{
@@ -28,10 +31,24 @@ namespace ZlPos.PrintServices
 
 
 
+            //芯烨提供的dll
             IntPtr hUSB = PrintBridge.OpenUsb();
             int sendSize = 0;
-            string teststr = "hello world\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n";
+            //设置下划线
+            //1b2d32
+            //byte[] vs = { 0x1b, 0x2d, 0x32 };
+            //byte[] vs = { 0x1b, 0x61, 0x01 };
+            //byte[] vs = { 0x1c, 0xfc, 0x1c,0x2f,0x04,0x1c,0x15 };
+            //gprinter 倍高倍宽
+            //byte[] vs = { 0x1b, 0x21, 0x30 };
+            //初始化打印设置
+            //byte[] vs = { 0x1b, 0x40 };
+            byte[] vs = { 0x1b, 0x61,0x31 };
+            PrintBridge.WriteUsb(hUSB, Encoding.Unicode.GetString(vs), vs.Length, ref sendSize);
+            string teststr = "hello world\r\n\r\n\r\n\r\n\r\n";
             PrintBridge.WriteUsb(hUSB, teststr, Encoding.Unicode.GetByteCount(teststr), ref sendSize);
+
+
 
 
 
