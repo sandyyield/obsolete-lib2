@@ -14,21 +14,28 @@ namespace ZlPos.Bizlogic
         {
             using (var db = SugarDao.GetInstance())
             {
-                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
-                if(contextEntity == null)
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.readCard;
+                }
+                else
                 {
                     return "";
                 }
-                return contextEntity.readCard;
             }
         }
 
         public static void SetReadCard(string v)
         {
-            using(var db = SugarDao.GetInstance())
+            using (var db = SugarDao.GetInstance())
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
-                if(contextEntity == null)
+                if (contextEntity == null)
                 {
                     contextEntity = new ContextEntity();
                 }
@@ -43,12 +50,19 @@ namespace ZlPos.Bizlogic
         {
             using (var db = SugarDao.GetInstance())
             {
-                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
-                if (contextEntity == null)
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.scale;
+                }
+                else
                 {
                     return "";
                 }
-                return contextEntity.scale;
             }
         }
 
@@ -72,12 +86,19 @@ namespace ZlPos.Bizlogic
         {
             using (var db = SugarDao.GetInstance())
             {
-                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
-                if (contextEntity == null)
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.shopcode;
+                }
+                else
                 {
                     return "";
                 }
-                return contextEntity.shopcode;
             }
         }
 
@@ -101,12 +122,19 @@ namespace ZlPos.Bizlogic
         {
             using (var db = SugarDao.GetInstance())
             {
-                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
-                if (contextEntity == null)
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.readCard;
+                }
+                else
                 {
                     return "";
                 }
-                return contextEntity.readCard;
             }
         }
 
