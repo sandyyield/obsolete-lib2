@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SqlSugar;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,25 +9,40 @@ namespace ZlPos.Models
 {
     class CommodityInfoVM : BaseData
     {
+        [SugarColumn(IsNullable = true,IsPrimaryKey = true,IsIdentity = true)]
         public int id { get; set; }
+        [SugarColumn(IsNullable = true)]
         public String shopcode { get; set; }
+        [SugarColumn(IsNullable = true)]
         public String requesttime { get; set; }
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<CommodityEntity> commoditys { get; set; }
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<CategoryEntity> categorys { get; set; }
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<MemberEntity> memberlevels { get; set; }
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<PayTypeEntity> paytypes { get; set; }
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<AssistantsEntity> assistants { get; set; }
+        [SugarColumn(IsNullable = true,IsIgnore = true)]
         public List<CashierEntity> users { get; set; }
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<SupplierEntity> suppliers { get; set; }
 
         // TODO: 2017/8/17
+        [SugarColumn(IsNullable = true)]
         public String templete58 { get; set; }
+        [SugarColumn(IsNullable = true)]
         public String templete80 { get; set; }
         // TODO: 2017/10/17
+        [SugarColumn(IsNullable = true)]
         public String branchcode { get; set; }
 
         // add: 2018/2/27
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<BarCodeEntity> barcodes { get; set; }
+        [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<CommodityPriceEntity> commoditypricelist { get; set; }
     }
 }
