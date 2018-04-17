@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -40,7 +41,7 @@ namespace ZlPos.Forms
             };
             this.Controls.Add(button);
 
-            button.Text = "测试调用JS方法";
+            button.Text = "PING JS ";
             button.Click += Button_Click;
         }
 
@@ -48,6 +49,17 @@ namespace ZlPos.Forms
         {
             //chromiumBrowser.ExecuteJavaScriptAsync(new object[] { });
             hostApp.ExecuteScriptAsync();
+
+            //string path = Application.StartupPath + "\\DataBase\\zlCloudPos.db";
+            //FileAttributes attr = File.GetAttributes(path);
+            //if (attr == FileAttributes.Directory)
+            //{
+            //    Directory.Delete(path, true);
+            //}
+            //else
+            //{
+            //    File.Delete(path);
+            //}
         }
     }
 }

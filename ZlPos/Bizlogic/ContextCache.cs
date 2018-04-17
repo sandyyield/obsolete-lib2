@@ -106,13 +106,20 @@ namespace ZlPos.Bizlogic
         {
             using (var db = SugarDao.GetInstance())
             {
-                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
-                if (contextEntity == null)
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
                 {
-                    contextEntity = new ContextEntity();
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        contextEntity = new ContextEntity();
+                    }
+                    contextEntity.shopcode = v;
+                    DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
                 }
-                contextEntity.shopcode = v;
-                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+                else
+                {
+                    return;
+                }
             }
         }
         #endregion

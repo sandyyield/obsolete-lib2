@@ -27,7 +27,7 @@ namespace ZlPos.Bizlogic
 
         private ChromiumWebBrowser browser;
 
-        private static LoginUserManager _LoginUserManager;
+        private static LoginUserManager _LoginUserManager = LoginUserManager.Instance;
 
         static JSBridge instance = null;
 
@@ -123,8 +123,8 @@ namespace ZlPos.Bizlogic
                             }
                             if (userList != null && userList.Count == 1)
                             {
-                                _LoginUserManager.Instance.Login = true;
-                                _LoginUserManager.Instance.UserEntity = userList[0];
+                                _LoginUserManager.Login = true;
+                                _LoginUserManager.UserEntity = userList[0];
                                 UserVM userVM = new UserVM();
                                 UserEntity userEntity = userList[0];
                                 userVM.user_info = userEntity;
@@ -160,7 +160,7 @@ namespace ZlPos.Bizlogic
                 UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
                 if (userVM != null)
                 {
-                    logger.Info("保存或更新用户信息,获取到的userVM：" + userVM.ToString());
+                    //logger.Info("保存或更新用户信息,获取到的userVM：" + json);
                     ShopConfigEntity config = userVM.config;
                     UserEntity user_info = userVM.user_info;
                     if (config != null && user_info != null)
@@ -174,20 +174,20 @@ namespace ZlPos.Bizlogic
 
                         ContextCache.SetShopcode(user_info.shopcode);
                     }
-                    _LoginUserManager.Instance.Login = true;
-                    _LoginUserManager.Instance.UserEntity = user_info;
+                    _LoginUserManager.Login = true;
+                    _LoginUserManager.UserEntity = user_info;
 
-                    logger.Info("保存或更新用户信息接口：用户在线登陆并保存用户信息成功");
+                    //logger.Info("保存或更新用户信息接口：用户在线登陆并保存用户信息成功");
 
                 }
                 else
                 {
-                    logger.Info("存或更新用户信息接口：用户登录成功但用户信息保存失败");
+                    //logger.Info("存或更新用户信息接口：用户登录成功但用户信息保存失败");
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                logger.Info("保存或更新用户信息接口：保存数据库操作异常");
+                //logger.Info("保存或更新用户信息接口：保存数据库操作异常");
                 //throw;
             }
         }
@@ -200,10 +200,10 @@ namespace ZlPos.Bizlogic
         public ResponseEntity SaveOrUpdateCommodityInfo(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
-            if (_LoginUserManager.Instance.Login)
+            if (_LoginUserManager.Login)
             {
-                string shopcode = _LoginUserManager.Instance.UserEntity.shopcode;
-                string branchcode = _LoginUserManager.Instance.UserEntity.branchcode;
+                string shopcode = _LoginUserManager.UserEntity.shopcode;
+                string branchcode = _LoginUserManager.UserEntity.branchcode;
                 try
                 {
                     DbManager dbManager = DBUtils.Instance.DbManager;
@@ -335,9 +335,9 @@ namespace ZlPos.Bizlogic
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            if (_LoginUserManager.Instance.Login)
+            if (_LoginUserManager.Login)
             {
-                UserEntity userEntity = _LoginUserManager.Instance.UserEntity;
+                UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
                     List<CommodityEntity> commodityEntities = null;
@@ -476,15 +476,15 @@ namespace ZlPos.Bizlogic
         {
             String lastRequestTime = "";
             DbManager dbManager = DBUtils.Instance.DbManager;
-            if (_LoginUserManager.Instance.Login)
+            if (_LoginUserManager.Login)
             {
                 try
                 {
                     using (var db = SugarDao.GetInstance())
                     {
                         List<CommodityInfoVM> lastRequestTimeList = db.Queryable<CommodityInfoVM>()
-                                                                    .Where(it => it.shopcode == _LoginUserManager.Instance.UserEntity.shopcode
-                                                                    && it.branchcode == _LoginUserManager.Instance.UserEntity.branchcode).ToList();
+                                                                    .Where(it => it.shopcode == _LoginUserManager.UserEntity.shopcode
+                                                                    && it.branchcode == _LoginUserManager.UserEntity.branchcode).ToList();
                         if (lastRequestTimeList != null && lastRequestTimeList.Count > 0)
                         {
                             CommodityInfoVM commodityInfoVM = lastRequestTimeList[lastRequestTimeList.Count - 1];
@@ -516,7 +516,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetLastUserName(string json)
+        public string GetLastUserName()
         {
             string shopcode = "";
             try
@@ -641,7 +641,7 @@ namespace ZlPos.Bizlogic
         public List<BillEntity> GetAllSaleBill(string state)
         {
             DbManager dbManager = DBUtils.Instance.DbManager;
-            UserEntity userEntity = _LoginUserManager.Instance.UserEntity;
+            UserEntity userEntity = _LoginUserManager.UserEntity;
             string shopcode = userEntity.shopcode;
             string branchcode = userEntity.branchcode;
 
@@ -814,8 +814,8 @@ namespace ZlPos.Bizlogic
                 {
 
                     number = db.Queryable<BillEntity>().Where(it => it.ticketstatue == "hangup"
-                                                        && it.shopcode == _LoginUserManager.Instance.UserEntity.shopcode
-                                                        && it.branchcode == _LoginUserManager.Instance.UserEntity.branchcode).ToList().Count;
+                                                        && it.shopcode == _LoginUserManager.UserEntity.shopcode
+                                                        && it.branchcode == _LoginUserManager.UserEntity.branchcode).ToList().Count;
                 }
                 catch (Exception e)
                 {
@@ -851,8 +851,8 @@ namespace ZlPos.Bizlogic
                                                         || it.ticketstatue == "updated"
                                                         && it.insertTime >= startDateTime
                                                         && it.insertTime <= endDateTime
-                                                        && it.shopcode == _LoginUserManager.Instance.UserEntity.shopcode
-                                                        && it.branchcode == _LoginUserManager.Instance.UserEntity.branchcode).Count();
+                                                        && it.shopcode == _LoginUserManager.UserEntity.shopcode
+                                                        && it.branchcode == _LoginUserManager.UserEntity.branchcode).Count();
                 }
                 catch (Exception e)
                 {

@@ -9,74 +9,46 @@ namespace ZlPos.Models
         /// <summary>
         /// 
         /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string newsstate { get; set; }
         /// <summary>
         /// 
         /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string mbcreditrule { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string localtax { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string deviceflag { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string isonmeituanmsg { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string mbcreditpay { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string mbmsisrecharge { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string mbisrecharge { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string deviceisrecharge { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string nationaltax { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string attachurl { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string ismeituanmapping { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string devicecode { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string dbneedcheck { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string shopcode { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string mbcreditrange { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string mbcreditrate { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
+        [SugarColumn(IsNullable = true)]
         public string rechargepwd { get; set; }
+
+
     }
 }

@@ -15,20 +15,25 @@ namespace ZlPos.Manager
         private LoginTypeEnum loginType;
         private String requesttime;//上次更新商品信息时间
 
+        private static readonly object obj = new object();
+
         private LoginUserManager()
         {
         }
 
 
-        public LoginUserManager Instance
+        public static LoginUserManager Instance
         {
             get
             {
-                if(loginUserManager == null)
+                lock (obj)
                 {
-                    loginUserManager = new LoginUserManager();
+                    if (loginUserManager == null)
+                    {
+                        loginUserManager = new LoginUserManager();
+                    }
+                    return loginUserManager;
                 }
-                return loginUserManager;
             }
         }
 

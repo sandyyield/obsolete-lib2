@@ -5,7 +5,6 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-
     public class UserVM
     {
         /// <summary>
