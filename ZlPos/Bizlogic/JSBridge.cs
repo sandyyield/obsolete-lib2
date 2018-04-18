@@ -15,6 +15,7 @@ using ZlPos.Utils;
 using System.Collections;
 using System.IO.Ports;
 using ZlPos.PrintServices;
+using System.Reflection;
 
 namespace ZlPos.Bizlogic
 {
@@ -23,7 +24,8 @@ namespace ZlPos.Bizlogic
     /// </summary>
     class JSBridge
     {
-        private static ILog logger = null;
+        //private static ILog logger = null;
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private ChromiumWebBrowser browser;
 
@@ -89,7 +91,7 @@ namespace ZlPos.Bizlogic
 
         //null method
         #region SecondScreenAction
-        public void SecondScreenAction(string p1,string p2)
+        public void SecondScreenAction(string p1, string p2)
         {
             return;
         }
@@ -181,7 +183,7 @@ namespace ZlPos.Bizlogic
                 UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
                 if (userVM != null)
                 {
-                    //logger.Info("保存或更新用户信息,获取到的userVM：" + json);
+                    logger.Info("保存或更新用户信息,获取到的userVM：" + json);
                     ShopConfigEntity config = userVM.config;
                     UserEntity user_info = userVM.user_info;
                     if (config != null && user_info != null)
@@ -198,17 +200,17 @@ namespace ZlPos.Bizlogic
                     _LoginUserManager.Login = true;
                     _LoginUserManager.UserEntity = user_info;
 
-                    //logger.Info("保存或更新用户信息接口：用户在线登陆并保存用户信息成功");
+                    logger.Info("保存或更新用户信息接口：用户在线登陆并保存用户信息成功");
 
                 }
                 else
                 {
-                    //logger.Info("存或更新用户信息接口：用户登录成功但用户信息保存失败");
+                    logger.Info("存或更新用户信息接口：用户登录成功但用户信息保存失败");
                 }
             }
             catch (Exception e)
             {
-                //logger.Info("保存或更新用户信息接口：保存数据库操作异常");
+                logger.Info("保存或更新用户信息接口：保存数据库操作异常");
                 //throw;
             }
         }
@@ -325,7 +327,7 @@ namespace ZlPos.Bizlogic
                         #endregion
 
                         dbManager.SaveOrUpdate(commodityInfoVM);
-                      //logger.Info("保存和更新商品信息接口：信息保存成功");
+                        logger.Info("保存和更新商品信息接口：信息保存成功");
                         responseEntity.code = ResponseCode.SUCCESS;
 
                         //callback
@@ -334,16 +336,16 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception e)
                 {
-                  //logger.Info("保存和更新商品信息接口：" + e.StackTrace);
+                    logger.Info("保存和更新商品信息接口：" + e.StackTrace);
                     responseEntity.code = ResponseCode.Failed;
                 }
             }
             else
             {
-              //logger.Info("保存和更新商品信息接口：用户未登录");
+                logger.Info("保存和更新商品信息接口：用户未登录");
                 responseEntity.code = ResponseCode.Failed;
             }
-            //logger.Info("数据保存成功");
+            logger.Info("数据保存成功");
             return JsonConvert.SerializeObject(responseEntity);
 
         }
@@ -523,7 +525,7 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception e)
                 {
-                  //logger.Error(e.Message + ">>>" + e.StackTrace);
+                    logger.Error(e.Message + ">>>" + e.StackTrace);
                 }
             }
             else
@@ -550,7 +552,7 @@ namespace ZlPos.Bizlogic
             }
             catch (Exception e)
             {
-              //logger.Error(e.Message + e.StackTrace);
+                logger.Error(e.Message + e.StackTrace);
             }
             return shopcode;
         }
@@ -568,7 +570,7 @@ namespace ZlPos.Bizlogic
 
             if (string.IsNullOrEmpty(json))
             {
-              //logger.Info("保存销售单据接口：空字符串");
+                logger.Info("保存销售单据接口：空字符串");
                 responseEntity.code = ResponseCode.Failed;
                 responseEntity.msg = "参数不能为空";
                 return responseEntity;
@@ -578,7 +580,7 @@ namespace ZlPos.Bizlogic
             BillEntity billEntity = JsonConvert.DeserializeObject<BillEntity>(json);
             if (billEntity == null)
             {
-              //logger.Info("保存销售单据接口：json解析失败");
+                logger.Info("保存销售单据接口：json解析失败");
                 responseEntity.code = ResponseCode.Failed;
                 responseEntity.msg = "参数格式错误";
                 return responseEntity;
@@ -594,7 +596,7 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception e)
                 {
-                  //logger.Error(e.Message + e.StackTrace);
+                    logger.Error(e.Message + e.StackTrace);
                 }
                 if (insertDate == DateTime.MinValue)
                 {
@@ -606,13 +608,13 @@ namespace ZlPos.Bizlogic
             }
             catch (Exception e)
             {
-              //logger.Error("保存销售单据接口： 异常");
+                logger.Error("保存销售单据接口： 异常");
             }
             List<BillCommodityEntity> commoditys = billEntity.commoditys;
             List<PayDetailEntity> paydetails = billEntity.paydetails;
             if (commoditys == null || commoditys.Count == 0)
             {
-              //logger.Info("保存销售单据接口：该单据没有商品信息");
+                logger.Info("保存销售单据接口：该单据没有商品信息");
             }
             else
             {
@@ -628,14 +630,14 @@ namespace ZlPos.Bizlogic
                     }
                     catch (Exception e)
                     {
-                      //logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException");
+                        logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException");
                     }
                 }
             }
 
             if (paydetails == null || paydetails.Count == 0)
             {
-              //logger.Info("保存销售单据接口：该单据没有付款方式信息");
+                logger.Info("保存销售单据接口：该单据没有付款方式信息");
             }
             else
             {
@@ -647,7 +649,7 @@ namespace ZlPos.Bizlogic
                     }
                     catch (Exception e)
                     {
-                      //logger.Error("保存销售单据接口： dbManager.saveOrUpdate(payDetailEntity)--DbException");
+                        logger.Error("保存销售单据接口： dbManager.saveOrUpdate(payDetailEntity)--DbException");
                     }
                 }
             }
@@ -679,7 +681,7 @@ namespace ZlPos.Bizlogic
                                                                                 && it.branchcode == branchcode).ToList();
                     if (billEntities != null)
                     {
-                      //logger.Info("获取对应状态的单据信息billEntities: " + billEntities.ToString());
+                        logger.Info("获取对应状态的单据信息billEntities: " + billEntities.ToString());
                         for (int i = 0; i < billEntities.Count; i++)
                         {
                             List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
@@ -708,7 +710,7 @@ namespace ZlPos.Bizlogic
             }
             catch (Exception e)
             {
-              //logger.Error(e.Message + e.StackTrace);
+                logger.Error(e.Message + e.StackTrace);
             }
             //有问题直接返回null
             return null;
@@ -756,13 +758,13 @@ namespace ZlPos.Bizlogic
                             {
                                 billEntity.ticketstatue = "updated";
                                 dbManager.SaveOrUpdate(billEntity);
-                              //logger.Info("更新销售单据状态接口:成功");
+                                logger.Info("更新销售单据状态接口:成功");
                             }
 
                         }
                         catch (Exception e)
                         {
-                          //logger.Error("更新销售单据状态接口:异常");
+                            logger.Error("更新销售单据状态接口:异常");
                         }
                     }
                 }
@@ -801,7 +803,7 @@ namespace ZlPos.Bizlogic
                             }
                         }
                         dbManager.Delete(billEntity);
-                      //logger.Info("删除单个挂单接口  成功");
+                        logger.Info("删除单个挂单接口  成功");
 
                     }
                 }
@@ -809,7 +811,7 @@ namespace ZlPos.Bizlogic
             }
             catch (Exception e)
             {
-              //logger.Info("删除单个挂单接口  数据库异常");
+                logger.Info("删除单个挂单接口  数据库异常");
             }
         }
         #endregion
@@ -844,7 +846,7 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception e)
                 {
-                  //logger.Error(e.Message + e.StackTrace);
+                    logger.Error(e.Message + e.StackTrace);
                 }
 
             }
@@ -858,7 +860,7 @@ namespace ZlPos.Bizlogic
             long number = 0;
             if (string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end))
             {
-                //logger.Info("按时间区间查询单据，开始时间或结束时间为空：start:" + start + "end:" + end);
+                logger.Info("按时间区间查询单据，开始时间或结束时间为空：start:" + start + "end:" + end);
                 return number;
             }
             DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
@@ -881,7 +883,7 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception e)
                 {
-                    //logger.Error(e.Message + e.StackTrace);
+                    logger.Error(e.Message + e.StackTrace);
                 }
 
             }
@@ -924,7 +926,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string getCommodityByCategoryCode(string p1,int p2,int p3)
+        public string getCommodityByCategoryCode(string p1, int p2, int p3)
         {
             //TODO...
             return "";
