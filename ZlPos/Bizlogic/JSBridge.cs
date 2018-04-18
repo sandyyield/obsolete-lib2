@@ -108,8 +108,8 @@ namespace ZlPos.Bizlogic
             ResponseEntity responseEntity = new ResponseEntity();
             if (string.IsNullOrEmpty(json))
             {
-                responseEntity.Code = ResponseCode.Failed;
-                responseEntity.Msg = "参数不能为空";
+                responseEntity.code = ResponseCode.Failed;
+                responseEntity.msg = "参数不能为空";
 
                 //TODO这里考虑开个线程池去操作
                 ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
@@ -213,7 +213,7 @@ namespace ZlPos.Bizlogic
         /// <summary>
         /// 保存或更新商品信息
         /// </summary>
-        public ResponseEntity SaveOrUpdateCommodityInfo(string json)
+        public string SaveOrUpdateCommodityInfo(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             if (_LoginUserManager.Login)
@@ -321,7 +321,7 @@ namespace ZlPos.Bizlogic
 
                         dbManager.SaveOrUpdate(commodityInfoVM);
                       //logger.Info("保存和更新商品信息接口：信息保存成功");
-                        responseEntity.Code = ResponseCode.SUCCESS;
+                        responseEntity.code = ResponseCode.SUCCESS;
 
                         //callback
                         ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOrUpdateCommodityInfoCallBack", responseEntity });
@@ -330,16 +330,16 @@ namespace ZlPos.Bizlogic
                 catch (Exception e)
                 {
                   //logger.Info("保存和更新商品信息接口：" + e.StackTrace);
-                    responseEntity.Code = ResponseCode.Failed;
+                    responseEntity.code = ResponseCode.Failed;
                 }
             }
             else
             {
               //logger.Info("保存和更新商品信息接口：用户未登录");
-                responseEntity.Code = ResponseCode.Failed;
+                responseEntity.code = ResponseCode.Failed;
             }
-          //logger.Info("数据保存成功");
-            return responseEntity;
+            //logger.Info("数据保存成功");
+            return JsonConvert.SerializeObject(responseEntity);
 
         }
         #endregion
@@ -350,7 +350,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public ResponseEntity GetCommodityInfo()
+        public string GetCommodityInfo()
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
@@ -461,26 +461,27 @@ namespace ZlPos.Bizlogic
                         commodityInfoVM.suppliers = supplierEntities;
                         commodityInfoVM.barcodes = barCodes;
                         commodityInfoVM.commoditypricelist = commodityPriceList;
-                        responseEntity.Data = commodityInfoVM;
-                        responseEntity.Code = ResponseCode.SUCCESS;
-                        responseEntity.Msg = "获取所有商品信息成功";
+                        responseEntity.data = commodityInfoVM;
+                        responseEntity.code = ResponseCode.SUCCESS;
+                        responseEntity.msg = "获取所有商品信息成功";
 
 
                     }
                 }
                 catch (Exception e)
                 {
-                    responseEntity.Code = ResponseCode.Failed;
-                    responseEntity.Msg = "数据异常";
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "数据异常";
                 }
             }
             else
             {
-                responseEntity.Code = ResponseCode.Failed;
-                responseEntity.Msg = "用户未登陆";
+                responseEntity.code = ResponseCode.Failed;
+                responseEntity.msg = "用户未登陆";
             }
 
-            return responseEntity;
+            //return responseEntity;
+            return JsonConvert.SerializeObject(responseEntity);
 
         }
         #endregion
@@ -563,8 +564,8 @@ namespace ZlPos.Bizlogic
             if (string.IsNullOrEmpty(json))
             {
               //logger.Info("保存销售单据接口：空字符串");
-                responseEntity.Code = ResponseCode.Failed;
-                responseEntity.Msg = "参数不能为空";
+                responseEntity.code = ResponseCode.Failed;
+                responseEntity.msg = "参数不能为空";
                 return responseEntity;
             }
             DbManager dbManager = DBUtils.Instance.DbManager;
@@ -573,8 +574,8 @@ namespace ZlPos.Bizlogic
             if (billEntity == null)
             {
               //logger.Info("保存销售单据接口：json解析失败");
-                responseEntity.Code = ResponseCode.Failed;
-                responseEntity.Msg = "参数格式错误";
+                responseEntity.code = ResponseCode.Failed;
+                responseEntity.msg = "参数格式错误";
                 return responseEntity;
             }
             try
@@ -645,8 +646,8 @@ namespace ZlPos.Bizlogic
                     }
                 }
             }
-            responseEntity.Code = ResponseCode.SUCCESS;
-            responseEntity.Msg = "保存单据成功";
+            responseEntity.code = ResponseCode.SUCCESS;
+            responseEntity.msg = "保存单据成功";
             return responseEntity;
         }
         #endregion
@@ -890,10 +891,10 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public List<CommodityEntity> GetCommodityById(string json)
+        public string GetCommodityById(string json)
         {
             //TODO...
-            return null;
+            return "";
         }
 
         /// <summary>
@@ -901,16 +902,16 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public List<CommodityEntity> GetCommodityByBarcode(string json)
+        public string GetCommodityByBarcode(string json)
         {
             //TODO...
-            return null;
+            return "";
         }
 
-        public List<CommodityEntity> GetCommodityByCommoditycode(string json)
+        public string GetCommodityByCommoditycode(string json)
         {
             //TODO...
-            return null;
+            return "";
         }
 
         /// <summary>
@@ -918,10 +919,10 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public List<CommodityEntity> getCommodityByCategoryCode(string json)
+        public string getCommodityByCategoryCode(string p1,int p2,int p3)
         {
             //TODO...
-            return null;
+            return "";
         }
 
         /// <summary>
@@ -929,10 +930,10 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public List<CommodityEntity> getCommodityByMnemonic(string json)
+        public string getCommodityByMnemonic(string json)
         {
             //TODO...
-            return null;
+            return "";
         }
 
         /// <summary>

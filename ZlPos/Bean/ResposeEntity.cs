@@ -7,17 +7,17 @@ namespace ZlPos.Bean
 {
     class ResponseEntity
     {
-        private int code;
+        public int code { get; set; }
 
-        private string msg;
+        public string msg { get; set; }
 
-        private BaseData data;
+        public BaseData data { get; set; }
 
-        private object obj;
+        public object obj { get; set; }
 
-        public int Code { get => code; set => code = value; }
-        public string Msg { get => msg; set => msg = value; }
-        internal BaseData Data { get => data; set => data = value; }
-        public object Obj { get => obj; set => obj = value; }
+        //public int Code { get => code; set => code = value; }
+        //public string Msg { get => msg; set => msg = value; }
+        //public BaseData Data { get => data; set => data = value; }
+        //public object Obj { get => obj; set => obj = value; }
     }
 }

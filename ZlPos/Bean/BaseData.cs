@@ -3,7 +3,7 @@ using ZlPos.Models;
 
 namespace ZlPos.Bean
 {
-    internal class BaseData
+    public class BaseData
     {
         //public static implicit operator BaseData(CommodityInfoVM v)
         //{

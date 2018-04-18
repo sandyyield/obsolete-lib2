@@ -35,14 +35,15 @@ namespace ZlPos.Forms
 
             //bound = new BoundObject(chromiumBrowser);
 
-            Button button = new Button()
-            {
-                Dock = DockStyle.Top,
-            };
-            this.Controls.Add(button);
+            //用来ping js的
+            //Button button = new Button()
+            //{
+            //    Dock = DockStyle.Top,
+            //};
+            //this.Controls.Add(button);
 
-            button.Text = "PING JS ";
-            button.Click += Button_Click;
+            //button.Text = "PING JS ";
+            //button.Click += Button_Click;
         }
 
         private void Button_Click(object sender, EventArgs e)
