@@ -82,6 +82,11 @@ namespace ZlPos.Bizlogic
             return "json";
         }
 
+        public void SetZoomLevel(double d)
+        {
+            browser.SetZoomLevel(d);
+        }
+
         //null method
         #region SecondScreenAction
         public void SecondScreenAction(string p1,string p2)
