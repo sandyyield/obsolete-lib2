@@ -1038,10 +1038,38 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public List<CommodityEntity> getCommodityByKeyword(string json)
+        public string getCommodityByKeyword(string keyword)
         {
-            //TODO...
-            return null;
+            ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            List<CommodityEntity> commodityEntities = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using(var db = SugarDao.GetInstance())
+                    {
+                        commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                            && i.commoditystatus == "0"
+                                                                            && i.del == "0"
+                                                                            && (i.commodityname.Contains("keyword")
+                                                                                || i.mnemonic.Contains("keyword"))).ToList();
+                    }
+                }
+                catch(Exception e)
+                {
+                    logger.Error(e.StackTrace);
+                }
+        }
+        if (commodityEntities == null) {
+            commodityEntities = new List<CommodityEntity>();
+        }
+        if (commodityEntities.Count > 50) {
+            commodityEntities = commodityEntities.GetRange(0, 50);
+        }
+
+        return JsonConvert.SerializeObject(commodityEntities);
         }
 
         /// <summary>
