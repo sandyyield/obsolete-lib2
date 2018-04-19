@@ -552,7 +552,7 @@ namespace ZlPos.Bizlogic
             try
             {
                 shopcode = ContextCache.GetShopcode();
-               
+
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.data = shopcode;
                 ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
@@ -1109,7 +1109,7 @@ namespace ZlPos.Bizlogic
                     //        String paycode = dbModel.getDataMap().get("paycode");
                     //payCodeList.add(paycode);
                     //    }
-                    payList =JsonConvert.SerializeObject(payCodeList);
+                    payList = JsonConvert.SerializeObject(payCodeList);
                 }
             }
             catch (Exception e)
@@ -1135,6 +1135,11 @@ namespace ZlPos.Bizlogic
             return JsonConvert.SerializeObject(arrSerial);
         }
         #endregion
+
+        public string GetGPrinter()
+        {
+            return "";
+        }
 
         public void TestUsbPrint()
         {
@@ -1178,10 +1183,10 @@ namespace ZlPos.Bizlogic
         /// 获取上次保存的打印机设置
         /// </summary>
         /// <returns></returns>
-        public PrinterConfigEntity GetPrinter()
+        public string GetPrinter()
         {
             //TODO...
-            return null;
+            return "";
         }
 
         public ResponseEntity StartBluetoothSearch()
@@ -1196,10 +1201,19 @@ namespace ZlPos.Bizlogic
             return null;
         }
 
-        public ResponseEntity setPrinter()
+        public void setPrinter(string json)
         {
-            //TODO...
-            return null;
+            ResponseEntity responseEntity = new ResponseEntity();
+            try
+            {
+                PrinterConfigEntity printerConfigEntity = JsonConvert.DeserializeObject<PrinterConfigEntity>(json);
+                //PrinterSetter printerSetter = new PrinterSetter(mContext);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.StackTrace);
+            }
+
         }
 
         public void SetNote(string json)
