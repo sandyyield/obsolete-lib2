@@ -44,5 +44,35 @@ namespace ZlPos.Models
         public List<BarCodeEntity> barcodes { get; set; }
         [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<CommodityPriceEntity> commoditypricelist { get; set; }
+
+        // add: 2018/4/8
+        [SugarColumn(IsNullable = true)]
+        public String cashiergrant { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String isbranchpay { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String type { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String mbcreditrule { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String mbcreditrange { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String mbcreditrate { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String mbcreditpay { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String mbmsisrecharge { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public String mbisrecharge { get; set; }
+
+
     }
 }
