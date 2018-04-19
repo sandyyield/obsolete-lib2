@@ -16,6 +16,7 @@ using System.Collections;
 using System.IO.Ports;
 using ZlPos.PrintServices;
 using System.Reflection;
+using SqlSugar;
 
 namespace ZlPos.Bizlogic
 {
@@ -993,10 +994,6 @@ namespace ZlPos.Bizlogic
             }
             return JsonConvert.SerializeObject(selectCommodityList);
 
-
-
-
-            return "";
         }
 
         /// <summary>
@@ -1004,10 +1001,36 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string getCommodityByMnemonic(string json)
+        public string getCommodityByMnemonic(string mnemonic)
         {
-            //TODO...
-            return "";
+            ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            List<CommodityEntity> commodityEntities = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        commodityEntities = db.Queryable<CommodityEntity>()
+                                                .Where(i => i.shopcode == userEntity.shopcode
+                                                && i.commoditystatus == "0"
+                                                && i.del == "0"
+                                                && i.mnemonic.Contains(mnemonic)).ToList();
+                    }
+                }catch(Exception e)
+                {
+                    logger.Error(e.StackTrace);
+                }
+        }
+        if (commodityEntities == null) {
+            commodityEntities = new List<CommodityEntity>();
+        }
+        if (commodityEntities.Count > 100) {
+            commodityEntities = commodityEntities.GetRange(0, 100);
+        }
+            return JsonConvert.SerializeObject(commodityEntities);
         }
 
         /// <summary>
