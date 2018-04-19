@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class CashierEntity
+    public class CashierEntity
     {
         [SugarColumn(IsNullable = true,IsPrimaryKey =true)]
         public String id { get; set; }//isid

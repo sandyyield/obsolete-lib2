@@ -926,9 +926,61 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string getCommodityByCategoryCode(string p1, int p2, int p3)
+        public string getCommodityByCategoryCode(String categoryCode, int pageindex, int pagesize)
         {
-            //TODO...
+            logger.Info("getCommodityByCategory\n" + "categoryCode:" + categoryCode + "\tpageindex:" + pageindex + "\tpagesize:" + pagesize);
+            ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            CommodityCacheManager commodityCacheManager = CommodityCacheManager.getInstance();
+            List<CommodityEntity> commodityEntities = null;
+            if (LoginUserManager.getInstance().isLogin())
+            {
+                if (commodityCacheManager != null
+                        && commodityCacheManager.getCommodityMap() != null
+                        && !commodityCacheManager.getCommodityMap().isEmpty()
+                        && commodityCacheManager.getCommodityMap().containsKey(categoryCode))
+                {
+                    commodityEntities = commodityCacheManager.getCommodityMap().get(categoryCode);
+                }
+                else
+                {
+                    UserEntity userEntity = LoginUserManager.getInstance().getUserEntity();
+                    try
+                    {
+                        commodityEntities = dbManager.selector(CommodityEntity.class)
+                            .where("shopcode", "=", userEntity.getShopcode())
+                            .and("commoditystatus", "=", "0")
+                            .and("del", "=", "0")
+                            .and("categorycode", "=", categoryCode)
+                            .orderBy("commoditycode", true)
+                            .findAll();
+    } catch (DbException db) {
+                }
+                if (commodityCacheManager.getCommodityMap() != null) {
+                    commodityCacheManager.getCommodityMap().put(categoryCode, commodityEntities);
+                }
+            }
+        }
+        List<CommodityEntity> selectCommodityList = null;
+        if (commodityEntities != null && commodityEntities.size() > 0 && pageindex != -1) {
+            if (commodityEntities.size() > (pageindex* pagesize + pagesize)) {
+                selectCommodityList = commodityEntities.subList(pageindex* pagesize, pageindex* pagesize + pagesize);
+            } else {
+                if (pageindex* pagesize < commodityEntities.size()) {
+                    selectCommodityList = commodityEntities.subList(pageindex* pagesize, commodityEntities.size());
+                }
+            }
+        }else {
+            selectCommodityList=commodityEntities;
+        }
+        if (selectCommodityList == null) {
+            selectCommodityList = new ArrayList<>();
+        }
+        return gson.toJson(selectCommodityList);
+
+
+
+            
             return "";
         }
 

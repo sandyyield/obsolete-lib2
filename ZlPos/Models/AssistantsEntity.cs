@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class AssistantsEntity
+    public class AssistantsEntity
     {
         /// <summary>
         /// 

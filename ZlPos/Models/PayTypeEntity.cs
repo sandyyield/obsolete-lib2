@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class PayTypeEntity
+    public class PayTypeEntity
     {
         [SugarColumn(IsNullable = true,IsPrimaryKey = true)]
         public String id { get; set; }

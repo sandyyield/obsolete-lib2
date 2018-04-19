@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class CommodityPriceEntity : ModelContext
+    public class CommodityPriceEntity : ModelContext
     {
         [SugarColumn(IsNullable = true,IsPrimaryKey = true)]
         public String id { get; set; }
