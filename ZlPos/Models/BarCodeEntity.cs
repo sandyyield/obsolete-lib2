@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class BarCodeEntity
+    public class BarCodeEntity
     {
         [SugarColumn(IsNullable = true,IsPrimaryKey = true)]
         public string uid { get; set; }
