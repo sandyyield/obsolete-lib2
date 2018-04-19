@@ -17,6 +17,7 @@ using System.IO.Ports;
 using ZlPos.PrintServices;
 using System.Reflection;
 using SqlSugar;
+using System.Data.Entity.Infrastructure;
 
 namespace ZlPos.Bizlogic
 {
@@ -1019,17 +1020,20 @@ namespace ZlPos.Bizlogic
                                                 && i.del == "0"
                                                 && i.mnemonic.Contains(mnemonic)).ToList();
                     }
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     logger.Error(e.StackTrace);
                 }
-        }
-        if (commodityEntities == null) {
-            commodityEntities = new List<CommodityEntity>();
-        }
-        if (commodityEntities.Count > 100) {
-            commodityEntities = commodityEntities.GetRange(0, 100);
-        }
+            }
+            if (commodityEntities == null)
+            {
+                commodityEntities = new List<CommodityEntity>();
+            }
+            if (commodityEntities.Count > 100)
+            {
+                commodityEntities = commodityEntities.GetRange(0, 100);
+            }
             return JsonConvert.SerializeObject(commodityEntities);
         }
 
@@ -1048,7 +1052,7 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    using(var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.GetInstance())
                     {
                         commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                             && i.commoditystatus == "0"
@@ -1057,29 +1061,55 @@ namespace ZlPos.Bizlogic
                                                                                 || i.mnemonic.Contains("keyword"))).ToList();
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     logger.Error(e.StackTrace);
                 }
-        }
-        if (commodityEntities == null) {
-            commodityEntities = new List<CommodityEntity>();
-        }
-        if (commodityEntities.Count > 50) {
-            commodityEntities = commodityEntities.GetRange(0, 50);
-        }
+            }
+            if (commodityEntities == null)
+            {
+                commodityEntities = new List<CommodityEntity>();
+            }
+            if (commodityEntities.Count > 50)
+            {
+                commodityEntities = commodityEntities.GetRange(0, 50);
+            }
 
-        return JsonConvert.SerializeObject(commodityEntities);
+            return JsonConvert.SerializeObject(commodityEntities);
         }
 
         /// <summary>
         /// 获取支付优先级
         /// </summary>
         /// <returns></returns>
-        public ResponseEntity getPayPriority()
+        public string getPayPriority()
         {
-            //TODO...
-            return null;
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            string payList = "";
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    var paycodeModelList = db.Queryable<PayDetailEntity>().GroupBy(i => i.paycode).ToList();
+                    List<string> payCodeList = new List<string>();
+                    foreach (var item in paycodeModelList)
+                    {
+                        string paycode = item.paycode;
+                        payCodeList.Add(paycode);
+
+                    }
+                    //    for (DbModel dbModel : paycodeModelList) {
+                    //        String paycode = dbModel.getDataMap().get("paycode");
+                    //payCodeList.add(paycode);
+                    //    }
+                    payList =JsonConvert.SerializeObject(payCodeList);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.StackTrace);
+            }
+            return payList;
         }
 
 
@@ -1091,11 +1121,11 @@ namespace ZlPos.Bizlogic
         /// 获取本机所有串口端口号 win专用
         /// </summary>
         /// <returns></returns>
-        public string[] GetPort()
+        public string GetPort()
         {
             string[] arrSerial = SerialPort.GetPortNames();
 
-            return arrSerial;
+            return JsonConvert.SerializeObject(arrSerial);
         }
         #endregion
 
