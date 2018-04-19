@@ -573,7 +573,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public ResponseEntity SaveOneSaleBill(string json)
+        public void SaveOneSaleBill(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
 
@@ -582,7 +582,7 @@ namespace ZlPos.Bizlogic
                 logger.Info("保存销售单据接口：空字符串");
                 responseEntity.code = ResponseCode.Failed;
                 responseEntity.msg = "参数不能为空";
-                return responseEntity;
+                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
             }
             DbManager dbManager = DBUtils.Instance.DbManager;
 
@@ -592,7 +592,7 @@ namespace ZlPos.Bizlogic
                 logger.Info("保存销售单据接口：json解析失败");
                 responseEntity.code = ResponseCode.Failed;
                 responseEntity.msg = "参数格式错误";
-                return responseEntity;
+                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
             }
             try
             {
@@ -664,7 +664,7 @@ namespace ZlPos.Bizlogic
             }
             responseEntity.code = ResponseCode.SUCCESS;
             responseEntity.msg = "保存单据成功";
-            return responseEntity;
+            ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
         }
         #endregion
 
