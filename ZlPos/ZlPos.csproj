@@ -94,6 +94,7 @@
     <Compile Include="Enums\EnPrinterPort.cs" />
     <Compile Include="Enums\EnStateFlag.cs" />
     <Compile Include="Enums\PrinterType.cs" />
+    <Compile Include="Manager\CommodityCacheManager.cs" />
     <Compile Include="PrintServices\PrintBridge.cs" />
     <Compile Include="Config\ResponseCode.cs" />
     <Compile Include="Core\CallbackResponseStruct.cs" />

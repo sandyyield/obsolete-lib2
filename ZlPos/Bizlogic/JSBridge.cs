@@ -931,56 +931,71 @@ namespace ZlPos.Bizlogic
             logger.Info("getCommodityByCategory\n" + "categoryCode:" + categoryCode + "\tpageindex:" + pageindex + "\tpagesize:" + pagesize);
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            CommodityCacheManager commodityCacheManager = CommodityCacheManager.getInstance();
+            CommodityCacheManager commodityCacheManager = CommodityCacheManager.Instance;
             List<CommodityEntity> commodityEntities = null;
-            if (LoginUserManager.getInstance().isLogin())
+            if (_LoginUserManager.Login)
             {
                 if (commodityCacheManager != null
-                        && commodityCacheManager.getCommodityMap() != null
-                        && !commodityCacheManager.getCommodityMap().isEmpty()
-                        && commodityCacheManager.getCommodityMap().containsKey(categoryCode))
+                        && commodityCacheManager.CommodityMap != null
+                        && !(commodityCacheManager.CommodityMap.Count == 0)
+                        && commodityCacheManager.CommodityMap.ContainsKey(categoryCode))
                 {
-                    commodityEntities = commodityCacheManager.getCommodityMap().get(categoryCode);
+                    commodityEntities = commodityCacheManager.CommodityMap[categoryCode];
                 }
                 else
                 {
-                    UserEntity userEntity = LoginUserManager.getInstance().getUserEntity();
+                    UserEntity userEntity = _LoginUserManager.UserEntity;
                     try
                     {
-                        commodityEntities = dbManager.selector(CommodityEntity.class)
-                            .where("shopcode", "=", userEntity.getShopcode())
-                            .and("commoditystatus", "=", "0")
-                            .and("del", "=", "0")
-                            .and("categorycode", "=", categoryCode)
-                            .orderBy("commoditycode", true)
-                            .findAll();
-    } catch (DbException db) {
-                }
-                if (commodityCacheManager.getCommodityMap() != null) {
-                    commodityCacheManager.getCommodityMap().put(categoryCode, commodityEntities);
-                }
-            }
-        }
-        List<CommodityEntity> selectCommodityList = null;
-        if (commodityEntities != null && commodityEntities.size() > 0 && pageindex != -1) {
-            if (commodityEntities.size() > (pageindex* pagesize + pagesize)) {
-                selectCommodityList = commodityEntities.subList(pageindex* pagesize, pageindex* pagesize + pagesize);
-            } else {
-                if (pageindex* pagesize < commodityEntities.size()) {
-                    selectCommodityList = commodityEntities.subList(pageindex* pagesize, commodityEntities.size());
+                        using (var db = SugarDao.GetInstance())
+                        {
+                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                    && i.commoditystatus == "0"
+                                                                                    && i.del == "0"
+                                                                                    && i.categorycode == categoryCode)
+                                                                                    .OrderBy(i => i.categorycode, SqlSugar.OrderByType.Desc)
+                                                                                    .ToList();
+                        }
+
+                    }
+                    catch (Exception db)
+                    {
+                        logger.Error(db.StackTrace);
+                    }
+                    if (commodityCacheManager.CommodityMap != null)
+                    {
+                        commodityCacheManager.CommodityMap.Add(categoryCode, commodityEntities);
+                    }
                 }
             }
-        }else {
-            selectCommodityList=commodityEntities;
-        }
-        if (selectCommodityList == null) {
-            selectCommodityList = new ArrayList<>();
-        }
-        return gson.toJson(selectCommodityList);
+            List<CommodityEntity> selectCommodityList = null;
+            if (commodityEntities != null && commodityEntities.Count > 0 && pageindex != -1)
+            {
+                if (commodityEntities.Count > (pageindex * pagesize + pagesize))
+                {
+                    selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, pageindex * pagesize + pagesize);
+                }
+                else
+                {
+                    if (pageindex * pagesize < commodityEntities.Count)
+                    {
+                        selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, commodityEntities.Count);
+                    }
+                }
+            }
+            else
+            {
+                selectCommodityList = commodityEntities;
+            }
+            if (selectCommodityList == null)
+            {
+                selectCommodityList = new List<CommodityEntity>();
+            }
+            return JsonConvert.SerializeObject(selectCommodityList);
 
 
 
-            
+
             return "";
         }
 
