@@ -548,12 +548,19 @@ namespace ZlPos.Bizlogic
         public string GetLastUserName()
         {
             string shopcode = "";
+            ResponseEntity responseEntity = new ResponseEntity();
             try
             {
                 shopcode = ContextCache.GetShopcode();
+               
+                responseEntity.code = ResponseCode.SUCCESS;
+                responseEntity.data = shopcode;
+                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
             }
             catch (Exception e)
             {
+                responseEntity.code = ResponseCode.Failed;
+                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
                 logger.Error(e.Message + e.StackTrace);
             }
             return shopcode;

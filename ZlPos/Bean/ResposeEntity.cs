@@ -11,7 +11,7 @@ namespace ZlPos.Bean
 
         public string msg { get; set; }
 
-        public BaseData data { get; set; }
+        public object data { get; set; }
 
         public object obj { get; set; }
 
