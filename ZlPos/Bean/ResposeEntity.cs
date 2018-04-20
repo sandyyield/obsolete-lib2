@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZlPos.Bean
 {
-    class ResponseEntity
+    public class ResponseEntity
     {
         public int code { get; set; }
 

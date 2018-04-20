@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class PrinterConfigEntity
+    public class PrinterConfigEntity
     {
         public int id { get; set; }
 

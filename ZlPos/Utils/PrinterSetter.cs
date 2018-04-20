@@ -16,7 +16,7 @@ namespace ZlPos.Utils
         {
         }
 
-        public void setPrinter(PrinterConfigEntity printerConfigEntity,MethodResultListener listener)
+        public void SetPrinter(PrinterConfigEntity printerConfigEntity)
         { }
 
 
