@@ -4,6 +4,7 @@ using log4net.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using ZlPos.Bizlogic;
@@ -13,7 +14,7 @@ namespace ZlPos
 {
     static class Program
     {
-        private static ILog logger = null;
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// 应用程序的主入口点。
@@ -26,6 +27,8 @@ namespace ZlPos
 #else
             InitLog4netCfg(Level.Info);
 #endif
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             logger = LogManager.GetLogger("Logger");
 
             logger.Info("Initiallize chromium core..");
@@ -34,6 +37,8 @@ namespace ZlPos
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+           
 
             logger.Info("Start run " + AppContext.Instance.AppName + " services");
             Application.Run(new PosForm());
@@ -76,6 +81,51 @@ namespace ZlPos
             log4net.Config.BasicConfigurator.Configure(appender1);
         }
 
-        
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            if (e.Exception is DeException)
+            {
+                DeException dx = e.Exception as DeException;
+
+                if (logger != null)
+                    logger.Error("Application_ThreadException,errorcode is " + dx.ErrorCode, dx.InnerException);
+
+                MessageBox.Show(String.Format("错误编码{0},{1}---{2}", dx.ErrorCode, dx.Message, dx.StackTrace));
+            }
+            else
+            {
+                if (logger != null)
+                    logger.Error("Application_ThreadException", e.Exception);
+
+                MessageBox.Show(e.Exception.Message);
+            }
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (e.ExceptionObject is DeException)
+            {
+                DeException dx = e.ExceptionObject as DeException;
+
+                if (logger != null)
+                    logger.Error("Application_ThreadException,errorcode is " + dx.ErrorCode, dx.InnerException);
+
+                if (!dx.ErrorCode.Equals(""))
+                {
+                    MessageBox.Show(String.Format("错误编码{0},{1}---{2}", dx.ErrorCode, dx.Message, dx.StackTrace));
+                }
+            }
+            else
+            {
+                Exception ex = e.ExceptionObject as Exception;
+
+                if (logger != null)
+                    logger.Error("CurrentDomain_UnhandledException", ex);
+
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
     }
 }

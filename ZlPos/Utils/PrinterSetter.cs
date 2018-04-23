@@ -1,24 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Remoting.Contexts;
 using System.Text;
 using ZlPos.Bean;
+using ZlPos.Bizlogic;
+using ZlPos.Config;
+using ZlPos.Enums;
 using ZlPos.Models;
 
 namespace ZlPos.Utils
 {
     public class PrinterSetter
     {
+
         private ResponseEntity responseEntity;
 
         public PrinterSetter()
         {
         }
 
-        public void SetPrinter(PrinterConfigEntity printerConfigEntity)
-        { }
 
+        internal void SetPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
+        {
+            if (printerConfigEntity != null)
+            {
+                //add 2018/01/15 保存设置的小票打印份数
+                PrinterManager.Instance.PrintNumber = int.Parse(printerConfigEntity.printernumber);
+                responseEntity = new ResponseEntity();
+
+                switch (printerConfigEntity.printerType)
+                {
+                    case "usb":
+                        USBPrinterSetter usbPrinterSetter = new USBPrinterSetter();
+                        usbPrinterSetter.setUSBPrinter(printerConfigEntity, webCallback);
+                        break;
+                    case "bluetooth":
+                        BluethoothPrinterSetter bluethoothPrinterSetter = new BluethoothPrinterSetter();
+                        bluethoothPrinterSetter.setBluethoothPrinter(printerConfigEntity, webCallback);
+                        break;
+                    case "port":
+                        SerialPortPrinterSetter.setSerialPort(printerConfigEntity, webCallback);
+                        break;
+                    default:
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印机类型不可用";
+                        //L.i(TAG, "打印机类型不可用");
+                        if (webCallback != null)
+                        {
+                            webCallback.Invoke(responseEntity);
+                        }
+                        break;
+                }
+            }
 
         }
+
+    }
+}
 }

@@ -35,6 +35,8 @@ namespace ZlPos.Bizlogic
 
         static JSBridge instance = null;
 
+        public delegate void JsCallbackHandle(object state);
+
         public static JSBridge Instance
         {
             get
@@ -1201,6 +1203,9 @@ namespace ZlPos.Bizlogic
             return null;
         }
 
+
+
+        
         public void setPrinter(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
@@ -1208,6 +1213,16 @@ namespace ZlPos.Bizlogic
             {
                 PrinterConfigEntity printerConfigEntity = JsonConvert.DeserializeObject<PrinterConfigEntity>(json);
                 //PrinterSetter printerSetter = new PrinterSetter(mContext);
+                try
+                {
+                    PrinterSetter printerSetter = new PrinterSetter();
+                    //委托js回调方法
+                    JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod);
+                    printerSetter.SetPrinter(printerConfigEntity, jsCallbackHandle);
+                }catch(Exception e)
+                {
+                    logger.Error(e.StackTrace);
+                }
             }
             catch (Exception e)
             {
