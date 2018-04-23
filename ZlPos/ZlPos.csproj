@@ -91,6 +91,7 @@
     <Compile Include="Bizlogic\DeException.cs" />
     <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
+    <Compile Include="Enums\PrinterTypeEnum.cs" />
     <Compile Include="Listener\IPublish.cs" />
     <Compile Include="Listener\ISubscribe.cs" />
     <Compile Include="Listener\Publisher.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Enums\EnStateFlag.cs" />
     <Compile Include="Enums\PrinterType.cs" />
     <Compile Include="Manager\CommodityCacheManager.cs" />
+    <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\PrintBridge.cs" />
     <Compile Include="Config\ResponseCode.cs" />
     <Compile Include="Core\CallbackResponseStruct.cs" />
@@ -158,13 +160,18 @@
     <Compile Include="Models\UserVM.cs" />
     <Compile Include="Models\VersionVM.cs" />
     <Compile Include="PrintServices\IUSBPrinterService.cs" />
+    <Compile Include="PrintServices\serialPort.cs" />
     <Compile Include="PrintServices\USBPrinter.cs" />
     <Compile Include="PrintServices\USBPrinterService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\BluethoothPrinterSetter.cs" />
     <Compile Include="Utils\DateUtils.cs" />
+    <Compile Include="Utils\PrinterManager.cs" />
     <Compile Include="Utils\PrinterSetter.cs" />
+    <Compile Include="Utils\SerialPortPrinterSetter.cs" />
     <Compile Include="Utils\StringUtils.cs" />
+    <Compile Include="Utils\USBPrinterSetter.cs" />
     <EmbeddedResource Include="Forms\PosForm.resx">
       <DependentUpon>PosForm.cs</DependentUpon>
     </EmbeddedResource>

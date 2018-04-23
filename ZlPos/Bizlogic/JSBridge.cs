@@ -1143,6 +1143,15 @@ namespace ZlPos.Bizlogic
             return "";
         }
 
+        public void getGPrintUsbDevices()
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            responseEntity.code = ResponseCode.Failed;
+            ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
+
+            //return "";
+        }
+
         public void TestUsbPrint()
         {
             //TODO...
