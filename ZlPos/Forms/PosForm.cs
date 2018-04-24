@@ -33,6 +33,9 @@ namespace ZlPos.Forms
             };
             this.Controls.Add(chromiumBrowser);
 
+            //this.KeyPreview = true;
+            //KeyDown += PosForm_KeyDown;
+
             //bound = new BoundObject(chromiumBrowser);
 
             //用来ping js的
@@ -45,6 +48,11 @@ namespace ZlPos.Forms
             //button.Text = "PING JS ";
             //button.Click += Button_Click;
         }
+
+        //private void PosForm_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    MessageBox.Show("hello");
+        //}
 
         private void Button_Click(object sender, EventArgs e)
         {

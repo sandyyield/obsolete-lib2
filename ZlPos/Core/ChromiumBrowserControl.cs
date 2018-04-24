@@ -18,7 +18,7 @@ namespace ZlPos.Core
     /// </summary>
     public partial class ChromiumBrowserControl : UserControl
     {
-        private ChromiumWebBrowser browser;
+        public ChromiumWebBrowser browser;
 
         private JSBridge jsBridge = JSBridge.Instance;
 
@@ -37,6 +37,7 @@ namespace ZlPos.Core
             //browser = new ChromiumWebBrowser(@"file:///E:/ZlPos/newH5andorid/newH5/home.html")
             //browser = new ChromiumWebBrowser(@"https://zhonglunnet032001.oss-cn-shanghai.aliyuncs.com/attachment/20180110/2587e38d-411c-4d9c-b0dd-7fe3159d129e.mp4")
             {
+                KeyboardHandler = new KeyBoardHander(),
                 Dock = DockStyle.Fill,
             };
             Controls.Add(browser);
@@ -44,6 +45,7 @@ namespace ZlPos.Core
             BrowserLoading();
 
             InitializeComponent();
+
         }
 
         /// <summary>
@@ -66,6 +68,9 @@ namespace ZlPos.Core
             browser.AddressChanged += OnBrowserAddressChanged;
             browser.IsBrowserInitializedChanged += IsBrowserInitializedChanged;
 
+            //注册DevTools热键
+            //this.KeyDown += Browser_KeyDown;
+
 
             var bitness = Environment.Is64BitProcess ? "x64" : "x86";
             var version = String.Format("Chromium: {0}, CEF: {1}, CefSharp: {2}, Environment: {3}", Cef.ChromiumVersion, Cef.CefVersion, Cef.CefSharpVersion, bitness);
@@ -73,6 +78,13 @@ namespace ZlPos.Core
 
         }
 
+        //private void Browser_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode == Keys.F12)
+        //    {
+        //        browser.ShowDevTools();
+        //    }
+        //}
         #region 事件驱动
 
         private void IsBrowserInitializedChanged(object sender, IsBrowserInitializedChangedEventArgs e)
@@ -81,8 +93,8 @@ namespace ZlPos.Core
             {
                 //canExecuteJavaScriptAsync = true;
 #if DEBUG
-                //调试器
-                browser.ShowDevTools();
+                ////调试器
+                //browser.ShowDevTools();
 #endif
             }
 

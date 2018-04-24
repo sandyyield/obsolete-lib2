@@ -91,6 +91,7 @@
     <Compile Include="Bizlogic\DeException.cs" />
     <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
+    <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Enums\PrinterTypeEnum.cs" />
     <Compile Include="Listener\IPublish.cs" />
     <Compile Include="Listener\ISubscribe.cs" />
