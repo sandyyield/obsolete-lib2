@@ -29,13 +29,22 @@ namespace ZlPos.Bizlogic
         //private static ILog logger = null;
         private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private ChromiumWebBrowser browser;
+        private static ChromiumWebBrowser browser;
 
         private static LoginUserManager _LoginUserManager = LoginUserManager.Instance;
 
         static JSBridge instance = null;
 
         public delegate void JsCallbackHandle(object state);
+
+        /// <summary>
+        /// 委托方式托管回调
+        /// </summary>
+        /// <param name="methodName">js方法名</param>
+        /// <param name="responseEntity">回调参数</param>
+        public delegate void WebViewHandle(string methodName, ResponseEntity responseEntity);
+
+        public static WebViewHandle mWebViewHandle;
 
         public static JSBridge Instance
         {
@@ -44,6 +53,7 @@ namespace ZlPos.Bizlogic
                 if (instance == null)
                 {
                     instance = new JSBridge();
+                    mWebViewHandle = new WebViewHandle(AsyncCallbackMethod);
                 }
                 return instance;
             }
@@ -123,7 +133,8 @@ namespace ZlPos.Bizlogic
                 responseEntity.msg = "参数不能为空";
 
                 //TODO这里考虑开个线程池去操作
-                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
+                mWebViewHandle.Invoke("loginCallBack", responseEntity);
             }
             else
             {
@@ -163,8 +174,9 @@ namespace ZlPos.Bizlogic
                         }
                     }
                     //只是为了调试加的
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
-                    System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
+                    //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
+                    mWebViewHandle.Invoke("loginCallBack", responseEntity);
+                    //System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
                 }
                 catch (Exception e)
                 {
@@ -335,7 +347,9 @@ namespace ZlPos.Bizlogic
                         responseEntity.code = ResponseCode.SUCCESS;
 
                         //callback
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOrUpdateCommodityInfoCallBack", responseEntity });
+                        //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOrUpdateCommodityInfoCallBack", responseEntity });
+                        //减少线程开销
+                        mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
                     }
                 }
                 catch (Exception e)
@@ -557,12 +571,14 @@ namespace ZlPos.Bizlogic
 
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.data = shopcode;
-                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
+                mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
             }
             catch (Exception e)
             {
                 responseEntity.code = ResponseCode.Failed;
-                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
+                mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
                 logger.Error(e.Message + e.StackTrace);
             }
             return shopcode;
@@ -584,7 +600,8 @@ namespace ZlPos.Bizlogic
                 logger.Info("保存销售单据接口：空字符串");
                 responseEntity.code = ResponseCode.Failed;
                 responseEntity.msg = "参数不能为空";
-                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+                mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
             }
             DbManager dbManager = DBUtils.Instance.DbManager;
 
@@ -594,7 +611,8 @@ namespace ZlPos.Bizlogic
                 logger.Info("保存销售单据接口：json解析失败");
                 responseEntity.code = ResponseCode.Failed;
                 responseEntity.msg = "参数格式错误";
-                ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+                mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
             }
             try
             {
@@ -666,7 +684,8 @@ namespace ZlPos.Bizlogic
             }
             responseEntity.code = ResponseCode.SUCCESS;
             responseEntity.msg = "保存单据成功";
-            ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+            mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
         }
         #endregion
 
@@ -1147,7 +1166,8 @@ namespace ZlPos.Bizlogic
         {
             ResponseEntity responseEntity = new ResponseEntity();
             responseEntity.code = ResponseCode.Failed;
-            ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
+            //ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
+            mWebViewHandle.Invoke("getGPrintUsbDevicesCallBack", responseEntity);
 
             //return "";
         }
@@ -1214,7 +1234,7 @@ namespace ZlPos.Bizlogic
 
 
 
-        
+
         public void setPrinter(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
@@ -1228,7 +1248,8 @@ namespace ZlPos.Bizlogic
                     //委托js回调方法
                     JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod);
                     printerSetter.SetPrinter(printerConfigEntity, jsCallbackHandle);
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     logger.Error(e.StackTrace);
                 }
@@ -1460,21 +1481,26 @@ namespace ZlPos.Bizlogic
         }
 
 
-
+        /// <summary>
+        /// 多线程方式回调
+        /// </summary>
+        /// <param name="state"></param>
         private void CallbackMethod(object state)
         {
 
             object[] paramsArr = (object[])state;
-            //first params is method name  
             string methodName = paramsArr[0] as string;
-
-            //real params tofix
             ResponseEntity responseEntity = paramsArr[1] as ResponseEntity;
+            browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
+        }
 
-            ////模拟耗时操作
-            //Thread.Sleep(5000);
-
-
+        /// <summary>
+        /// 委托方式回调
+        /// </summary>
+        /// <param name="methodName">回调得js方法名</param>
+        /// <param name="responseEntity">回调的数据包</param>
+        private static void AsyncCallbackMethod(string methodName, ResponseEntity responseEntity)
+        {
             browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
         }
     }

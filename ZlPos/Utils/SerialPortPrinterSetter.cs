@@ -16,7 +16,7 @@ namespace ZlPos.Utils
             ResponseEntity responseEntity = new ResponseEntity();
             if (webCallback != null)
             {
-                webCallback.Invoke(responseEntity);
+                webCallback.Invoke(new object[] { "setPrinterCallBack", responseEntity });
             }
         }
     }

@@ -49,7 +49,7 @@ namespace ZlPos.Utils
                         //L.i(TAG, "打印机类型不可用");
                         if (webCallback != null)
                         {
-                            webCallback.Invoke(responseEntity);
+                            webCallback.Invoke(new object[] { "setPrinterCallBack",responseEntity });
                         }
                         break;
                 }

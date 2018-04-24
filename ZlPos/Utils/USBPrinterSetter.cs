@@ -39,7 +39,7 @@ namespace ZlPos.Utils
                 responseEntity.msg = "参数不能为空";
                 if (listener != null)
                 {
-                    listener.Invoke(responseEntity);
+                    listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
                 }
 
             }
