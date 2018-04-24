@@ -1157,6 +1157,18 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        public void getUsbDevices()
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            responseEntity.code = ResponseCode.SUCCESS;
+            List<string> devices = new List<string> { "usb" };
+            DeviceEntity deviceEntity = new DeviceEntity();
+            deviceEntity.devices = devices;
+            responseEntity.data = deviceEntity;
+            mWebViewHandle.Invoke("getUsbDevicesCallBack", responseEntity);
+            return;
+        }
+
         public string GetGPrinter()
         {
             return "";

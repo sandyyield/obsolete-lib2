@@ -161,7 +161,6 @@
     <Compile Include="Models\UserVM.cs" />
     <Compile Include="Models\VersionVM.cs" />
     <Compile Include="PrintServices\IUSBPrinterService.cs" />
-    <Compile Include="PrintServices\serialPort.cs" />
     <Compile Include="PrintServices\USBPrinter.cs" />
     <Compile Include="PrintServices\USBPrinterService.cs" />
     <Compile Include="Program.cs" />
@@ -170,6 +169,7 @@
     <Compile Include="Utils\DateUtils.cs" />
     <Compile Include="Utils\PrinterManager.cs" />
     <Compile Include="Utils\PrinterSetter.cs" />
+    <Compile Include="Utils\serialPort.cs" />
     <Compile Include="Utils\SerialPortPrinterSetter.cs" />
     <Compile Include="Utils\StringUtils.cs" />
     <Compile Include="Utils\USBPrinterSetter.cs" />

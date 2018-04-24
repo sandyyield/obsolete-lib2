@@ -43,10 +43,11 @@ namespace ZlPos.PrintServices
             //byte[] vs = { 0x1b, 0x21, 0x30 };
             //初始化打印设置
             //byte[] vs = { 0x1b, 0x40 };
-            byte[] vs = { 0x1b, 0x61,0x31 };
-            PrintBridge.WriteUsb(hUSB, Encoding.Unicode.GetString(vs), vs.Length, ref sendSize);
-            string teststr = "hello world\r\n\r\n\r\n\r\n\r\n";
-            PrintBridge.WriteUsb(hUSB, teststr, Encoding.Unicode.GetByteCount(teststr), ref sendSize);
+            //byte[] vs = { 0x1b, 0x61,0x31 };
+            //PrintBridge.WriteUsb(hUSB, Encoding.Unicode.GetString(vs), vs.Length, ref sendSize);
+            string teststr = "打印机测试成功\r\n\r\n\r\n\r\n\r\n";
+            byte[] bytestr = Encoding.Default.GetBytes(teststr);
+            PrintBridge.WriteUsb(hUSB, Encoding.Default.GetString(bytestr), Encoding.Default.GetByteCount(teststr), ref sendSize);
 
 
 

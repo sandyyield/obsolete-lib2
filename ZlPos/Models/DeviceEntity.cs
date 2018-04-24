@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class DeviceEntity
+    public class DeviceEntity
     {
-        public List<String> devices { get; set; }
-        public PrinterConfigEntity config { get; set; }
+        public List<string> devices { get; set; }
+        //public PrinterConfigEntity config { get; set; }
     }
 }

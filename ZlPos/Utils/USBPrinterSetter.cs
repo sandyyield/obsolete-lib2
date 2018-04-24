@@ -32,16 +32,23 @@ namespace ZlPos.Utils
                 responseEntity = new ResponseEntity();
                 PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
                 getUsbDevices();
+
+
+                //debug 
+
+                PrintServices.USBPrinterService upt = new PrintServices.USBPrinterService();
+                upt.Print("hhh");
+                responseEntity.code = ResponseCode.SUCCESS;
+
             }
             else
             {
                 responseEntity.code = ResponseCode.Failed;
                 responseEntity.msg = "参数不能为空";
-                if (listener != null)
-                {
-                    listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
-                }
-
+            }
+            if (listener != null)
+            {
+                listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
             }
 
 

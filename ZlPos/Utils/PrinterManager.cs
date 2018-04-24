@@ -54,6 +54,7 @@ namespace ZlPos.Utils
         public int PrintNumber { get => printNumber; set => printNumber = value; }
         public USBPrinter UsbPrinter { get => usbPrinter; set => usbPrinter = value; }
         public PrinterConfigEntity PrinterConfigEntity { get => printerConfigEntity; set => printerConfigEntity = value; }
+        public bool Init { get; internal set; }
         internal BluetoothPrinter BluetoothPrinter { get => bluetoothPrinter; set => bluetoothPrinter = value; }
         internal serialPort PortPrinter { get => portPrinter; set => portPrinter = value; }
     }
