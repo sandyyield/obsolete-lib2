@@ -67,7 +67,7 @@ namespace ZlPos.Utils
                 if (bluetoothDevice.DeviceName.Equals(printerConfigEntity.deviceId))
                 {
                     BluetoothPrinter bluetoothPrinter;
-                    if (PrinterManager.Instance.isInit() && PrinterManager.Instance.BluetoothPrinter != null)
+                    if (PrinterManager.Instance.Init && PrinterManager.Instance.BluetoothPrinter != null)
                     {
                         if (bluetoothDevice.DeviceAddress.Equals(PrinterManager.Instance.BluetoothPrinter.MacAddress))
                         {
@@ -99,22 +99,22 @@ namespace ZlPos.Utils
                     if (!bluetoothPrinter.isConnected())
                     {
                         bluetoothPrinter.openConnection();
-                        PrinterManager.Instance.BluetoothPrinter = bluetoothPrinter;
-                        PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
                     }
                     else
                     {
-                        PrinterManager.Instance.Init = true;
-                        PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.bluetooth;
-                        PrinterManager.Instance.BluetoothPrinter = bluetoothPrinter;
-                        responseEntity.code = ResponseCode.SUCCESS;
-                        responseEntity.msg = "打印机设置成功";
                         //                    savePrinterConfig(printerConfigEntity);
                         //                    PrintUtils.printText(bluetoothPrinter);
-                        if (listener != null)
-                        {
-                            listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
-                        }
+                    }
+                    PrinterManager.Instance.Init = true;
+                    PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.bluetooth;
+                    PrinterManager.Instance.BluetoothPrinter = bluetoothPrinter;
+                    PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
+                    bluetoothPrinter.PrintString("蓝牙打印机测试成功\r\n\r\n\r\n\r\n");
+                    responseEntity.code = ResponseCode.SUCCESS;
+                    responseEntity.msg = "打印机设置成功";
+                    if (listener != null)
+                    {
+                        listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
                     }
                     return true;
                 }
@@ -150,7 +150,7 @@ namespace ZlPos.Utils
             }
         }
 
-        
+
     }
 
 }
