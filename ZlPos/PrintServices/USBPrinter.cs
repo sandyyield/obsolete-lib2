@@ -14,11 +14,15 @@ namespace ZlPos.PrintServices
     {
         protected static ILog logger = null;
 
-        private IntPtr hDevice;
+        //记录usb设备的句柄
+        private IntPtr hDevice = IntPtr.Zero;
         private PrinterType currentPrintType;
+
+        private bool init = false;
 
         public IntPtr HDevice { get => hDevice; set => hDevice = value; }
         public PrinterType CurrentPrintType { get => currentPrintType; set => currentPrintType = value; }
+        public bool Init { get => init; set => init = value; }
 
         public static readonly int COMM_ALIGN = 13;
         public static readonly int COMM_ALIGN_LEFT = 0;
@@ -27,7 +31,7 @@ namespace ZlPos.PrintServices
 
         public int PrintText(string content)
         {
-            if(content == null)
+            if (content == null)
             {
                 return -1;
             }
@@ -45,15 +49,51 @@ namespace ZlPos.PrintServices
             }
         }
 
+        public IntPtr open()
+        {
+            IntPtr hUsb = IntPtr.Zero;
+            if (hDevice == IntPtr.Zero)
+            {
+                hUsb = PrintBridge.OpenUsb();
+                init = true;
+            }
+            return hUsb;
+        }
+
+        /// <summary>
+        /// ***************注意打开关闭时间间隔过小会导致bug*****************
+        /// </summary>
+        public void close()
+        {
+            PrintBridge.CloseUsb(hDevice);
+            init = false;
+            hDevice = IntPtr.Zero;
+        }
+
+        internal int PrintString(string content)
+        {
+            try
+            {
+                int sendCount = 0;
+                PrintBridge.WriteUsb(hDevice, content, Encoding.Default.GetByteCount(content), ref sendCount);
+                return sendCount;
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.StackTrace);
+                return -1;
+            }
+        }
+
         public static int Write(IntPtr hDevice, string content)
         {
             try
             {
                 int sendCount = 0;
-                PrintBridge.WriteUsb(hDevice, content, Encoding.Unicode.GetByteCount(content), ref sendCount);
+                PrintBridge.WriteUsb(hDevice, content, Encoding.Default.GetByteCount(content), ref sendCount);
                 return sendCount;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 logger.Error(e.StackTrace);
                 return -1;

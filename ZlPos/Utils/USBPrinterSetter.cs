@@ -6,7 +6,9 @@ using System.Text;
 using ZlPos.Bean;
 using ZlPos.Bizlogic;
 using ZlPos.Config;
+using ZlPos.Enums;
 using ZlPos.Models;
+using ZlPos.PrintServices;
 
 namespace ZlPos.Utils
 {
@@ -26,12 +28,41 @@ namespace ZlPos.Utils
 
         internal void setUSBPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
         {
+            IntPtr hUsb;
             if (printerConfigEntity != null)
             {
                 listener = webCallback;
                 responseEntity = new ResponseEntity();
                 PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
-                getUsbDevices();
+                if (PrinterManager.Instance.UsbPrinter == null)
+                {
+                    USBPrinter usbPrinter = new USBPrinter();
+                    if (!usbPrinter.Init)
+                    {
+                        hUsb = usbPrinter.open();
+                        usbPrinter.HDevice = hUsb;
+                    }
+                    PrinterManager.Instance.Init = true;
+                    PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.usb;
+                    PrinterManager.Instance.UsbPrinter = usbPrinter;
+                    PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
+
+                    usbPrinter.PrintString("蓝牙打印机测试成功\r\n\r\n\r\n\r\n");
+                    responseEntity.code = ResponseCode.SUCCESS;
+                    responseEntity.msg = "打印机设置成功";
+                    if (listener != null)
+                    {
+                        listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
+                    }
+
+                }
+                else
+                {
+                    //TODO...
+                }
+
+
+                //getUsbDevices();
 
 
                 //debug 
@@ -54,10 +85,13 @@ namespace ZlPos.Utils
 
         }
 
-        private void getUsbDevices()
-        {
-            //TODO... 这里的逻辑和android那边的不太一样  因为是引用的第三方封装dll方法 所以好像一些排版会有问题
-        }
+        //private void getUsbDevices()
+        //{
+        //    //TODO... 这里的逻辑和android那边的不太一样  因为是引用的第三方封装dll方法 所以好像一些排版会有问题
+
+        //    USBPrinter usbPrinter = new USBPrinter();
+
+        //}
 
         //public Handle
 
