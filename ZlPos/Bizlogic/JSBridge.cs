@@ -40,6 +40,9 @@ namespace ZlPos.Bizlogic
 
         public delegate void JsCallbackHandle(object state);
 
+        //内存镜像
+        PrinterConfigEntity _printerConfigEntity;
+
         /// <summary>
         /// 委托方式托管回调
         /// </summary>
@@ -1233,14 +1236,14 @@ namespace ZlPos.Bizlogic
                 responseEntity.data = deviceEntity;
                 mWebViewHandle.Invoke("getBluetoothDevicesCallBack", responseEntity);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 responseEntity.code = ResponseCode.Failed;
                 mWebViewHandle.Invoke("getBluetoothDevicesCallBack", responseEntity);
             }
 
 
-            
+
         }
 
         /// <summary>
@@ -1259,8 +1262,23 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetPrinter()
         {
-            //TODO...
-            return "";
+            string config = "";
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    PrinterConfigEntity printerConfigEntity = db.Queryable<PrinterConfigEntity>().First();
+                    if (printerConfigEntity != null)
+                    {
+                        config = JsonConvert.SerializeObject(printerConfigEntity);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.StackTrace);
+            }
+            return config; ;
         }
 
         public ResponseEntity StartBluetoothSearch()
@@ -1289,7 +1307,8 @@ namespace ZlPos.Bizlogic
                 {
                     PrinterSetter printerSetter = new PrinterSetter();
                     //委托js回调方法
-                    JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod);
+                    JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod4SetPrinter);
+                    _printerConfigEntity = printerConfigEntity;
                     printerSetter.SetPrinter(printerConfigEntity, jsCallbackHandle);
                 }
                 catch (Exception e)
@@ -1546,5 +1565,34 @@ namespace ZlPos.Bizlogic
         {
             browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
         }
+
+        private void CallbackMethod4SetPrinter(object state)
+        {
+            object[] paramsArr = (object[])state;
+            string methodName = paramsArr[0] as string;
+            ResponseEntity responseEntity = paramsArr[1] as ResponseEntity;
+            browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
+            if (responseEntity.code == ResponseCode.SUCCESS)
+            {
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        //db.DbMaintenance.DropTable("PrinterConfigEntity");
+                        if (db.DbMaintenance.IsAnyTable(typeof(PrinterConfigEntity).Name))
+                        {
+                            db.DbMaintenance.DropTable(typeof(PrinterConfigEntity).Name);
+                        }
+                        DBUtils.Instance.DbManager.SaveOrUpdate(_printerConfigEntity);
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.StackTrace);
+                }
+            }
+        }
+
+
     }
 }

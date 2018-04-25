@@ -1,30 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SqlSugar;
 
 namespace ZlPos.Models
 {
     public class PrinterConfigEntity
     {
+        [SugarColumn(IsPrimaryKey = true,IsIdentity = true,IsNullable = false)]
         public int id { get; set; }
 
-        public String printerType { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string printerType { get; set; }
 
-        public String pageWidth { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string pageWidth { get; set; }
+
         //public object PageWidth { get; internal set; }
-        public String port { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string port { get; set; }
 
-        public String intBaud { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string intBaud { get; set; }
 
-        public String deviceId { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string deviceId { get; set; }
 
-        public String usbSystem { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string usbSystem { get; set; }
 
-        public String printerBrand { get; set; }
-        public object PrinterBrand { get; internal set; }
+        [SugarColumn(IsNullable = true)]
+        public string printerBrand { get; set; }
+
+        //[SugarColumn(IsNullable = true)]
+        //public string PrinterBrand { get;  set; }
 
         //add 2018/01/15 打印小票份数
-        public String printernumber { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string printernumber { get; set; }
     }
 }
