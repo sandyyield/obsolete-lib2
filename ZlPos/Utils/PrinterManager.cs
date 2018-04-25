@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InTheHand.Net.Sockets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,7 @@ namespace ZlPos.Utils
         private PrinterConfigEntity printerConfigEntity;
 
         //private ArrayList<UsbDevice> usbDeviceArrayList;
-        //private ArrayList<BluetoothDevice> bluetoothDeviceArrayList;
+        private List<BluetoothDeviceInfo> bluetoothDeviceArrayList;
 
 
         private bool init;
@@ -50,11 +51,17 @@ namespace ZlPos.Utils
             }
         }
 
+        public bool isInit()
+        {
+            return init;
+        }
+
         public PrinterTypeEnum PrinterTypeEnum { get => printerTypeEnum; set => printerTypeEnum = value; }
         public int PrintNumber { get => printNumber; set => printNumber = value; }
         public USBPrinter UsbPrinter { get => usbPrinter; set => usbPrinter = value; }
         public PrinterConfigEntity PrinterConfigEntity { get => printerConfigEntity; set => printerConfigEntity = value; }
         public bool Init { get; internal set; }
+        public List<BluetoothDeviceInfo> BluetoothDeviceArrayList { get => bluetoothDeviceArrayList; set => bluetoothDeviceArrayList = value; }
         internal BluetoothPrinter BluetoothPrinter { get => bluetoothPrinter; set => bluetoothPrinter = value; }
         internal serialPort PortPrinter { get => portPrinter; set => portPrinter = value; }
     }

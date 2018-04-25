@@ -64,6 +64,10 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net40\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="InTheHand.Net.Personal, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Library\InTheHand.Net.Personal.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -205,6 +209,9 @@
   </ItemGroup>
   <!-- add by sVen 2018年4月16日 -->
   <ItemGroup>
+    <Content Include="Library\InTheHand.Net.Personal.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="References\MySql.Data.dll" />
     <Content Include="References\Newtonsoft.Json.dll" />
     <Content Include="References\Oracle.ManagedDataAccess.dll" />

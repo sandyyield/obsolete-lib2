@@ -12,7 +12,7 @@ namespace ZlPos.Models
         public String printerType { get; set; }
 
         public String pageWidth { get; set; }
-        public object PageWidth { get; internal set; }
+        //public object PageWidth { get; internal set; }
         public String port { get; set; }
 
         public String intBaud { get; set; }

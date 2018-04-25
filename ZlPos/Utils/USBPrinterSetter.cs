@@ -37,7 +37,7 @@ namespace ZlPos.Utils
                 //debug 
 
                 PrintServices.USBPrinterService upt = new PrintServices.USBPrinterService();
-                upt.Print("hhh");
+                upt.TestPrint();
                 responseEntity.code = ResponseCode.SUCCESS;
 
             }

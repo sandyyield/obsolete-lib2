@@ -18,6 +18,9 @@ using ZlPos.PrintServices;
 using System.Reflection;
 using SqlSugar;
 using System.Data.Entity.Infrastructure;
+using InTheHand.Net;
+using InTheHand.Net.Bluetooth;
+using InTheHand.Net.Sockets;
 
 namespace ZlPos.Bizlogic
 {
@@ -1206,10 +1209,38 @@ namespace ZlPos.Bizlogic
             return null;
         }
 
-        public ResponseEntity GetBluetoothDevices()
+        public void GetBluetoothDevices()
         {
-            //TODO...
-            return null;
+            ResponseEntity responseEntity = new ResponseEntity();
+            try
+            {
+                BluetoothRadio BuleRadio = BluetoothRadio.PrimaryRadio;
+                BuleRadio.Mode = RadioMode.Connectable;
+
+                BluetoothClient Blueclient = new BluetoothClient();
+                Dictionary<string, BluetoothAddress> deviceAddresses = new Dictionary<string, BluetoothAddress>();
+
+                BluetoothDeviceInfo[] Devices = Blueclient.DiscoverDevices();
+                //List<BluetoothDeviceInfo> bluetoothDeviceInfos = new List<BluetoothDeviceInfo>(Devices);
+                List<string> deviceNames = new List<string>();
+                DeviceEntity deviceEntity = new DeviceEntity();
+                foreach (BluetoothDeviceInfo device in Devices)
+                {
+                    deviceNames.Add(device.DeviceName);
+                }
+                deviceEntity.devices = deviceNames;
+                responseEntity.code = ResponseCode.SUCCESS;
+                responseEntity.data = deviceEntity;
+                mWebViewHandle.Invoke("getBluetoothDevicesCallBack", responseEntity);
+            }
+            catch(Exception e)
+            {
+                responseEntity.code = ResponseCode.Failed;
+                mWebViewHandle.Invoke("getBluetoothDevicesCallBack", responseEntity);
+            }
+
+
+            
         }
 
         /// <summary>
@@ -1447,7 +1478,7 @@ namespace ZlPos.Bizlogic
         public void TestUSBPrint()
         {
             USBPrinterService usbPrinterService = new USBPrinterService();
-            usbPrinterService.Print("hello");
+            usbPrinterService.TestPrint();
         }
 
 

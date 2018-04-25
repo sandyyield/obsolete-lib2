@@ -2,12 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ZlPos.Enums;
 using ZlPos.Models;
 
 namespace ZlPos.PrintServices
 {
     class USBPrinterService : IUSBPrinterService
     {
+        public void TestPrint()
+        {
+            IntPtr hUSB = PrintBridge.OpenUsb();
+            int sendSize = 0;
+            string teststr = "打印机测试成功\r\n\r\n\r\n\r\n\r\n";
+            string sendUnicode = Encoding.Unicode.GetString(Encoding.Default.GetBytes(teststr));
+            PrintBridge.WriteUsb(hUSB, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendSize);
+        }
+
         public void Print(object state)
         {
             if (state == null)
@@ -46,8 +56,9 @@ namespace ZlPos.PrintServices
             //byte[] vs = { 0x1b, 0x61,0x31 };
             //PrintBridge.WriteUsb(hUSB, Encoding.Unicode.GetString(vs), vs.Length, ref sendSize);
             string teststr = "打印机测试成功\r\n\r\n\r\n\r\n\r\n";
-            byte[] bytestr = Encoding.Default.GetBytes(teststr);
-            PrintBridge.WriteUsb(hUSB, Encoding.Default.GetString(bytestr), Encoding.Default.GetByteCount(teststr), ref sendSize);
+            string sendUnicode = Encoding.Unicode.GetString(Encoding.Default.GetBytes(teststr));
+            PrintBridge.WriteUsb(hUSB, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendSize);
+
 
 
 
