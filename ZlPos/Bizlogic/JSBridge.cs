@@ -21,6 +21,7 @@ using System.Data.Entity.Infrastructure;
 using InTheHand.Net;
 using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace ZlPos.Bizlogic
 {
@@ -132,63 +133,68 @@ namespace ZlPos.Bizlogic
         /// <param name="json"></param>
         public void Login(string json)
         {
-            ResponseEntity responseEntity = new ResponseEntity();
-            if (string.IsNullOrEmpty(json))
+            Task.Factory.StartNew(() =>
             {
-                responseEntity.code = ResponseCode.Failed;
-                responseEntity.msg = "参数不能为空";
 
-                //TODO这里考虑开个线程池去操作
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
-                mWebViewHandle.Invoke("loginCallBack", responseEntity);
-            }
-            else
-            {
-                try
+
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (string.IsNullOrEmpty(json))
                 {
-                    // 将H5传过来的用户输入信息进行解析，用于离线登录匹配
-                    LoginEntity loginEntity = JsonConvert.DeserializeObject<LoginEntity>(json);
-                    DbManager dbManager = DBUtils.Instance.DbManager;
-                    if (loginEntity != null)
-                    {
-                        using (var db = SugarDao.GetInstance())
-                        {
-                            List<UserEntity> userList;
-                            if (String.IsNullOrEmpty(loginEntity.account) || loginEntity.account == "0")
-                            {
-                                userList = db.Queryable<UserEntity>().Where(it => it.account == loginEntity.account
-                                                                            && it.password == loginEntity.password).ToList();
-                            }
-                            else
-                            {
-                                userList = db.Queryable<UserEntity>().Where(it => it.username == loginEntity.username
-                                                                            && it.shopcode == loginEntity.shopcode
-                                                                            && it.password == loginEntity.password).ToList();
-                            }
-                            if (userList != null && userList.Count == 1)
-                            {
-                                _LoginUserManager.Login = true;
-                                _LoginUserManager.UserEntity = userList[0];
-                                UserVM userVM = new UserVM();
-                                UserEntity userEntity = userList[0];
-                                userVM.user_info = userEntity;
-                                List<ShopConfigEntity> configEntities = db.Queryable<ShopConfigEntity>().Where(
-                                                                        it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).ToList();
-                                //TODO...先去写saveOrUpadteUserInfo 再来完成这边login的逻辑
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "参数不能为空";
 
-                            }
-                        }
-                    }
-                    //只是为了调试加的
+                    //TODO这里考虑开个线程池去操作
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
                     mWebViewHandle.Invoke("loginCallBack", responseEntity);
-                    //System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
                 }
-                catch (Exception e)
+                else
                 {
+                    try
+                    {
+                        // 将H5传过来的用户输入信息进行解析，用于离线登录匹配
+                        LoginEntity loginEntity = JsonConvert.DeserializeObject<LoginEntity>(json);
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        if (loginEntity != null)
+                        {
+                            using (var db = SugarDao.GetInstance())
+                            {
+                                List<UserEntity> userList;
+                                if (String.IsNullOrEmpty(loginEntity.account) || loginEntity.account == "0")
+                                {
+                                    userList = db.Queryable<UserEntity>().Where(it => it.account == loginEntity.account
+                                                                                && it.password == loginEntity.password).ToList();
+                                }
+                                else
+                                {
+                                    userList = db.Queryable<UserEntity>().Where(it => it.username == loginEntity.username
+                                                                                && it.shopcode == loginEntity.shopcode
+                                                                                && it.password == loginEntity.password).ToList();
+                                }
+                                if (userList != null && userList.Count == 1)
+                                {
+                                    _LoginUserManager.Login = true;
+                                    _LoginUserManager.UserEntity = userList[0];
+                                    UserVM userVM = new UserVM();
+                                    UserEntity userEntity = userList[0];
+                                    userVM.user_info = userEntity;
+                                    List<ShopConfigEntity> configEntities = db.Queryable<ShopConfigEntity>().Where(
+                                                                            it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).ToList();
+                                    //TODO...先去写saveOrUpadteUserInfo 再来完成这边login的逻辑
 
+                                }
+                            }
+                        }
+                        //只是为了调试加的
+                        //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
+                        mWebViewHandle.Invoke("loginCallBack", responseEntity);
+                        //System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
                 }
-            }
+            });
         }
         #endregion
 
@@ -355,7 +361,10 @@ namespace ZlPos.Bizlogic
                         //callback
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOrUpdateCommodityInfoCallBack", responseEntity });
                         //减少线程开销
-                        mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
+                        Task.Factory.StartNew(() =>
+                        {
+                            mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
+                        });
                     }
                 }
                 catch (Exception e)
@@ -578,13 +587,19 @@ namespace ZlPos.Bizlogic
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.data = shopcode;
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
-                mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
+                Task.Factory.StartNew(() =>
+                {
+                    mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
+                });
             }
             catch (Exception e)
             {
                 responseEntity.code = ResponseCode.Failed;
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
-                mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
+                Task.Factory.StartNew(() =>
+                {
+                    mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
+                });
                 logger.Error(e.Message + e.StackTrace);
             }
             return shopcode;
@@ -599,99 +614,103 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public void SaveOneSaleBill(string json)
         {
-            ResponseEntity responseEntity = new ResponseEntity();
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
 
-            if (string.IsNullOrEmpty(json))
-            {
-                logger.Info("保存销售单据接口：空字符串");
-                responseEntity.code = ResponseCode.Failed;
-                responseEntity.msg = "参数不能为空";
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
-                mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
-            }
-            DbManager dbManager = DBUtils.Instance.DbManager;
+                if (string.IsNullOrEmpty(json))
+                {
+                    logger.Info("保存销售单据接口：空字符串");
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "参数不能为空";
+                    //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+                    mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                }
+                DbManager dbManager = DBUtils.Instance.DbManager;
 
-            BillEntity billEntity = JsonConvert.DeserializeObject<BillEntity>(json);
-            if (billEntity == null)
-            {
-                logger.Info("保存销售单据接口：json解析失败");
-                responseEntity.code = ResponseCode.Failed;
-                responseEntity.msg = "参数格式错误";
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
-                mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
-            }
-            try
-            {
-                DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
-                dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
-                DateTime insertDate = DateTime.MinValue;
+                BillEntity billEntity = JsonConvert.DeserializeObject<BillEntity>(json);
+                if (billEntity == null)
+                {
+                    logger.Info("保存销售单据接口：json解析失败");
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "参数格式错误";
+                    //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+                    mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                }
                 try
                 {
-                    insertDate = Convert.ToDateTime(billEntity.saletime, dtFormat);
+                    DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+                    dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+                    DateTime insertDate = DateTime.MinValue;
+                    try
+                    {
+                        insertDate = Convert.ToDateTime(billEntity.saletime, dtFormat);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e.Message + e.StackTrace);
+                    }
+                    if (insertDate == DateTime.MinValue)
+                    {
+                        insertDate = DateTime.Now;
+                    }
+                    billEntity.insertTime = Utils.DateUtils.ConvertDataTimeToLong(insertDate);
+
+                    dbManager.SaveOrUpdate(billEntity);
                 }
                 catch (Exception e)
                 {
-                    logger.Error(e.Message + e.StackTrace);
+                    logger.Error("保存销售单据接口： 异常");
                 }
-                if (insertDate == DateTime.MinValue)
+                List<BillCommodityEntity> commoditys = billEntity.commoditys;
+                List<PayDetailEntity> paydetails = billEntity.paydetails;
+                if (commoditys == null || commoditys.Count == 0)
                 {
-                    insertDate = DateTime.Now;
+                    logger.Info("保存销售单据接口：该单据没有商品信息");
                 }
-                billEntity.insertTime = Utils.DateUtils.ConvertDataTimeToLong(insertDate);
+                else
+                {
+                    foreach (BillCommodityEntity billCommodityEntity in commoditys)
+                    {
+                        try
+                        {
+                            billCommodityEntity.uid = billCommodityEntity
+                                    .ticketcode
+                                    + "_"
+                                    + billCommodityEntity.id;
+                            dbManager.SaveOrUpdate(billCommodityEntity);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException");
+                        }
+                    }
+                }
 
-                dbManager.SaveOrUpdate(billEntity);
-            }
-            catch (Exception e)
-            {
-                logger.Error("保存销售单据接口： 异常");
-            }
-            List<BillCommodityEntity> commoditys = billEntity.commoditys;
-            List<PayDetailEntity> paydetails = billEntity.paydetails;
-            if (commoditys == null || commoditys.Count == 0)
-            {
-                logger.Info("保存销售单据接口：该单据没有商品信息");
-            }
-            else
-            {
-                foreach (BillCommodityEntity billCommodityEntity in commoditys)
+                if (paydetails == null || paydetails.Count == 0)
                 {
-                    try
+                    logger.Info("保存销售单据接口：该单据没有付款方式信息");
+                }
+                else
+                {
+                    foreach (PayDetailEntity payDetailEntity in paydetails)
                     {
-                        billCommodityEntity.uid = billCommodityEntity
-                                .ticketcode
-                                + "_"
-                                + billCommodityEntity.id;
-                        dbManager.SaveOrUpdate(billCommodityEntity);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException");
+                        try
+                        {
+                            dbManager.SaveOrUpdate(payDetailEntity);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error("保存销售单据接口： dbManager.saveOrUpdate(payDetailEntity)--DbException");
+                        }
                     }
                 }
-            }
-
-            if (paydetails == null || paydetails.Count == 0)
-            {
-                logger.Info("保存销售单据接口：该单据没有付款方式信息");
-            }
-            else
-            {
-                foreach (PayDetailEntity payDetailEntity in paydetails)
-                {
-                    try
-                    {
-                        dbManager.SaveOrUpdate(payDetailEntity);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error("保存销售单据接口： dbManager.saveOrUpdate(payDetailEntity)--DbException");
-                    }
-                }
-            }
-            responseEntity.code = ResponseCode.SUCCESS;
-            responseEntity.msg = "保存单据成功";
-            //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
-            mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                responseEntity.code = ResponseCode.SUCCESS;
+                responseEntity.msg = "保存单据成功";
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
+                mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+            });
+            return;
         }
         #endregion
 
@@ -1146,7 +1165,11 @@ namespace ZlPos.Bizlogic
             return payList;
         }
 
-
+        public void saveJSExceotion(string s)
+        {
+            //TODO...
+            return;
+        }
 
 
         //IO 操作相关 ... 
@@ -1165,13 +1188,16 @@ namespace ZlPos.Bizlogic
 
         public void getUsbDevices()
         {
-            ResponseEntity responseEntity = new ResponseEntity();
-            responseEntity.code = ResponseCode.SUCCESS;
-            List<string> devices = new List<string> { "usb" };
-            DeviceEntity deviceEntity = new DeviceEntity();
-            deviceEntity.devices = devices;
-            responseEntity.data = deviceEntity;
-            mWebViewHandle.Invoke("getUsbDevicesCallBack", responseEntity);
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                responseEntity.code = ResponseCode.SUCCESS;
+                List<string> devices = new List<string> { "usb" };
+                DeviceEntity deviceEntity = new DeviceEntity();
+                deviceEntity.devices = devices;
+                responseEntity.data = deviceEntity;
+                mWebViewHandle.Invoke("getUsbDevicesCallBack", responseEntity);
+            });
             return;
         }
 
@@ -1182,10 +1208,14 @@ namespace ZlPos.Bizlogic
 
         public void getGPrintUsbDevices()
         {
-            ResponseEntity responseEntity = new ResponseEntity();
-            responseEntity.code = ResponseCode.Failed;
-            //ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
-            mWebViewHandle.Invoke("getGPrintUsbDevicesCallBack", responseEntity);
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                responseEntity.code = ResponseCode.Failed;
+                //ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
+                mWebViewHandle.Invoke("getGPrintUsbDevicesCallBack", responseEntity);
+            });
+            return;
 
             //return "";
         }
@@ -1215,33 +1245,37 @@ namespace ZlPos.Bizlogic
         public void GetBluetoothDevices()
         {
             ResponseEntity responseEntity = new ResponseEntity();
-            try
+            Task.Factory.StartNew(() =>
             {
-                BluetoothRadio BuleRadio = BluetoothRadio.PrimaryRadio;
-                BuleRadio.Mode = RadioMode.Connectable;
-
-                BluetoothClient Blueclient = new BluetoothClient();
-                Dictionary<string, BluetoothAddress> deviceAddresses = new Dictionary<string, BluetoothAddress>();
-
-                BluetoothDeviceInfo[] Devices = Blueclient.DiscoverDevices();
-                //List<BluetoothDeviceInfo> bluetoothDeviceInfos = new List<BluetoothDeviceInfo>(Devices);
-                List<string> deviceNames = new List<string>();
-                DeviceEntity deviceEntity = new DeviceEntity();
-                foreach (BluetoothDeviceInfo device in Devices)
+                try
                 {
-                    deviceNames.Add(device.DeviceName);
-                }
-                deviceEntity.devices = deviceNames;
-                responseEntity.code = ResponseCode.SUCCESS;
-                responseEntity.data = deviceEntity;
-                mWebViewHandle.Invoke("getBluetoothDevicesCallBack", responseEntity);
-            }
-            catch (Exception e)
-            {
-                responseEntity.code = ResponseCode.Failed;
-                mWebViewHandle.Invoke("getBluetoothDevicesCallBack", responseEntity);
-            }
+                    BluetoothRadio BuleRadio = BluetoothRadio.PrimaryRadio;
+                    BuleRadio.Mode = RadioMode.Connectable;
 
+                    BluetoothClient Blueclient = new BluetoothClient();
+                    Dictionary<string, BluetoothAddress> deviceAddresses = new Dictionary<string, BluetoothAddress>();
+
+                    BluetoothDeviceInfo[] Devices = Blueclient.DiscoverDevices();
+                    //List<BluetoothDeviceInfo> bluetoothDeviceInfos = new List<BluetoothDeviceInfo>(Devices);
+                    List<string> deviceNames = new List<string>();
+                    DeviceEntity deviceEntity = new DeviceEntity();
+                    foreach (BluetoothDeviceInfo device in Devices)
+                    {
+                        deviceNames.Add(device.DeviceName);
+                    }
+                    deviceEntity.devices = deviceNames;
+                    responseEntity.code = ResponseCode.SUCCESS;
+                    responseEntity.data = deviceEntity;
+                    mWebViewHandle?.Invoke("getBluetoothDevicesCallBack", responseEntity);
+                }
+                catch (Exception e)
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    mWebViewHandle?.Invoke("getBluetoothDevicesCallBack", responseEntity);
+                }
+            });
+
+            return;
 
 
         }
@@ -1278,7 +1312,7 @@ namespace ZlPos.Bizlogic
             {
                 logger.Error(e.StackTrace);
             }
-            return config; ;
+            return config;
         }
 
         public ResponseEntity StartBluetoothSearch()
@@ -1299,27 +1333,36 @@ namespace ZlPos.Bizlogic
         public void setPrinter(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
-            try
+            Task.Factory.StartNew(() =>
             {
-                PrinterConfigEntity printerConfigEntity = JsonConvert.DeserializeObject<PrinterConfigEntity>(json);
-                //PrinterSetter printerSetter = new PrinterSetter(mContext);
                 try
                 {
-                    PrinterSetter printerSetter = new PrinterSetter();
-                    //委托js回调方法
-                    //JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod4SetPrinter);
-                    _printerConfigEntity = printerConfigEntity;
-                    printerSetter.SetPrinter(printerConfigEntity, CallbackMethod4SetPrinter);
+                    PrinterConfigEntity printerConfigEntity = JsonConvert.DeserializeObject<PrinterConfigEntity>(json);
+                    //PrinterSetter printerSetter = new PrinterSetter(mContext);
+                    try
+                    {
+                        PrinterSetter printerSetter = new PrinterSetter();
+                        //委托js回调方法
+                        //JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod4SetPrinter);
+                        _printerConfigEntity = printerConfigEntity;
+                        //Action<object> t = new Action<object>(CallbackMethod4SetPrinter);
+                        //Action<PrinterConfigEntity, Action<object>> action = new Action<PrinterConfigEntity, Action<object>>(printerConfigEntity,t);
+                        //Task.Factory.StartNew()
+                        printerSetter.SetPrinter(printerConfigEntity, CallbackMethod4SetPrinter);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e.StackTrace);
+                    }
                 }
                 catch (Exception e)
                 {
                     logger.Error(e.StackTrace);
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.StackTrace);
-            }
+            });
+
+            return;
+
 
         }
 
@@ -1328,16 +1371,129 @@ namespace ZlPos.Bizlogic
             //TODO...
         }
 
-        public ResponseEntity Print()
+        /// <summary>
+        /// 标签打印
+        /// </summary>
+        /// <param name="json"></param>
+        public void PrintLabel(string json)
         {
             //TODO...
-            return null;
+            return;
         }
 
-        public ResponseEntity Print2()
+        /// <summary>
+        /// 小票打印接口
+        /// </summary>
+        public void Print(string s)
         {
-            //TODO...
-            return null;
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                try
+                {
+                    BillEntity billEntity = JsonConvert.DeserializeObject<BillEntity>(s);
+                    if (PrinterManager.Instance.Init)
+                    {
+                        switch (PrinterManager.Instance.PrinterTypeEnum)
+                        {
+                            case Enums.PrinterTypeEnum.usb:
+                                break;
+                            case Enums.PrinterTypeEnum.bluetooth:
+                                break;
+                            case Enums.PrinterTypeEnum.port:
+                                break;
+                            default:
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "非法打印机类型";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印机未设置，请设置打印机";
+                        //SToastUtil.toast(mWebView.getContext(), "打印机未设置，请设置打印机");
+                    }
+
+
+
+                }
+                catch (Exception e)
+                {
+
+                }
+
+
+
+
+            });
+            return;
+        }
+
+        /// <summary>
+        /// 模板打印
+        /// </summary>
+        public void Print2(string content)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (!string.IsNullOrEmpty(content))
+                {
+                    try
+                    {
+                        if (PrinterManager.Instance.Init)
+                        {
+                            switch (PrinterManager.Instance.PrinterTypeEnum)
+                            {
+                                case Enums.PrinterTypeEnum.usb:
+                                    USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
+                                    PrintUtils.printModel(content, usbPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                case Enums.PrinterTypeEnum.bluetooth:
+                                    BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
+                                    PrintUtils.printModel(content, bluetoothPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                case Enums.PrinterTypeEnum.port:
+                                    serialPort portPrinter = PrinterManager.Instance.PortPrinter;
+                                    PrintUtils.printModel(content, portPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                default:
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "非法打印机类型";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "打印机未设置，请设置打印机";
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印出现异常";
+                        logger.Error(e.Message + e.StackTrace);
+                    }
+
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "打印内容不能为空";
+                }
+
+                mWebViewHandle.Invoke("print2CallBack", responseEntity);
+
+            });
+            return;
         }
 
         public ResponseEntity PrintBill(string json)

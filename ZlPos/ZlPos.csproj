@@ -173,6 +173,7 @@
     <Compile Include="Utils\DateUtils.cs" />
     <Compile Include="Utils\PrinterManager.cs" />
     <Compile Include="Utils\PrinterSetter.cs" />
+    <Compile Include="Utils\PrintUtils.cs" />
     <Compile Include="Utils\serialPort.cs" />
     <Compile Include="Utils\SerialPortPrinterSetter.cs" />
     <Compile Include="Utils\StringUtils.cs" />
