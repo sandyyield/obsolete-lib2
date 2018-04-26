@@ -10,6 +10,15 @@ using CefSharp.WinForms;
 using CefSharp;
 using ZlPos.Bizlogic;
 using System.Configuration;
+using System.Threading;
+using log4net;
+using System.Reflection;
+using System.Threading.Tasks;
+using ZlPos.Dao;
+using ZlPos.Utils;
+using ZlPos.Models;
+using ZlPos.Bean;
+using ZlPos.Config;
 
 namespace ZlPos.Core
 {
@@ -18,6 +27,8 @@ namespace ZlPos.Core
     /// </summary>
     public partial class ChromiumBrowserControl : UserControl
     {
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public ChromiumWebBrowser browser;
 
         private JSBridge jsBridge = JSBridge.Instance;
@@ -28,7 +39,7 @@ namespace ZlPos.Core
         //internal JSBridge HostApp { get => hostApp; set => hostApp = value; }
         internal JSBridge JsBridge { get => jsBridge; set => jsBridge = value; }
 
-        public ChromiumBrowserControl(object boundObject=null)
+        public ChromiumBrowserControl(object boundObject = null)
         {
             //Text = "zlpos";
 
@@ -71,12 +82,59 @@ namespace ZlPos.Core
             //注册DevTools热键
             //this.KeyDown += Browser_KeyDown;
 
+            //启动时候需要加载一下打印机设置
+            Task.Factory.StartNew(action: new Action(InitPrinterManangerAsync));
+
 
             var bitness = Environment.Is64BitProcess ? "x64" : "x86";
             var version = String.Format("Chromium: {0}, CEF: {1}, CefSharp: {2}, Environment: {3}", Cef.ChromiumVersion, Cef.CefVersion, Cef.CefSharpVersion, bitness);
             DisplayOutput(version);
 
         }
+
+        private void InitPrinterManangerAsync()
+        {
+            try
+            {
+                PrinterConfigEntity printerConfigEntity;
+                //先从数据库取出上次缓存的配置
+                using (var db = SugarDao.GetInstance())
+                {
+                    printerConfigEntity = db.Queryable<PrinterConfigEntity>().First();
+                }
+                if (printerConfigEntity != null)
+                {
+                    PrinterSetter printerSetter = new PrinterSetter();
+                    //委托js回调方法
+                    //JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod4SetPrinter);
+                    //_printerConfigEntity = printerConfigEntity;
+                    //printerSetter.SetPrinter(printerConfigEntity, ()=> "haha");
+                    printerSetter.SetPrinter(printerConfigEntity, CallbackMethod4InitPrinter);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message + e.StackTrace);
+            }
+        }
+
+        private void CallbackMethod4InitPrinter(object state)
+        {
+            object[] paramsArr = (object[])state;
+            string methodName = paramsArr[0] as string;
+            ResponseEntity responseEntity = paramsArr[1] as ResponseEntity;
+            if (responseEntity.code == ResponseCode.SUCCESS)
+            {
+                logger.Info("初始化打印机成功");
+            }
+            else
+            {
+                logger.Info("打印机设置失败" + responseEntity.msg);
+            }
+        }
+
+
+
 
         //private void Browser_KeyDown(object sender, KeyEventArgs e)
         //{

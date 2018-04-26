@@ -21,7 +21,7 @@ namespace ZlPos.PrintServices
         }
 
         public object MacAddress { get; internal set; }
-        public string Encoding { get; internal set; }
+        public string Encoding { get; set; }
         public PrinterType CurrentPrintType { get; set; }
 
         internal void closeConnection()

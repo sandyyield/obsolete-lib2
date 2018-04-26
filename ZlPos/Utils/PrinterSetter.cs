@@ -22,7 +22,8 @@ namespace ZlPos.Utils
         }
 
 
-        internal void SetPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
+        //internal void SetPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
+        internal void SetPrinter(PrinterConfigEntity printerConfigEntity, Action<object> webCallback)
         {
             if (printerConfigEntity != null)
             {
@@ -49,7 +50,7 @@ namespace ZlPos.Utils
                         //L.i(TAG, "打印机类型不可用");
                         if (webCallback != null)
                         {
-                            webCallback.Invoke(new object[] { "setPrinterCallBack",responseEntity });
+                            webCallback.Invoke(new object[] { "setPrinterCallBack", responseEntity });
                         }
                         break;
                 }

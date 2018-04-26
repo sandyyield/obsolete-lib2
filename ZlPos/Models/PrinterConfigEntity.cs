@@ -4,8 +4,10 @@ namespace ZlPos.Models
 {
     public class PrinterConfigEntity
     {
-        [SugarColumn(IsPrimaryKey = true,IsIdentity = true,IsNullable = false)]
-        public int id { get; set; }
+        //public int id { get; set; }
+        private int id = 1;
+        [SugarColumn(IsPrimaryKey = true, IsIdentity = false, IsNullable = false)]
+        public int Id { get => id; set => id = value; }
 
         [SugarColumn(IsNullable = true)]
         public string printerType { get; set; }
@@ -35,5 +37,6 @@ namespace ZlPos.Models
         //add 2018/01/15 打印小票份数
         [SugarColumn(IsNullable = true)]
         public string printernumber { get; set; }
+        
     }
 }

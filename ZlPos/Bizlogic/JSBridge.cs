@@ -1307,9 +1307,9 @@ namespace ZlPos.Bizlogic
                 {
                     PrinterSetter printerSetter = new PrinterSetter();
                     //委托js回调方法
-                    JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod4SetPrinter);
+                    //JsCallbackHandle jsCallbackHandle = new JsCallbackHandle(CallbackMethod4SetPrinter);
                     _printerConfigEntity = printerConfigEntity;
-                    printerSetter.SetPrinter(printerConfigEntity, jsCallbackHandle);
+                    printerSetter.SetPrinter(printerConfigEntity, CallbackMethod4SetPrinter);
                 }
                 catch (Exception e)
                 {
@@ -1579,10 +1579,10 @@ namespace ZlPos.Bizlogic
                     using (var db = SugarDao.GetInstance())
                     {
                         //db.DbMaintenance.DropTable("PrinterConfigEntity");
-                        if (db.DbMaintenance.IsAnyTable(typeof(PrinterConfigEntity).Name))
-                        {
-                            db.DbMaintenance.DropTable(typeof(PrinterConfigEntity).Name);
-                        }
+                        //if (db.DbMaintenance.IsAnyTable(typeof(PrinterConfigEntity).Name))
+                        //{
+                        //    db.DbMaintenance.DropTable(typeof(PrinterConfigEntity).Name);
+                        //}
                         DBUtils.Instance.DbManager.SaveOrUpdate(_printerConfigEntity);
                     }
                 }

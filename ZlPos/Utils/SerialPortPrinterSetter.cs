@@ -14,7 +14,7 @@ namespace ZlPos.Utils
     public class SerialPortPrinterSetter
     {
 
-        internal static void setSerialPort(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
+        internal static void setSerialPort(PrinterConfigEntity printerConfigEntity, Action<object> webCallback)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             if (printerConfigEntity != null)

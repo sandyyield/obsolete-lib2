@@ -16,10 +16,10 @@ namespace ZlPos.Utils
 {
     public class BluethoothPrinterSetter
     {
-        private JSBridge.JsCallbackHandle listener;
+        private Action<object> listener;
         private PrinterConfigEntity printerConfigEntity;
         private ResponseEntity responseEntity;
-        internal void setBluethoothPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
+        internal void setBluethoothPrinter(PrinterConfigEntity printerConfigEntity, Action<object> webCallback)
         {
             if (printerConfigEntity != null)
             {

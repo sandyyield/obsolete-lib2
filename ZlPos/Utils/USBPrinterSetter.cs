@@ -20,13 +20,14 @@ namespace ZlPos.Utils
         //private ArrayList<UsbDevice> usbDevices;
         //private boolean isGet = false;//是否是获取USB设备列表
 
-        JSBridge.JsCallbackHandle listener;
+        Action<object> listener;
 
         public USBPrinterSetter()
         {
         }
 
-        internal void setUSBPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
+        //internal void setUSBPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
+        internal void setUSBPrinter(PrinterConfigEntity printerConfigEntity, Action<object> webCallback)
         {
             IntPtr hUsb;
             if (printerConfigEntity != null)
@@ -40,6 +41,13 @@ namespace ZlPos.Utils
                     if (!usbPrinter.Init)
                     {
                         hUsb = usbPrinter.open();
+                        if((int)hUsb == -1)
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "USB打印机打开失败";
+                            listener?.Invoke(new object[] { "setPrinterCallBack", responseEntity });
+                            return;
+                        }
                         usbPrinter.HDevice = hUsb;
                     }
                     PrinterManager.Instance.Init = true;
@@ -47,18 +55,23 @@ namespace ZlPos.Utils
                     PrinterManager.Instance.UsbPrinter = usbPrinter;
                     PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
 
-                    usbPrinter.PrintString("蓝牙打印机测试成功\r\n\r\n\r\n\r\n");
+                    usbPrinter.PrintString("usb打印机测试成功\r\n\r\n\r\n\r\n");
                     responseEntity.code = ResponseCode.SUCCESS;
                     responseEntity.msg = "打印机设置成功";
-                    if (listener != null)
-                    {
-                        listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
-                    }
+                    //if (listener != null)
+                    //{
+                    //    listener.Invoke(new object[] { "setPrinterCallBack", responseEntity });
+                    //}
 
                 }
                 else
                 {
-                    //TODO...
+                    if (PrinterManager.Instance.Init)
+                    {
+                        PrinterManager.Instance.UsbPrinter.PrintString("usb打印机测试成功\r\n\r\n\r\n\r\n");
+                        responseEntity.code = ResponseCode.SUCCESS;
+                        responseEntity.msg = "打印机设置成功";
+                    }
                 }
 
 
@@ -67,9 +80,9 @@ namespace ZlPos.Utils
 
                 //debug 
 
-                PrintServices.USBPrinterService upt = new PrintServices.USBPrinterService();
-                upt.TestPrint();
-                responseEntity.code = ResponseCode.SUCCESS;
+                //PrintServices.USBPrinterService upt = new PrintServices.USBPrinterService();
+                //upt.TestPrint();
+                //responseEntity.code = ResponseCode.SUCCESS;
 
             }
             else
