@@ -1571,11 +1571,8 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetScale()
         {
-            //TODO...
-
             string scale = CacheManager.Get(SPCode.scale) as string;
             return scale;
-
         }
 
         /// <summary>
@@ -1596,7 +1593,7 @@ namespace ZlPos.Bizlogic
                     result = true;
                     //缓存
                     CacheManager.Insert(SPCode.scale, json);
-                    
+
                 }
             }
             catch (Exception e)
@@ -1611,10 +1608,40 @@ namespace ZlPos.Bizlogic
         /// 获取重量
         /// </summary>
         /// <returns></returns>
-        public ResponseEntity GetWeight()
+        public void GetWeight()
         {
-            //TODO...
-            return null;
+            Task.Factory.StartNew(() =>
+            {
+                string scale = CacheManager.Get(SPCode.scale) as string;
+                if (!string.IsNullOrEmpty(scale))
+                {
+                    try
+                    {
+                        ScaleConfigEntity scaleConfigEntity = JsonConvert.DeserializeObject<ScaleConfigEntity>(scale);
+                        if (!string.IsNullOrEmpty(scaleConfigEntity.port))
+                        {
+                            WeightUtil.Instance.Open(scaleConfigEntity.port);
+                            WeightUtil.Instance.Listener = (number) =>
+                            {
+                                browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
+                            };
+
+                        }
+                        else
+                        {
+                            browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e.Message + e.StackTrace);
+                        browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                    }
+                }
+
+
+            });
+
         }
 
         /// <summary>

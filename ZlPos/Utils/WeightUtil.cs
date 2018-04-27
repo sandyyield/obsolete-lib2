@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ZlPos.Utils
 {
@@ -9,6 +12,8 @@ namespace ZlPos.Utils
     {
         private static WeightUtil _WeightUtil = null;
         private static object obj = new object();
+        internal Action<string> Listener;
+        private SerialPort mSerialPort;
 
         private WeightUtil() { }
 
@@ -18,7 +23,7 @@ namespace ZlPos.Utils
             {
                 lock (obj)
                 {
-                    if(_WeightUtil == null)
+                    if (_WeightUtil == null)
                     {
                         _WeightUtil = new WeightUtil();
                     }
@@ -29,7 +34,27 @@ namespace ZlPos.Utils
 
         internal void Open(string port)
         {
-            throw new NotImplementedException();
+            if (mSerialPort == null)
+            {
+                try
+                {
+                    mSerialPort = new SerialPort(port, 9600);
+                    mSerialPort.Open();
+                    Task.Factory.StartNew(() =>
+                    {
+                        int size;
+                        byte[] buffer = new byte[64];
+                        while (true)
+                        {
+                            //TODO...
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    //LOG
+                }
+            }
         }
 
         internal void Close()
