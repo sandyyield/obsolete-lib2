@@ -1569,20 +1569,42 @@ namespace ZlPos.Bizlogic
         /// 获取电子秤
         /// </summary>
         /// <returns></returns>
-        public ResponseEntity GetScale()
+        public string GetScale()
         {
             //TODO...
-            return null;
+
+            string scale = CacheManager.Get(SPCode.scale) as string;
+            return scale;
+
         }
 
         /// <summary>
         /// 设置电子秤
         /// </summary>
         /// <returns></returns>
-        public ResponseEntity SetScale()
+        public bool SetScale(string json)
         {
-            //TODO...
-            return null;
+            bool result = false;
+
+            try
+            {
+                ScaleConfigEntity scaleConfigEntity = JsonConvert.DeserializeObject<ScaleConfigEntity>(json);
+                if (!string.IsNullOrEmpty(scaleConfigEntity.port))
+                {
+                    WeightUtil.Instance.Open(scaleConfigEntity.port);
+                    WeightUtil.Instance.Close();
+                    result = true;
+                    //缓存
+                    CacheManager.Insert(SPCode.scale, json);
+                    
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message + e.StackTrace);
+            }
+
+            return result;
         }
 
         /// <summary>

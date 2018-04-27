@@ -55,7 +55,7 @@ namespace ZlPos.Utils
                     PrinterManager.Instance.UsbPrinter = usbPrinter;
                     PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
 
-                    usbPrinter.PrintString("usb打印机测试成功\r\n\r\n\r\n\r\n");
+                    usbPrinter.PrintString("usb打印机测试成功\n\n\n\n\n");
                     responseEntity.code = ResponseCode.SUCCESS;
                     responseEntity.msg = "打印机设置成功";
                     //if (listener != null)

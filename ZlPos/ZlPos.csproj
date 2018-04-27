@@ -78,6 +78,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -170,14 +171,17 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\BluethoothPrinterSetter.cs" />
+    <Compile Include="Utils\CacheManager.cs" />
     <Compile Include="Utils\DateUtils.cs" />
     <Compile Include="Utils\PrinterManager.cs" />
     <Compile Include="Utils\PrinterSetter.cs" />
     <Compile Include="Utils\PrintUtils.cs" />
     <Compile Include="Utils\serialPort.cs" />
     <Compile Include="Utils\SerialPortPrinterSetter.cs" />
+    <Compile Include="Utils\SPCode.cs" />
     <Compile Include="Utils\StringUtils.cs" />
     <Compile Include="Utils\USBPrinterSetter.cs" />
+    <Compile Include="Utils\WeightUtil.cs" />
     <EmbeddedResource Include="Forms\PosForm.resx">
       <DependentUpon>PosForm.cs</DependentUpon>
     </EmbeddedResource>

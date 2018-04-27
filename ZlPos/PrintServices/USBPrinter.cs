@@ -29,6 +29,7 @@ namespace ZlPos.PrintServices
         public static readonly int COMM_ALIGN_CENTER = 1;
         public static readonly int COMM_LINE_HEIGHT = 20;
 
+        [Obsolete]
         public int PrintText(string content)
         {
             if (content == null)
@@ -70,6 +71,11 @@ namespace ZlPos.PrintServices
             hDevice = IntPtr.Zero;
         }
 
+        /// <summary>
+        /// 转换编码
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         internal int PrintString(string content)
         {
             try
@@ -99,6 +105,14 @@ namespace ZlPos.PrintServices
             {
                 logger.Error(e.StackTrace);
                 return -1;
+            }
+        }
+
+        public void initUSB()
+        {
+            if (!init)
+            {
+                open();
             }
         }
     }

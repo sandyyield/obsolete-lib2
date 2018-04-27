@@ -1,23 +1,29 @@
-﻿using System;
+﻿using SqlSugar;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace ZlPos.Models
 {
-    class ContextEntity
+    public class ContextEntity
     {
         //这里要id默认为1
-        public String id { get; set; }
+        private int _id = 1;
+        [SugarColumn(IsPrimaryKey = true,IsIdentity = false,IsNullable = false)]
+        public int id { get => this._id; set => this._id = value; }
 
-        public String scale { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string scale { get; set; }
 
-        public String shopcode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string shopcode { get; set; }
 
 
+        [SugarColumn(IsNullable = true)]
+        public string readCard { get; set; }
 
-        public String readCard { get; set; }
-
-        public String serialPort { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string serialPort { get; set; }
     }
 }
