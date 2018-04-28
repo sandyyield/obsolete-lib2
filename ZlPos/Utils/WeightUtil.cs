@@ -32,6 +32,7 @@ namespace ZlPos.Utils
             }
         }
 
+        string sBuffer = "asdfsdfa";
         internal void Open(string port)
         {
             if (mSerialPort == null)
@@ -44,9 +45,25 @@ namespace ZlPos.Utils
                     {
                         int size;
                         byte[] buffer = new byte[64];
-                        while (true)
+                        while (mSerialPort.IsOpen)
                         {
-                            //TODO...
+                            Thread.Sleep(40);
+                            //size = mSerialPort.Read(buffer, 0, 1);
+                            string s = mSerialPort.ReadLine();
+                            if (!sBuffer.Equals(s))
+                            {
+                                
+                                sBuffer = s;
+                                Listener?.Invoke(s.Replace("\r","").Replace("\n",""));
+                            }
+                            
+                            //if (size > 0)
+                            //{
+                            //    lock (obj)
+                            //    {
+                            //        onDataReceived(buffer, size);
+                            //    }
+                            //}
                         }
                     });
                 }
@@ -57,9 +74,30 @@ namespace ZlPos.Utils
             }
         }
 
+        private void onDataReceived(byte[] buffer, int size)
+        {
+            if(buffer[0] == 32)
+            {
+                return;
+            }
+            string s64 = Encoding.Default.GetString(buffer);
+            string[] data = s64.Replace("\n\r", "@").Split('@');
+            Listener?.Invoke(data[1]);
+
+            
+
+
+
+        }
+
         internal void Close()
         {
-            throw new NotImplementedException();
+            if (mSerialPort != null)
+            {
+                mSerialPort.Close();
+                mSerialPort = null;
+                GC.Collect();
+            }
         }
     }
 }

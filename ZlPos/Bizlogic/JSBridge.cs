@@ -1579,9 +1579,10 @@ namespace ZlPos.Bizlogic
         /// 设置电子秤
         /// </summary>
         /// <returns></returns>
-        public bool SetScale(string json)
+        public string SetScale(string json)
         {
-            bool result = false;
+            ResponseEntity responseEntity = new ResponseEntity();
+            responseEntity.code = ResponseCode.Failed;
 
             try
             {
@@ -1590,7 +1591,7 @@ namespace ZlPos.Bizlogic
                 {
                     WeightUtil.Instance.Open(scaleConfigEntity.port);
                     WeightUtil.Instance.Close();
-                    result = true;
+                    responseEntity.code = ResponseCode.SUCCESS;
                     //缓存
                     CacheManager.Insert(SPCode.scale, json);
 
@@ -1601,9 +1602,9 @@ namespace ZlPos.Bizlogic
                 logger.Error(e.Message + e.StackTrace);
             }
 
-            return result;
-        }
+            return JsonConvert.SerializeObject(responseEntity);
 
+        }
         /// <summary>
         /// 获取重量
         /// </summary>
@@ -1648,10 +1649,9 @@ namespace ZlPos.Bizlogic
         /// 关闭电子秤
         /// </summary>
         /// <returns></returns>
-        public ResponseEntity closeWeighter()
+        public void closeWeighter()
         {
-            //TODO...
-            return null;
+            WeightUtil.Instance.Close();
         }
 
 
