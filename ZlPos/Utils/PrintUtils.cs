@@ -10,14 +10,14 @@ namespace ZlPos.Utils
 {
     public class PrintUtils
     {
-        public static void printModel(string content,USBPrinter usbPrinter)
+        public static void printModel(string content, USBPrinter usbPrinter)
         {
-            if(string.IsNullOrEmpty(content) && usbPrinter == null)
+            if (string.IsNullOrEmpty(content) && usbPrinter == null)
             {
                 return;
             }
-            List<PrintEntity> printEntities = (List<PrintEntity>)JsonConvert.DeserializeObject(content);
-            if(printEntities != null && printEntities.Count > 0)
+            List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
+            if (printEntities != null && printEntities.Count > 0)
             {
                 usbPrinter.initUSB();
                 for (int i = 0; i < printEntities.Count; i++)
@@ -31,12 +31,45 @@ namespace ZlPos.Utils
 
         public static void printModel(string content, BluetoothPrinter bluetoothPrinter)
         {
-            bluetoothPrinter.PrintString(content);
+            if (string.IsNullOrEmpty(content) && bluetoothPrinter == null)
+            {
+                return;
+            }
+            List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
+            if (printEntities != null && printEntities.Count > 0)
+            {
+                if (!bluetoothPrinter.isConnected())
+                {
+                    bluetoothPrinter.openConnection();
+                }
+
+                for (int i = 0; i < printEntities.Count; i++)
+                {
+                    bluetoothPrinter.PrintString(printEntities[i].content);
+                }
+            }
+            bluetoothPrinter.PrintString("\n\n\n\n\n\n");
+            //bluetoothPrinter.PrintString(content);
         }
 
         public static void printModel(string content, serialPort portPrinter)
         {
-            portPrinter.Write(content);
+            if (string.IsNullOrEmpty(content) && portPrinter == null)
+            {
+                return;
+            }
+            List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
+
+            if (printEntities != null && printEntities.Count > 0)
+            {
+                //portPrinter.initUSB();
+                for (int i = 0; i < printEntities.Count; i++)
+                {
+                    portPrinter.Write(printEntities[i].content);
+                }
+            }
+            portPrinter.Write("\n\n\n\n\n\n");
+            //portPrinter.Write(content);
         }
     }
 }
