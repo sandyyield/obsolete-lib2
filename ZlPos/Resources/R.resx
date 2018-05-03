@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="app_name" xml:space="preserve">
+    <value>中仑零售</value>
+  </data>
+  <data name="bags" xml:space="preserve">
+    <value>保鲜袋</value>
+  </data>
+  <data name="balance" xml:space="preserve">
+    <value>余额：</value>
+  </data>
+  <data name="branch_name" xml:space="preserve">
+    <value>门店名称：</value>
+  </data>
+  <data name="date_time" xml:space="preserve">
+    <value>日期范围：</value>
+  </data>
+  <data name="hook" xml:space="preserve">
+    <value>铁丝挂钩</value>
+  </data>
+  <data name="integral" xml:space="preserve">
+    <value>积分：</value>
+  </data>
+  <data name="member_code" xml:space="preserve">
+    <value>会员号：</value>
+  </data>
+  <data name="member_name" xml:space="preserve">
+    <value>会员：</value>
+  </data>
+  <data name="money" xml:space="preserve">
+    <value>金额</value>
+  </data>
+  <data name="mumber" xml:space="preserve">
+    <value>数量</value>
+  </data>
+  <data name="note_title" xml:space="preserve">
+    <value>品名;数量;单价;金额</value>
+  </data>
+  <data name="payType" xml:space="preserve">
+    <value>支付方式</value>
+  </data>
+  <data name="rechargeamount" xml:space="preserve">
+    <value>充值：</value>
+  </data>
+  <data name="returnamount" xml:space="preserve">
+    <value>退货额：</value>
+  </data>
+  <data name="returnnums" xml:space="preserve">
+    <value>退货数：</value>
+  </data>
+  <data name="shop_cashier_num" xml:space="preserve">
+    <value>收银员：</value>
+  </data>
+  <data name="shop_change" xml:space="preserve">
+    <value>找零：</value>
+  </data>
+  <data name="shop_company_address" xml:space="preserve">
+    <value>地址：江苏省宁波市东昌路12号</value>
+  </data>
+  <data name="shop_company_name" xml:space="preserve">
+    <value>公司名称：江苏一五一十家居用品有限公司</value>
+  </data>
+  <data name="shop_company_site" xml:space="preserve">
+    <value>公司网址：</value>
+  </data>
+  <data name="shop_company_tel" xml:space="preserve">
+    <value>电话：</value>
+  </data>
+  <data name="shop_company_title" xml:space="preserve">
+    <value>宁波月湖店</value>
+  </data>
+  <data name="shop_demo" xml:space="preserve">
+    <value>Demo 版本！</value>
+  </data>
+  <data name="shop_goods_buy_total_price" xml:space="preserve">
+    <value>原价：</value>
+  </data>
+  <data name="shop_goods_number" xml:space="preserve">
+    <value>数量：</value>
+  </data>
+  <data name="shop_goods_sale_total_collection" xml:space="preserve">
+    <value>实收：</value>
+  </data>
+  <data name="shop_goods_sale_total_price" xml:space="preserve">
+    <value>现价：</value>
+  </data>
+  <data name="shop_goods_youhui" xml:space="preserve">
+    <value>优惠：</value>
+  </data>
+  <data name="shop_note_num" xml:space="preserve">
+    <value>单据号：</value>
+  </data>
+  <data name="shop_num" xml:space="preserve">
+    <value>门店号：</value>
+  </data>
+  <data name="shop_payment" xml:space="preserve">
+    <value>付款：</value>
+  </data>
+  <data name="shop_print_time" xml:space="preserve">
+    <value>打印时间：</value>
+  </data>
+  <data name="shop_receipt_date" xml:space="preserve">
+    <value>单据日期：</value>
+  </data>
+  <data name="shop_receipt_num" xml:space="preserve">
+    <value>单号:</value>
+  </data>
+  <data name="shop_Service_Line" xml:space="preserve">
+    <value>服务专线：</value>
+  </data>
+  <data name="shop_thanks" xml:space="preserve">
+    <value>谢谢惠顾,欢迎再次光临！</value>
+  </data>
+  <data name="subtotal" xml:space="preserve">
+    <value>合计：</value>
+  </data>
+  <data name="ticketamount" xml:space="preserve">
+    <value>交易额：</value>
+  </data>
+  <data name="ticketnums" xml:space="preserve">
+    <value>交易数：</value>
+  </data>
+  <data name="time" xml:space="preserve">
+    <value>时间：</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>收银对账</value>
+  </data>
+  <data name="umbrella" xml:space="preserve">
+    <value>雨伞</value>
+  </data>
+</root>

@@ -22,6 +22,7 @@ using InTheHand.Net;
 using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
 using System.Threading.Tasks;
+using ZlPos.Enums;
 
 namespace ZlPos.Bizlogic
 {
@@ -708,9 +709,9 @@ namespace ZlPos.Bizlogic
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.msg = "保存单据成功";
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
-                mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                mWebViewHandle?.Invoke("saveOneSaleBillCallBack", responseEntity);
             });
-            return;
+            //return;
         }
         #endregion
 
@@ -720,7 +721,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public List<BillEntity> GetAllSaleBill(string state)
+        public string GetAllSaleBill(string state)
         {
             DbManager dbManager = DBUtils.Instance.DbManager;
             UserEntity userEntity = _LoginUserManager.UserEntity;
@@ -759,7 +760,7 @@ namespace ZlPos.Bizlogic
                             billEntities[i].paydetails = payDetailEntities;
                             billEntities[i].discountdetails = disCountDetailEntities;
                         }
-                        return billEntities;
+                        return JsonConvert.SerializeObject(billEntities);
                     }
                 }
             }
@@ -768,7 +769,7 @@ namespace ZlPos.Bizlogic
                 logger.Error(e.Message + e.StackTrace);
             }
             //有问题直接返回null
-            return null;
+            return "";
         }
         #endregion
 
@@ -780,9 +781,68 @@ namespace ZlPos.Bizlogic
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public List<BillEntity> GetSelectTimeSaleBill(string start, string end)
+        public string GetSelectTimeSaleBill(string start, string end)
         {
-            return null;
+            string result = "";
+            if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
+            {
+                return result;
+            }
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+            dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+            UserEntity userEntity = _LoginUserManager.UserEntity;
+            string shopcode = userEntity.shopcode;
+            string branchCode = userEntity.branchcode;
+            try
+            {
+                DateTime startDate = Convert.ToDateTime(start, dtFormat);
+                DateTime endDate = Convert.ToDateTime(end, dtFormat);
+                long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
+                long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                if (startDate != null && endDate != null)
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        string id = _LoginUserManager.UserEntity.userid;
+                        List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                                                                                        && i.cashierid == id
+                                                                                        && i.insertTime <= endDateTime
+                                                                                        && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
+                                                                                        && i.shopcode == shopcode
+                                                                                        && i.branchcode == branchCode).ToList();
+                        if (billEntities != null)
+                        {
+                            for (int i = 0; i < billEntities.Count; i++)
+                            {
+                                List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                if(billCommodityEntities == null)
+                                {
+                                    billCommodityEntities = new List<BillCommodityEntity>();
+                                }
+                                else
+                                {
+
+                                }
+                                if(payDetailEntities == null)
+                                {
+                                    payDetailEntities = new List<PayDetailEntity>();
+                                }
+                                billEntities[i].commoditys = billCommodityEntities;
+                                billEntities[i].paydetails = payDetailEntities;
+                            }
+                            result = JsonConvert.SerializeObject(billEntities);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info(e.Message + e.StackTrace);
+            }
+
+            return result;
         }
         #endregion
 
@@ -948,40 +1008,133 @@ namespace ZlPos.Bizlogic
         #endregion
 
 
+        #region GetCommodityById
         /// <summary>
         /// 根据商品id查询商品
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetCommodityById(string json)
+        public string GetCommodityById(string id)
         {
-            //TODO...
-            return "";
-        }
+            ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            List<CommodityEntity> commodityEntities = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                    && i.commoditystatus == "0"
+                                                                                    && i.del == "0"
+                                                                                    && i.id == id).ToList();
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Info(e.Message + e.StackTrace);
+                }
+            }
+            if (commodityEntities == null)
+            {
+                commodityEntities = new List<CommodityEntity>();
+            }
 
+            return JsonConvert.SerializeObject(commodityEntities);
+        }
+        #endregion
+
+        #region GetCommodityByBarcode
         /// <summary>
         /// 根据商品barcode查询商品
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetCommodityByBarcode(string json)
+        public string GetCommodityByBarcode(string barcode)
         {
-            //TODO...
-            return "";
-        }
+            ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            List<CommodityEntity> commodityEntities = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        BarCodeEntity barCodeEntity = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                            && i.barcodes.Contains(barcode)).First();
+                        if (barCodeEntity != null)
+                        {
+                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                        && i.commoditystatus == "0"
+                                                                                        && i.del == "0"
+                                                                                        && i.commoditycode == barCodeEntity.commoditycode).ToList();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Info(e.Message + e.StackTrace);
+                }
+            }
+            if (commodityEntities == null)
+            {
+                commodityEntities = new List<CommodityEntity>();
+            }
 
-        public string GetCommodityByCommoditycode(string json)
+            return JsonConvert.SerializeObject(commodityEntities);
+        }
+        #endregion
+
+        #region GetCommodityByCommoditycode
+        /// <summary>
+        /// 根据商品code,查询商品
+        /// </summary>
+        /// <param name="commoditycode"></param>
+        /// <returns></returns>
+        public string GetCommodityByCommoditycode(string commoditycode)
         {
-            //TODO...
-            return "";
-        }
+            ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            List<CommodityEntity> commodityEntities = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                    && i.commoditystatus == "0"
+                                                                                    && i.del == "0"
+                                                                                    && i.commoditycode == commoditycode).ToList();
 
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Info(e.Message + e.StackTrace);
+                }
+            }
+            if (commodityEntities == null)
+            {
+                commodityEntities = new List<CommodityEntity>();
+            }
+
+            return JsonConvert.SerializeObject(commodityEntities);
+        }
+        #endregion
+
+        #region GetCommodityByCategoryCode
         /// <summary>
         /// 根据商品categoryCode查询商品,barcode倒叙，然后再分页
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string getCommodityByCategoryCode(String categoryCode, int pageindex, int pagesize)
+        public string GetCommodityByCategoryCode(String categoryCode, int pageindex, int pagesize)
         {
             logger.Info("getCommodityByCategory\n" + "categoryCode:" + categoryCode + "\tpageindex:" + pageindex + "\tpagesize:" + pagesize);
             ResponseEntity responseEntity = new ResponseEntity();
@@ -1049,13 +1202,15 @@ namespace ZlPos.Bizlogic
             return JsonConvert.SerializeObject(selectCommodityList);
 
         }
+        #endregion
 
+        #region GetCommodityByMnemonic
         /// <summary>
         /// 根据商品mnemonic不区分大小写模糊查询商品
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string getCommodityByMnemonic(string mnemonic)
+        public string GetCommodityByMnemonic(string mnemonic)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
@@ -1089,13 +1244,15 @@ namespace ZlPos.Bizlogic
             }
             return JsonConvert.SerializeObject(commodityEntities);
         }
+        #endregion
 
+        #region GetCommodityByKeyword
         /// <summary>
         /// 根据商品名称,商品条码,助记码（大小写兼容）查询商品
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string getCommodityByKeyword(string keyword)
+        public string GetCommodityByKeyword(string keyword)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
@@ -1130,12 +1287,14 @@ namespace ZlPos.Bizlogic
 
             return JsonConvert.SerializeObject(commodityEntities);
         }
+        #endregion
 
+        #region GetPayPriority
         /// <summary>
         /// 获取支付优先级
         /// </summary>
         /// <returns></returns>
-        public string getPayPriority()
+        public string GetPayPriority()
         {
             DbManager dbManager = DBUtils.Instance.DbManager;
             string payList = "";
@@ -1164,6 +1323,7 @@ namespace ZlPos.Bizlogic
             }
             return payList;
         }
+        #endregion
 
         public void saveJSExceotion(string s)
         {
@@ -1186,7 +1346,8 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        public void getUsbDevices()
+        #region GetUsbDevices
+        public void GetUsbDevices()
         {
             Task.Factory.StartNew(() =>
             {
@@ -1200,7 +1361,9 @@ namespace ZlPos.Bizlogic
             });
             return;
         }
+        #endregion
 
+        #region GetGPrinter
         /// <summary>
         /// 获取标签打印机
         /// </summary>
@@ -1209,7 +1372,9 @@ namespace ZlPos.Bizlogic
         {
             return CacheManager.GetGprint() as string;
         }
+        #endregion
 
+        #region SetGprinter (bug)
         /// <summary>
         /// 设置佳博打印机
         /// </summary>
@@ -1228,7 +1393,7 @@ namespace ZlPos.Bizlogic
                                                 {
                                                     mWebViewHandle.Invoke("setGPrinterCallBack", result);
                                                     //保存缓存
-                                                    if(result.code == ResponseCode.SUCCESS)
+                                                    if (result.code == ResponseCode.SUCCESS)
                                                     {
                                                         CacheManager.InsertGprint(json);
                                                         if (GPrinterManager.Instance.Init)
@@ -1256,8 +1421,10 @@ namespace ZlPos.Bizlogic
                 }
             });
         }
+        #endregion
 
-        public void getGPrintUsbDevices()
+        #region GetGPrintUsbDevices (bug)
+        public void GetGPrintUsbDevices()
         {
             Task.Factory.StartNew(() =>
             {
@@ -1268,9 +1435,10 @@ namespace ZlPos.Bizlogic
             });
             return;
 
-            //return "";
         }
+        #endregion
 
+        #region print debug code
         public void TestUsbPrint()
         {
             //TODO...
@@ -1285,14 +1453,34 @@ namespace ZlPos.Bizlogic
         {
             //TODO...
         }
+        #endregion
 
-
+        #region StartBluetoothDeviceInquiry (null method）
+        [Obsolete]
         public ResponseEntity StartBluetoothDeviceInquiry()
         {
             //TODO...
             return null;
         }
+        #endregion
 
+        #region StartBluetoothSearch (null method)
+        public ResponseEntity StartBluetoothSearch()
+        {
+            //TODO...
+            return null;
+        }
+        #endregion
+
+        #region ReturnBluetoothSearch (null method)
+        public ResponseEntity ReturnBluetoothSearch()
+        {
+            //TODO...
+            return null;
+        }
+        #endregion
+
+        #region GetBluetoothDevices
         public void GetBluetoothDevices()
         {
             ResponseEntity responseEntity = new ResponseEntity();
@@ -1327,10 +1515,10 @@ namespace ZlPos.Bizlogic
             });
 
             return;
-
-
         }
+        #endregion
 
+        #region GetComSystemDevices (null method）
         /// <summary>
         /// 获取到的是串行总线上(物理或逻辑上)的设备
         /// </summary>
@@ -1340,7 +1528,9 @@ namespace ZlPos.Bizlogic
             //TODO...
             return null;
         }
+        #endregion
 
+        #region GetPrinter
         /// <summary>
         /// 获取上次保存的打印机设置
         /// </summary>
@@ -1365,23 +1555,10 @@ namespace ZlPos.Bizlogic
             }
             return config;
         }
+        #endregion
 
-        public ResponseEntity StartBluetoothSearch()
-        {
-            //TODO...
-            return null;
-        }
-
-        public ResponseEntity ReturnBluetoothSearch()
-        {
-            //TODO...
-            return null;
-        }
-
-
-
-
-        public void setPrinter(string json)
+        #region SetPrinter
+        public void SetPrinter(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             Task.Factory.StartNew(() =>
@@ -1413,15 +1590,17 @@ namespace ZlPos.Bizlogic
             });
 
             return;
-
-
         }
+        #endregion
 
+        #region SetNote (null mehtod)
         public void SetNote(string json)
         {
             //TODO...
         }
+        #endregion
 
+        #region PrintLabel (null mehtod)
         /// <summary>
         /// 标签打印
         /// </summary>
@@ -1431,7 +1610,9 @@ namespace ZlPos.Bizlogic
             //TODO...
             return;
         }
+        #endregion
 
+        #region Print
         /// <summary>
         /// 小票打印接口
         /// </summary>
@@ -1473,14 +1654,12 @@ namespace ZlPos.Bizlogic
                 {
 
                 }
-
-
-
-
             });
             return;
         }
+        #endregion
 
+        #region Print2
         /// <summary>
         /// 模板打印
         /// </summary>
@@ -1546,12 +1725,75 @@ namespace ZlPos.Bizlogic
             });
             return;
         }
+        #endregion
 
-        public ResponseEntity PrintBill(string json)
+        #region PrintBill
+        /// <summary>
+        /// 对账打印
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public void PrintBill(string json)
         {
-            //TODO...
-            return null;
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (!string.IsNullOrEmpty(json))
+                {
+                    try
+                    {
+                        StatisticsVM statisticsVM = JsonConvert.DeserializeObject<StatisticsVM>(json);
+                        if (PrinterManager.Instance.Init)
+                        {
+                            switch (PrinterManager.Instance.PrinterTypeEnum)
+                            {
+                                case PrinterTypeEnum.usb:
+                                    USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
+                                    PrintUtils.printNote(statisticsVM, usbPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                case PrinterTypeEnum.bluetooth:
+                                    BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
+                                    PrintUtils.printNote(statisticsVM, bluetoothPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                case PrinterTypeEnum.port:
+                                    serialPort portPrinter = PrinterManager.Instance.PortPrinter;
+                                    PrintUtils.printNote(statisticsVM, portPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                default:
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "非法打印机类型";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "打印机未设置，请设置打印机";
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "小票打印失败";
+                        logger.Info(e.Message + e.StackTrace);
+                    }
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "打印内容不能为空";
+                }
+                mWebViewHandle?.Invoke("printBillCallBack", responseEntity);
+            });
+
         }
+        #endregion
 
         /// <summary>
         /// 开钱箱
@@ -1567,10 +1809,10 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public ResponseEntity SetCustomerShow(string json)
+        public string SetCustomerShow(string json)
         {
             //TODO...
-            return null;
+            return "";
         }
 
         /// <summary>

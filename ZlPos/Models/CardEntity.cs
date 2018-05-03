@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class CardEntity
+    public class CardEntity
     {
         public int id { get; set; }//mk
 

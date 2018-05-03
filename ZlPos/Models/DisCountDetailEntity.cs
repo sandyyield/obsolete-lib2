@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    class DisCountDetailEntity
+    public class DisCountDetailEntity
     {
 
         public int id { get; set; }
