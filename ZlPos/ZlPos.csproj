@@ -101,6 +101,12 @@
     <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
+    <Compile Include="Core\SecondScreenFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\SecondScreenFrm.Designer.cs">
+      <DependentUpon>SecondScreenFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Enums\PrinterTypeEnum.cs" />
     <Compile Include="Listener\IPublish.cs" />
     <Compile Include="Listener\ISubscribe.cs" />
@@ -196,6 +202,9 @@
     <Compile Include="Utils\USBGPrinterSetter.cs" />
     <Compile Include="Utils\USBPrinterSetter.cs" />
     <Compile Include="Utils\WeightUtil.cs" />
+    <EmbeddedResource Include="Core\SecondScreenFrm.resx">
+      <DependentUpon>SecondScreenFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\PosForm.resx">
       <DependentUpon>PosForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -23,6 +23,7 @@ using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
 using System.Threading.Tasks;
 using ZlPos.Enums;
+using ZlPos.Core;
 
 namespace ZlPos.Bizlogic
 {
@@ -35,6 +36,10 @@ namespace ZlPos.Bizlogic
         private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static ChromiumWebBrowser browser;
+
+        public ChromiumWebBrowser _SecondScreenWebView { get; set; }
+
+        private SecondScreenFrm SecondScreen;
 
         private static LoginUserManager _LoginUserManager = LoginUserManager.Instance;
 
@@ -111,11 +116,26 @@ namespace ZlPos.Bizlogic
             browser.SetZoomLevel(d);
         }
 
-        //null method
+        public void OpenSecondScreen()
+        {
+            if(SecondScreen == null)
+            {
+                SecondScreen = new SecondScreenFrm(_SecondScreenWebView);
+                SecondScreen.Show();
+            }
+        }
+
+        //null method debug
         #region SecondScreenAction
         public void SecondScreenAction(string p1, string p2)
         {
-            return;
+            Task.Factory.StartNew(() =>
+            {
+                if(_SecondScreenWebView != null)
+                {
+                    _SecondScreenWebView.ExecuteScriptAsync(p1 + "('" + p2 + "')");
+                }
+            });
         }
         #endregion
 
@@ -1330,6 +1350,8 @@ namespace ZlPos.Bizlogic
             //TODO...
             return;
         }
+
+        //public void SetSecondScreenWebView()
 
 
         //IO 操作相关 ... 

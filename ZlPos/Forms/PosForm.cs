@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CefSharp.WinForms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +17,8 @@ namespace ZlPos.Forms
     {
         private ChromiumBrowserControl chromiumBrowser; //= new ChromiumBrowser();
 
+        private ChromiumWebBrowser secondScreenWebView;
+
         //private BoundObject bound;
 
         private JSBridge hostApp = JSBridge.Instance;
@@ -32,6 +35,17 @@ namespace ZlPos.Forms
                 Dock = DockStyle.Fill,
             };
             this.Controls.Add(chromiumBrowser);
+
+            //副屏初始化
+            string secondScreenFile = System.AppDomain.CurrentDomain.BaseDirectory + "Html\\" + System.Configuration.ConfigurationManager.AppSettings["CustomerScreen"];//testJsCallNetMethod.html";
+            secondScreenWebView = new ChromiumWebBrowser(@"file:///" + secondScreenFile.Replace("\\", "/"))
+            //secondScreenWebView = new ChromiumWebBrowser()
+            {
+                Dock = DockStyle.Fill
+            };
+
+            hostApp._SecondScreenWebView = secondScreenWebView;
+            hostApp.OpenSecondScreen();
 
             //this.KeyPreview = true;
             //KeyDown += PosForm_KeyDown;
