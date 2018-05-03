@@ -39,7 +39,7 @@ namespace ZlPos.Forms
             //副屏初始化
             string secondScreenFile = System.AppDomain.CurrentDomain.BaseDirectory + "Html\\" + System.Configuration.ConfigurationManager.AppSettings["CustomerScreen"];//testJsCallNetMethod.html";
             secondScreenWebView = new ChromiumWebBrowser(@"file:///" + secondScreenFile.Replace("\\", "/"))
-            //secondScreenWebView = new ChromiumWebBrowser()
+            //secondScreenWebView = new ChromiumWebBrowser("https://zhonglunnet032001.oss-cn-shanghai.aliyuncs.com/attachment/20180110/2587e38d-411c-4d9c-b0dd-7fe3159d129e.mp4")
             {
                 Dock = DockStyle.Fill
             };

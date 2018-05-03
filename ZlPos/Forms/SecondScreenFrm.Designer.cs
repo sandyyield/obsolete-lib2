@@ -1,4 +1,4 @@
-﻿namespace ZlPos.Core
+﻿namespace ZlPos.Forms
 {
     partial class SecondScreenFrm
     {

@@ -36,3 +36,5 @@ bin
 # user files
 .user
 .suo
+# rar files
+.rar

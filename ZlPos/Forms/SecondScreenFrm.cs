@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace ZlPos.Core
+namespace ZlPos.Forms
 {
     public partial class SecondScreenFrm : Form
     {

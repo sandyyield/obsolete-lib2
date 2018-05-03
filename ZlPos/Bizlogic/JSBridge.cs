@@ -24,6 +24,7 @@ using InTheHand.Net.Sockets;
 using System.Threading.Tasks;
 using ZlPos.Enums;
 using ZlPos.Core;
+using ZlPos.Forms;
 
 namespace ZlPos.Bizlogic
 {
