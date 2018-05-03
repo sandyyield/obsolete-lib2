@@ -11,17 +11,28 @@ namespace ZlPos.Utils
     class CacheManager
     {
         //static string filePath = Application.StartupPath + "\\localcache";
-        public static void Insert(string key,object configObject)
+        public static void InsertScale(string key, object configObject)
         {
 
             //HttpRuntime.Cache.Insert(key, configObject);
             ContextCache.setScale(configObject as string);
         }
 
-        public static object Get(string key)
+        public static object GetScale(string key)
         {
             //return HttpRuntime.Cache.Get(key);
             return ContextCache.getScale();
         }
+
+        public static void InsertGprint(object configObject)
+        {
+            ContextCache.setGprint(configObject as string);
+        }
+
+        public static object GetGprint()
+        {
+            return ContextCache.getGprint();
+        }
+
     }
 }

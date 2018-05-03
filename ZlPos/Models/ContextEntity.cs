@@ -8,6 +8,8 @@ namespace ZlPos.Models
 {
     public class ContextEntity
     {
+        
+
         //这里要id默认为1
         private int _id = 1;
         [SugarColumn(IsPrimaryKey = true,IsIdentity = false,IsNullable = false)]
@@ -25,5 +27,8 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public string serialPort { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string gprint { get; set; }
     }
 }

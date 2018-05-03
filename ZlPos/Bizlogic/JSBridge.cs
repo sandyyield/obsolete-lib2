@@ -1201,9 +1201,60 @@ namespace ZlPos.Bizlogic
             return;
         }
 
+        /// <summary>
+        /// 获取标签打印机
+        /// </summary>
+        /// <returns></returns>
         public string GetGPrinter()
         {
-            return "";
+            return CacheManager.GetGprint() as string;
+        }
+
+        /// <summary>
+        /// 设置佳博打印机
+        /// </summary>
+        /// <param name="json"></param>
+        public void SetGprinter(string json)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    PrinterConfigEntity printerConfigEntity = JsonConvert.DeserializeObject<PrinterConfigEntity>(json);
+                    GPrinterSetter printerSetter = new GPrinterSetter();
+                    printerSetter.setPrinter(printerConfigEntity,
+                                                p: (result) =>
+                                                {
+                                                    mWebViewHandle.Invoke("setGPrinterCallBack", result);
+                                                    //保存缓存
+                                                    if(result.code == ResponseCode.SUCCESS)
+                                                    {
+                                                        CacheManager.InsertGprint(json);
+                                                        if (GPrinterManager.Instance.Init)
+                                                        {
+                                                            switch (GPrinterManager.Instance.PrinterTypeEnum)
+                                                            {
+                                                                case "usb":
+                                                                    GPrinterUtils.Instance.printUSBTest();
+                                                                    break;
+                                                                case "port":
+                                                                    break;
+                                                                case "bluetooth":
+                                                                    break;
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                }
+                catch (Exception e)
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "设置打印机异常";
+                    mWebViewHandle.Invoke("setGPrinterCallBack", responseEntity);
+                    logger.Error(e.Message + e.StackTrace);
+                }
+            });
         }
 
         public void getGPrintUsbDevices()
@@ -1571,7 +1622,7 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetScale()
         {
-            string scale = CacheManager.Get(SPCode.scale) as string;
+            string scale = CacheManager.GetScale(SPCode.scale) as string;
             return scale;
         }
 
@@ -1593,7 +1644,7 @@ namespace ZlPos.Bizlogic
                     WeightUtil.Instance.Close();
                     responseEntity.code = ResponseCode.SUCCESS;
                     //缓存
-                    CacheManager.Insert(SPCode.scale, json);
+                    CacheManager.InsertScale(SPCode.scale, json);
 
                 }
             }
@@ -1613,7 +1664,7 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                string scale = CacheManager.Get(SPCode.scale) as string;
+                string scale = CacheManager.GetScale(SPCode.scale) as string;
                 if (!string.IsNullOrEmpty(scale))
                 {
                     try

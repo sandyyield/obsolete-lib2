@@ -160,5 +160,41 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region Gprint cache
+        public static string getGprint()
+        {
+            using (var db = SugarDao.GetInstance())
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.gprint;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setGprint(string v)
+        {
+            using (var db = SugarDao.GetInstance())
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.gprint = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion
+
     }
 }
