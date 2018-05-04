@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ZlPos.Enums;
+using ZlPos.Utils;
 
 namespace ZlPos.PrintServices
 {
@@ -118,7 +119,11 @@ namespace ZlPos.PrintServices
 
         internal void openCash()
         {
-            throw new NotImplementedException();
+            int sendCount = 0;
+            string str = "1B70008888";
+            byte[] strByte = HexUtils.HexStringToByte(str);
+            string sendUnicode = Encoding.Unicode.GetString(strByte);
+            PrintBridge.WriteUsb(hDevice, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendCount);
         }
     }
 }

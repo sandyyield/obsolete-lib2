@@ -6,6 +6,7 @@ using InTheHand.Net;
 using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
 using ZlPos.Enums;
+using ZlPos.Utils;
 
 namespace ZlPos.PrintServices
 {
@@ -99,7 +100,12 @@ namespace ZlPos.PrintServices
 
         internal void openCash()
         {
-            throw new NotImplementedException();
+            if (Blueclient.Connected)
+            {
+                //byte[] arrayOfByte = new byte[] { 27, 112, 0, 50, 80 };
+                byte[] arrayOfByte = HexUtils.HexStringToByte("1B7003250");
+                Blueclient.Client.Send(arrayOfByte, arrayOfByte.Length, System.Net.Sockets.SocketFlags.None);
+            }
         }
     }
 }
