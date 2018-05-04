@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using ZlPos.Enums;
 using ZlPos.Core;
 using ZlPos.Forms;
+using System.Windows.Forms;
 
 namespace ZlPos.Bizlogic
 {
@@ -119,11 +120,25 @@ namespace ZlPos.Bizlogic
 
         public void OpenSecondScreen()
         {
-            if(SecondScreen == null)
+            Screen[] sc;
+            sc = Screen.AllScreens;
+            if (sc.Length > 1)
             {
-                SecondScreen = new SecondScreenFrm(_SecondScreenWebView);
+                if (SecondScreen == null)
+                {
+                    SecondScreen = new SecondScreenFrm(_SecondScreenWebView);
+                }
                 SecondScreen.Show();
             }
+            //else
+            //{
+            //    //加载副屏但不现实
+            //    if (SecondScreen == null)
+            //    {
+            //        SecondScreen = new SecondScreenFrm(_SecondScreenWebView);
+            //    }
+            //}
+
         }
 
         //null method debug
@@ -132,7 +147,7 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                if(_SecondScreenWebView != null)
+                if (_SecondScreenWebView != null)
                 {
                     _SecondScreenWebView.ExecuteScriptAsync(p1 + "('" + p2 + "')");
                 }
@@ -838,7 +853,7 @@ namespace ZlPos.Bizlogic
                             {
                                 List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
                                 List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                if(billCommodityEntities == null)
+                                if (billCommodityEntities == null)
                                 {
                                     billCommodityEntities = new List<BillCommodityEntity>();
                                 }
@@ -846,7 +861,7 @@ namespace ZlPos.Bizlogic
                                 {
 
                                 }
-                                if(payDetailEntities == null)
+                                if (payDetailEntities == null)
                                 {
                                     payDetailEntities = new List<PayDetailEntity>();
                                 }
