@@ -45,7 +45,7 @@ namespace ZlPos.Utils
             }
         }
 
-        public void Write(string txt)
+        public void PrintString(string txt)
         {
             if (m_SerialPort.IsOpen)
             {
