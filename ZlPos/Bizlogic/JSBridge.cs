@@ -105,7 +105,16 @@ namespace ZlPos.Bizlogic
 
         public string GetDeviceId()
         {
-            return new Guid().ToString();
+            if (RegHelper.GetKey2() == "")
+            {
+                RegHelper.CreateAndSaveNewKey2();
+            }
+            return RegHelper.GetKey2();
+        }
+
+        public string GetVersionInfo()
+        {
+            return Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
         public string GetNetWorkStatus()
@@ -113,9 +122,9 @@ namespace ZlPos.Bizlogic
             return "json";
         }
 
-        public void SetZoomLevel(double d)
+        public void SetZoomLevel(double ZoomLevel)
         {
-            browser.SetZoomLevel(d);
+            browser.SetZoomLevel(ZoomLevel);
         }
 
         public void OpenSecondScreen()
@@ -1847,20 +1856,26 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string SetCustomerShow(string json)
+        public void SetCustomerShow(string json)
         {
-            //TODO...
-            return "";
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                responseEntity.code = ResponseCode.SUCCESS;
+                responseEntity.msg = "windows版不需要设置";
+                mWebViewHandle?.Invoke("setCustomerShowCallBack", responseEntity);
+            });
+
         }
 
         /// <summary>
         /// 获取客显设置信息
         /// </summary>
         /// <returns></returns>
-        public CustomerShowConfigEntity GetCustomerShow()
+        public string GetCustomerShow()
         {
-            //TODO...
-            return null;
+            var json = "{\"printerType\": \"\",             \"printernumber\": \"1\",             \"printerBrand\": \"\",             \"pageWidth\": \"small\",             \"deviceId\": \"\",             \"port\": \"\",             \"intBaud\": \"\"           }";
+            return json;
         }
 
         /// <summary>
