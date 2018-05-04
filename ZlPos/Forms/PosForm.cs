@@ -84,5 +84,31 @@ namespace ZlPos.Forms
             //    File.Delete(path);
             //}
         }
+
+        private void PosForm_Load(object sender, EventArgs e)
+        {
+            showOnMonitor(0);
+        }
+
+        private void showOnMonitor(int showOnMonitor)
+        {
+            Screen[] sc;
+            sc = Screen.AllScreens;
+
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new Point(sc[showOnMonitor].Bounds.Left, sc[showOnMonitor].Bounds.Top);
+            if (0 == showOnMonitor)
+            {
+                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;// 当检测到一个屏幕则最大化显示但是不全屏
+            }
+            else
+            {
+                // If you intend the form to be maximized, change it to normal then maximized.  
+                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;// 设置边框为 None
+            }
+            this.WindowState = FormWindowState.Maximized;// 最大化
+            this.ControlBox = true;
+            this.TopMost = true;// 置顶
+        }
     }
 }

@@ -37,6 +37,7 @@
             this.ClientSize = new System.Drawing.Size(1111, 577);
             this.Name = "PosForm";
             this.Text = "PosForm";
+            this.Load += new System.EventHandler(this.PosForm_Load);
             this.ResumeLayout(false);
 
         }
