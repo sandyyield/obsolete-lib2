@@ -193,6 +193,7 @@
     <Compile Include="Utils\GPrinterManager.cs" />
     <Compile Include="Utils\GPrinterSetter.cs" />
     <Compile Include="Utils\GPrinterUtils.cs" />
+    <Compile Include="Utils\HexUtils.cs" />
     <Compile Include="Utils\PrinterManager.cs" />
     <Compile Include="Utils\PrinterSetter.cs" />
     <Compile Include="Utils\PrintUtils.cs" />

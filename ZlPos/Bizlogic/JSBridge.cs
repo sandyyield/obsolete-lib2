@@ -1842,14 +1842,70 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region OpenBox
         /// <summary>
         /// 开钱箱
         /// </summary>
         public bool OpenBox()
         {
-            //TODO...
-            return true;
+            if (PrinterManager.Instance.Init)
+            {
+                switch (PrinterManager.Instance.PrinterTypeEnum)
+                {
+                    case PrinterTypeEnum.port:
+                        serialPort portPrinter = PrinterManager.Instance.PortPrinter;
+                        switch (portPrinter.brand)
+                        {
+                            case "PD":
+                                //portPrinter.PrintString("1B73009640");//开关钱箱代码
+                                portPrinter.OpenCash("1B70008888"); //PD新固件开钱箱代码
+                                break;
+                            case "YK":
+                                //                            portPrinter.Write("1B73009640", portPrinter.CMD);//开关钱箱代码
+                                //portPrinter.PrintString("1B70001080");
+                                portPrinter.OpenCash("1B70001080");
+                                break;
+                            case "FX":
+                                //portPrinter.PrintString("1014010005");//开关钱箱代码
+                                portPrinter.OpenCash("1014010005");
+                                break;
+                            default:
+                                break;
+                        }
+                        return true;
+                    case PrinterTypeEnum.usb:
+                        USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
+                        if (usbPrinter != null && usbPrinter.Init)
+                        {
+                            usbPrinter.openCash();
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    case PrinterTypeEnum.bluetooth:
+                        BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
+                        if (bluetoothPrinter != null && bluetoothPrinter.isConnected())
+                        {
+                            bluetoothPrinter.openCash();
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+
+                        }
+                    default:
+                        return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
+        #endregion
 
         /// <summary>
         /// 保存客显设置

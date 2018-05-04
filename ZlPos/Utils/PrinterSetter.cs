@@ -20,9 +20,6 @@ namespace ZlPos.Utils
         public PrinterSetter()
         {
         }
-
-
-        //internal void SetPrinter(PrinterConfigEntity printerConfigEntity, JSBridge.JsCallbackHandle webCallback)
         internal void SetPrinter(PrinterConfigEntity printerConfigEntity, Action<object> webCallback)
         {
             if (printerConfigEntity != null)

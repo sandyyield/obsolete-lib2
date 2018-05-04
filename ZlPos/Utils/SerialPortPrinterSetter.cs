@@ -28,6 +28,7 @@ namespace ZlPos.Utils
                     {
                         m_serialPort = new serialPort(port,intBaud);
                         m_serialPort.pageWidth = printerConfigEntity.pageWidth;
+                        m_serialPort.brand = printerConfigEntity.printerBrand;
                         m_serialPort.init();
                     }
                     else

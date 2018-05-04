@@ -115,5 +115,10 @@ namespace ZlPos.PrintServices
                 open();
             }
         }
+
+        internal void openCash()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

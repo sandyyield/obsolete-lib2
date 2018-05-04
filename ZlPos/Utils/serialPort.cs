@@ -54,6 +54,15 @@ namespace ZlPos.Utils
             }
         }
 
+        public void OpenCash(string str)
+        {
+            if (m_SerialPort.IsOpen)
+            {
+                byte[] strByte = HexUtils.HexStringToByte(str);
+                m_SerialPort.Write(strByte, 0, strByte.Length);
+            }
+        }
+
         public bool Open(string port, int rate)
         {
             try
