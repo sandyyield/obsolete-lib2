@@ -45,7 +45,7 @@ namespace ZlPos.Dao
         [Obsolete]
         public void Delete<T>(T entity) where T : class, new()
         {
-            using(var db = SugarDao.GetInstance())
+            using (var db = SugarDao.GetInstance())
             {
                 try
                 {
@@ -73,21 +73,44 @@ namespace ZlPos.Dao
             {
                 try
                 {
-                    //db.Ado.BeginTran();
-                    if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name))
+                    //判断一下是否为list集合
+                    if (entity.GetType().IsGenericType)
                     {
-                        //db.CodeFirst.InitTables(entity.GetType().Name);
-                        db.CodeFirst.InitTables(entity.GetType());
+                        Type[] tps = entity.GetType().GetGenericArguments();
+                        if(!(tps.Length > 0))
+                        {
+                            throw new Exception("saveOrUpdate list数据types出错");
+                        }
+                        if (!db.DbMaintenance.IsAnyTable(tps[0].Name))
+                        {
+                            //db.CodeFirst.InitTables(entity.GetType().Name);
+                            db.CodeFirst.InitTables(tps[0]);
 
+                        }
+                        //TODO...这里还没有完成
+                        Type tpp = entity.GetType().GetGenericTypeDefinition();
+                        //var tlist = entity is tpp;
+                        var s9 = db.Insertable(entity).Where(true, true).ExecuteCommand();
                     }
-                    //db.Ado.CommitTran();
-
-                    int rsCount = db.Updateable(entity).ExecuteCommand();
-
-                    if (rsCount == 0)
+                    else
                     {
-                        db.Insertable(entity).ExecuteCommand();
+                        //db.Ado.BeginTran();
+                        if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name))
+                        {
+                            //db.CodeFirst.InitTables(entity.GetType().Name);
+                            db.CodeFirst.InitTables(entity.GetType());
+
+                        }
+                        //db.Ado.CommitTran();
+
+                        int rsCount = db.Updateable(entity).ExecuteCommand();
+
+                        if (rsCount == 0)
+                        {
+                            db.Insertable(entity).ExecuteCommand();
+                        }
                     }
+
 
 
                 }

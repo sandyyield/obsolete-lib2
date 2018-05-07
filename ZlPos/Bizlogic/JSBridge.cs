@@ -333,9 +333,29 @@ namespace ZlPos.Bizlogic
                         //保存商品信息
                         if (commoditys != null)
                         {
-                            foreach (CommodityEntity commodityEntity in commoditys)
+                            //foreach (CommodityEntity commodityEntity in commoditys)
+                            //{
+                            //    dbManager.SaveOrUpdate(commodityEntity);
+                            //}
+                            try
                             {
-                                dbManager.SaveOrUpdate(commodityEntity);
+                                //这里为了提高效率 直接用块插方式  还未进行过封装
+                                using (var db = SugarDao.GetInstance())
+                                {
+
+                                    if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name)) 
+                                    {
+                                        db.CodeFirst.InitTables(typeof(CommodityEntity));
+                                    }
+                                    //var vv = commoditys;
+                                    //db.Deleteable<CommodityEntity>().In(commoditys).ExecuteCommand();
+                                    var s9 = db.Insertable(commoditys.ToArray()).Where(true,true).ExecuteCommand();
+                                    //dbManager.SaveOrUpdate(commoditys);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                logger.Error(e.Message + e.StackTrace);
                             }
                         }
                         //保存会员等级信息
