@@ -197,6 +197,8 @@
     </Compile>
     <Compile Include="Utils\BluethoothPrinterSetter.cs" />
     <Compile Include="Utils\CacheManager.cs" />
+    <Compile Include="Utils\ModelComperar.cs" />
+    <Compile Include="Utils\ConvertUtils.cs" />
     <Compile Include="Utils\DateUtils.cs" />
     <Compile Include="Utils\GPrinterManager.cs" />
     <Compile Include="Utils\GPrinterSetter.cs" />

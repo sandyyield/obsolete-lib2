@@ -10,7 +10,7 @@ namespace ZlPos.Dao
     {
         void SaveOrUpdate<T>(T entity) where T : class, new();
 
-        void BulkSaveOrUpdate<T>(T list) where T : class, new();
+        void BulkSaveOrUpdate<T>(T[] list) where T : class, new();
         void Delete<T> (T payDetailEntity) where T : class, new();
     }
 }

@@ -337,26 +337,27 @@ namespace ZlPos.Bizlogic
                             //{
                             //    dbManager.SaveOrUpdate(commodityEntity);
                             //}
-                            try
-                            {
-                                //这里为了提高效率 直接用块插方式  还未进行过封装
-                                using (var db = SugarDao.GetInstance())
-                                {
+                            dbManager.BulkSaveOrUpdate(commoditys.ToArray());
+                            //try
+                            //{
+                            //    //这里为了提高效率 直接用块插方式  还未进行过封装
+                            //    using (var db = SugarDao.GetInstance())
+                            //    {
 
-                                    if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name)) 
-                                    {
-                                        db.CodeFirst.InitTables(typeof(CommodityEntity));
-                                    }
-                                    //var vv = commoditys;
-                                    //db.Deleteable<CommodityEntity>().In(commoditys).ExecuteCommand();
-                                    var s9 = db.Insertable(commoditys.ToArray()).Where(true,true).ExecuteCommand();
-                                    //dbManager.SaveOrUpdate(commoditys);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                logger.Error(e.Message + e.StackTrace);
-                            }
+                            //        if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name)) 
+                            //        {
+                            //            db.CodeFirst.InitTables(typeof(CommodityEntity));
+                            //        }
+                            //        //var vv = commoditys;
+                            //        //db.Deleteable<CommodityEntity>().In(commoditys).ExecuteCommand();
+                            //        var s9 = db.Insertable(commoditys.ToArray()).Where(true,true).ExecuteCommand();
+                            //        //dbManager.SaveOrUpdate(commoditys);
+                            //    }
+                            //}
+                            //catch (Exception e)
+                            //{
+                            //    logger.Error(e.Message + e.StackTrace);
+                            //}
                         }
                         //保存会员等级信息
                         if (memberEntities != null)
@@ -608,9 +609,11 @@ namespace ZlPos.Bizlogic
                 {
                     using (var db = SugarDao.GetInstance())
                     {
+                        string shopcode = _LoginUserManager.UserEntity.shopcode;
+                        string branchcode = _LoginUserManager.UserEntity.branchcode;
                         List<CommodityInfoVM> lastRequestTimeList = db.Queryable<CommodityInfoVM>()
-                                                                    .Where(it => it.shopcode == _LoginUserManager.UserEntity.shopcode
-                                                                    && it.branchcode == _LoginUserManager.UserEntity.branchcode).ToList();
+                                                                    .Where(it => it.shopcode == shopcode
+                                                                    && it.branchcode == branchcode).ToList();
                         if (lastRequestTimeList != null && lastRequestTimeList.Count > 0)
                         {
                             CommodityInfoVM commodityInfoVM = lastRequestTimeList[lastRequestTimeList.Count - 1];

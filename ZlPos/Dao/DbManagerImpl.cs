@@ -1,45 +1,113 @@
-﻿using System;
+﻿using log4net;
+using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using ZlPos.Utils;
 
 namespace ZlPos.Dao
 {
     class DbManagerImpl : DbManager
     {
-
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         /// <summary>
         /// Bulkcopy with no the same
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="list"></param>
-        public void BulkSaveOrUpdate<T>(T list) where T : class, new()
+        /// <param name="dataArr"></param>
+        public void BulkSaveOrUpdate<T>(T[] dataArr) where T : class, new()
         {
-            using (var db = SugarDao.GetInstance())
+            try
             {
-                try
+                using (var db = SugarDao.GetInstance())
                 {
-                    #region 这里可以优化数据库操作  迫于上线需求 后期再来封装完善 实现去重的bulkcopy逻辑 TODO...
-                    ////先把数据封装成bulk 
-                    //Models.Employee sb = new Models.Employee() { EmployeeID = 95302, FirstName = "hahaha", LastName = "world" };
-                    //Models.Employee sb2 = new Models.Employee() { EmployeeID = 00011, FirstName = "凡总划水", LastName = "天下第一" };
-                    //List<Models.Employee> lstDataBulk = new List<Models.Employee>() { sb, sb2 };
-                    //var s9 = db.Insertable(lstDataBulk.ToArray()).IgnoreColumns(it => sb).ExecuteCommand();
-                    //var s9 = db.Insertable(new List<Models.Employee>(){ sb, sb2 }.ToArray()).IgnoreColumns(it=> sb).ExecuteCommand();
-                    //db.Deleteable(new List<Models.Employee>() { sb, sb2 }.ToArray()).ExecuteCommand();
-                    ////把块插入到一个临时表
+                    if (dataArr.GetType().IsArray)
+                    {
+                        //Type[] tps = list.GetType().GetGenericArguments();
+                        if (!(dataArr.Length > 0))
+                        {
+                            logger.Info("BulkSaveOrUpdate:array bound error");
+                        }
 
-                    ////通过temptable和目标表 比对差值 分成update部分和insert部分分别进行操作
+                        Type tp = dataArr[0].GetType();
+                        //数据处理
+                        if (!db.DbMaintenance.IsAnyTable(tp.Name))
+                        {
+                            //db.CodeFirst.InitTables(entity.GetType().Name);
+                            db.CodeFirst.InitTables(tp);
+                            //第一次建表直接插入完事
+                            db.Insertable(dataArr).Where(true, true).ExecuteCommand();
+                            return;
 
-                    #endregion
-                }
-                catch (Exception)
-                {
+                        }
+                        else
+                        {
+                            var table = db.Queryable<T>().ToList();
+                            var data = dataArr.ToList();
 
-                    throw;
+                            DataTable dt1 = ConvertUtils.ToDataTable(data);
+                            DataTable dt2 = ConvertUtils.ToDataTable(table);
+
+                            //差集
+                            IEnumerable<DataRow> query1 = dt1.AsEnumerable().Except(dt2.AsEnumerable(), DataRowComparer.Default);
+                            //两个数据源的差集集合
+                            if (query1.Any())
+                            {
+                                DataTable dt3 = query1.CopyToDataTable();
+                                var ls1 = ConvertUtils.ToList<T>(dt3).ToArray();
+                                if (ls1.Length > 0)
+                                {
+                                    db.Insertable(ls1).Where(true, true).ExecuteCommand();
+                                }
+                                dt3.Clear();dt3.Dispose();dt3 = null;
+
+                            }
+                            //交集
+                            IEnumerable<DataRow> query2 = dt1.AsEnumerable().Intersect(dt2.AsEnumerable(), DataRowComparer.Default);
+                            if (query2.Any())
+                            {
+                                DataTable dt4 = query2.CopyToDataTable();
+
+                                var ls2 = ConvertUtils.ToList<T>(dt4).ToList();
+                                if (ls2.Count > 0)
+                                {
+                                    db.Updateable(ls2).ExecuteCommand();
+                                }
+                                dt4.Clear(); dt4.Dispose(); dt4 = null;
+
+                            }
+
+                            ////交集
+                            //var intersectedList = data.Intersect(table).ToList();
+                            //if (intersectedList.Count > 0)
+                            //{
+                            //    var s8 = db.Updateable(intersectedList).ExecuteCommand();
+                            //}
+                            ////并集
+                            //var expectedList = dataArr.ToList().Except(table.ToList()).ToList();
+                            //if (expectedList.Count > 0)
+                            //{
+
+                            //    var s9 = db.Insertable(expectedList).Where(true, true).ExecuteCommand();
+                            //}
+                        }
+
+                    }
+                    else
+                    {
+                        logger.Info("BulkSaveOrUpdate：Array error");
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                logger.Error("BulkSaveOrUpdate:" + e.Message + e.StackTrace);
+            }
+
         }
 
         [Obsolete]
@@ -73,43 +141,44 @@ namespace ZlPos.Dao
             {
                 try
                 {
-                    //判断一下是否为list集合
-                    if (entity.GetType().IsGenericType)
+                    //这部分代码移到BulkSaveOrUpdate
+                    ////判断一下是否为list集合
+                    //if (entity.GetType().IsGenericType)
+                    //{
+                    //    Type[] tps = entity.GetType().GetGenericArguments();
+                    //    if(!(tps.Length > 0))
+                    //    {
+                    //        throw new Exception("saveOrUpdate list数据types出错");
+                    //    }
+                    //    if (!db.DbMaintenance.IsAnyTable(tps[0].Name))
+                    //    {
+                    //        //db.CodeFirst.InitTables(entity.GetType().Name);
+                    //        db.CodeFirst.InitTables(tps[0]);
+
+                    //    }
+                    //    //TODO...这里还没有完成
+                    //    Type tpp = entity.GetType().GetGenericTypeDefinition();
+                    //    //var tlist = entity is tpp;
+                    //    var s9 = db.Insertable(entity).Where(true, true).ExecuteCommand();
+                    //}
+                    //else
+                    //{
+                    //db.Ado.BeginTran();
+                    if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name))
                     {
-                        Type[] tps = entity.GetType().GetGenericArguments();
-                        if(!(tps.Length > 0))
-                        {
-                            throw new Exception("saveOrUpdate list数据types出错");
-                        }
-                        if (!db.DbMaintenance.IsAnyTable(tps[0].Name))
-                        {
-                            //db.CodeFirst.InitTables(entity.GetType().Name);
-                            db.CodeFirst.InitTables(tps[0]);
+                        //db.CodeFirst.InitTables(entity.GetType().Name);
+                        db.CodeFirst.InitTables(entity.GetType());
 
-                        }
-                        //TODO...这里还没有完成
-                        Type tpp = entity.GetType().GetGenericTypeDefinition();
-                        //var tlist = entity is tpp;
-                        var s9 = db.Insertable(entity).Where(true, true).ExecuteCommand();
                     }
-                    else
+                    //db.Ado.CommitTran();
+
+                    int rsCount = db.Updateable(entity).ExecuteCommand();
+
+                    if (rsCount == 0)
                     {
-                        //db.Ado.BeginTran();
-                        if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name))
-                        {
-                            //db.CodeFirst.InitTables(entity.GetType().Name);
-                            db.CodeFirst.InitTables(entity.GetType());
-
-                        }
-                        //db.Ado.CommitTran();
-
-                        int rsCount = db.Updateable(entity).ExecuteCommand();
-
-                        if (rsCount == 0)
-                        {
-                            db.Insertable(entity).ExecuteCommand();
-                        }
+                        db.Insertable(entity).ExecuteCommand();
                     }
+                    //}
 
 
 

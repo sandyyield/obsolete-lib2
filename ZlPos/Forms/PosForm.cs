@@ -45,7 +45,7 @@ namespace ZlPos.Forms
             };
 
             hostApp._SecondScreenWebView = secondScreenWebView;
-            hostApp.OpenSecondScreen();
+            //hostApp.OpenSecondScreen();
 
             //this.KeyPreview = true;
             //KeyDown += PosForm_KeyDown;
