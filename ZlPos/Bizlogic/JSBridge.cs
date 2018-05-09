@@ -294,7 +294,7 @@ namespace ZlPos.Bizlogic
         /// <summary>
         /// 保存或更新商品信息
         /// </summary>
-        public string SaveOrUpdateCommodityInfo(string json)
+        public void SaveOrUpdateCommodityInfo(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             if (_LoginUserManager.Login)
@@ -388,6 +388,7 @@ namespace ZlPos.Bizlogic
                         {
                             mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
                         });
+                        return;
                     }
                 }
                 catch (Exception e)
@@ -402,7 +403,11 @@ namespace ZlPos.Bizlogic
                 responseEntity.code = ResponseCode.Failed;
             }
             logger.Info("数据保存成功");
-            return JsonConvert.SerializeObject(responseEntity);
+            Task.Factory.StartNew(() =>
+            {
+                mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
+            });
+            return; /*JsonConvert.SerializeObject(responseEntity);*/
 
         }
         #endregion
