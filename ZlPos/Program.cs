@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZlPos.Bizlogic;
 using ZlPos.Forms;
@@ -38,6 +39,12 @@ namespace ZlPos
             cefSettings.LogSeverity = LogSeverity.Disable;
 
             Cef.Initialize(cefSettings, true, true);
+
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                //设置所有未觉察异常被觉察
+                e.SetObserved();
+            };
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
