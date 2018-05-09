@@ -321,83 +321,42 @@ namespace ZlPos.Bizlogic
                         List<BarCodeEntity> barCodes = commodityInfoVM.barcodes;
                         List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
 
-                        #region 循环saveorupdate 效率很慢 TODO...: 这里应该改造成bulksaveorupdate提高效率
+                        #region 已采用bulksave 方式提高存库效率
                         //保存商品分类信息
                         if (categoryEntities != null)
                         {
-                            foreach (CategoryEntity categoryEntity in categoryEntities)
-                            {
-                                dbManager.SaveOrUpdate(categoryEntity);
-                            }
+                            dbManager.BulkSaveOrUpdate(categoryEntities);
                         }
                         //保存商品信息
                         if (commoditys != null)
                         {
-                            //foreach (CommodityEntity commodityEntity in commoditys)
-                            //{
-                            //    dbManager.SaveOrUpdate(commodityEntity);
-                            //}
-                            dbManager.BulkSaveOrUpdate(commoditys.ToArray());
-                            //try
-                            //{
-                            //    //这里为了提高效率 直接用块插方式  还未进行过封装
-                            //    using (var db = SugarDao.GetInstance())
-                            //    {
-
-                            //        if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name)) 
-                            //        {
-                            //            db.CodeFirst.InitTables(typeof(CommodityEntity));
-                            //        }
-                            //        //var vv = commoditys;
-                            //        //db.Deleteable<CommodityEntity>().In(commoditys).ExecuteCommand();
-                            //        var s9 = db.Insertable(commoditys.ToArray()).Where(true,true).ExecuteCommand();
-                            //        //dbManager.SaveOrUpdate(commoditys);
-                            //    }
-                            //}
-                            //catch (Exception e)
-                            //{
-                            //    logger.Error(e.Message + e.StackTrace);
-                            //}
+                            //这里是数据的大头
+                            dbManager.BulkSaveOrUpdate(commoditys);
                         }
                         //保存会员等级信息
                         if (memberEntities != null)
                         {
-                            foreach (MemberEntity memberEntity in memberEntities)
-                            {
-                                dbManager.SaveOrUpdate(memberEntity);
-                            }
+                            dbManager.BulkSaveOrUpdate(memberEntities);
                         }
                         //保存付款方式信息
                         if (paytypes != null)
                         {
-                            foreach (PayTypeEntity payTypeEntity in paytypes)
-                            {
-                                dbManager.SaveOrUpdate(payTypeEntity);
-                            }
+                            dbManager.BulkSaveOrUpdate(paytypes);
                         }
                         //保存收银员信息
                         if (assistants != null)
                         {
-                            foreach (AssistantsEntity assistantsEntity in assistants)
-                            {
-                                dbManager.SaveOrUpdate(assistantsEntity);
-                            }
+                            dbManager.BulkSaveOrUpdate(assistants);
                         }
                         //保存收银员信息
                         if (users != null)
                         {
-                            foreach (CashierEntity cashierEntity in users)
-                            {
-                                dbManager.SaveOrUpdate(cashierEntity);
-                            }
+                            dbManager.BulkSaveOrUpdate(users);
                         }
                         //保存供应商信息
                         if (suppliers != null)
                         {
-                            foreach (SupplierEntity supplierEntity in suppliers)
-                            {
-                                dbManager.SaveOrUpdate(supplierEntity);
-                            }
+                            dbManager.BulkSaveOrUpdate(suppliers);
                         }
                         // add: 2018/2/27
                         //保存条码表信息
@@ -414,10 +373,7 @@ namespace ZlPos.Bizlogic
                         //保存调价表信息
                         if (commodityPriceEntityList != null)
                         {
-                            foreach (CommodityPriceEntity commodityPriceEntity in commodityPriceEntityList)
-                            {
-                                dbManager.SaveOrUpdate(commodityPriceEntity);
-                            }
+                            dbManager.BulkSaveOrUpdate(commodityPriceEntityList);
                         }
                         #endregion
 
@@ -762,17 +718,8 @@ namespace ZlPos.Bizlogic
                 }
                 else
                 {
-                    foreach (PayDetailEntity payDetailEntity in paydetails)
-                    {
-                        try
-                        {
-                            dbManager.SaveOrUpdate(payDetailEntity);
-                        }
-                        catch (Exception e)
-                        {
-                            logger.Error("保存销售单据接口： dbManager.saveOrUpdate(payDetailEntity)--DbException");
-                        }
-                    }
+                    //edit by sVen 2018年5月9日 优化为块存方式提高效率
+                    dbManager.BulkSaveOrUpdate(paydetails);
                 }
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.msg = "保存单据成功";

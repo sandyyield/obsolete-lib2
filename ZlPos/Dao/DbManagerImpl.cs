@@ -19,16 +19,16 @@ namespace ZlPos.Dao
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dataArr"></param>
-        public void BulkSaveOrUpdate<T>(T[] dataArr) where T : class, new()
+        public void BulkSaveOrUpdate<T>(List<T> dataArr) where T : class, new()
         {
             try
             {
                 using (var db = SugarDao.GetInstance())
                 {
-                    if (dataArr.GetType().IsArray)
+                    if (dataArr.GetType().IsGenericType)
                     {
                         //Type[] tps = list.GetType().GetGenericArguments();
-                        if (!(dataArr.Length > 0))
+                        if (!(dataArr.Count > 0))
                         {
                             logger.Info("BulkSaveOrUpdate:array bound error");
                         }
@@ -40,14 +40,14 @@ namespace ZlPos.Dao
                             //db.CodeFirst.InitTables(entity.GetType().Name);
                             db.CodeFirst.InitTables(tp);
                             //第一次建表直接插入完事
-                            db.Insertable(dataArr).Where(true, true).ExecuteCommand();
+                            db.Insertable(dataArr.ToArray()).Where(true, true).ExecuteCommand();
                             return;
 
                         }
                         else
                         {
                             var table = db.Queryable<T>().ToList();
-                            var data = dataArr.ToList();
+                            var data = dataArr;
 
                             DataTable dt1 = ConvertUtils.ToDataTable(data);
                             DataTable dt2 = ConvertUtils.ToDataTable(table);
@@ -80,6 +80,8 @@ namespace ZlPos.Dao
                                 dt4.Clear(); dt4.Dispose(); dt4 = null;
 
                             }
+                            dt1.Clear(); dt1.Dispose(); dt1 = null;
+                            dt2.Clear(); dt2.Dispose(); dt2 = null;
 
                             ////交集
                             //var intersectedList = data.Intersect(table).ToList();
