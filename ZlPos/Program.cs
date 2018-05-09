@@ -33,7 +33,11 @@ namespace ZlPos
 
             logger.Info("Initiallize chromium core..");
 
-            Cef.Initialize(new CefSettings(), true, true);
+            CefSettings cefSettings = new CefSettings();
+            //禁用调试日志
+            cefSettings.LogSeverity = LogSeverity.Disable;
+
+            Cef.Initialize(cefSettings, true, true);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
