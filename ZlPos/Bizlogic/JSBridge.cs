@@ -115,6 +115,16 @@ namespace ZlPos.Bizlogic
             {
                 RegHelper.CreateAndSaveNewKey2();
             }
+            //add by sVen 2018年5月14日 增加一个系统版本回调给js
+            Task.Factory.StartNew(() =>
+            {
+                var os = Environment.OSVersion.Version;
+                string osVer = os.Major + "." + os.Minor;
+
+                browser.ExecuteScriptAsync("getDeviceIdCallback('" + os + "')");
+            });
+
+
             return RegHelper.GetKey2();
         }
 
