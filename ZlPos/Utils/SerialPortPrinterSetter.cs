@@ -42,7 +42,7 @@ namespace ZlPos.Utils
                         PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.port;
                         PrinterManager.Instance.PortPrinter = m_serialPort;
 
-                        m_serialPort.PrintString("打印机测试成功!\n\n\n\n\n");
+                        m_serialPort.PrintString("串口打印机连接成功!\n\n\n\n\n");
                         responseEntity.code = ResponseCode.SUCCESS;
                         responseEntity.msg = "打印机设置成功";
 

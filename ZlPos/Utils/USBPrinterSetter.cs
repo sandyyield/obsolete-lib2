@@ -35,13 +35,14 @@ namespace ZlPos.Utils
                 listener = webCallback;
                 responseEntity = new ResponseEntity();
                 PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
-                if (PrinterManager.Instance.UsbPrinter == null)
+                //edit by sven 2018年5月14日 不管USBprint是否已经init 都重新初始化一次
+                //if (PrinterManager.Instance.UsbPrinter == null)
                 {
                     USBPrinter usbPrinter = new USBPrinter();
-                    if (!usbPrinter.Init)
+                    //if (!usbPrinter.Init)
                     {
                         hUsb = usbPrinter.open();
-                        if((int)hUsb == -1)
+                        if ((int)hUsb == -1)
                         {
                             responseEntity.code = ResponseCode.Failed;
                             responseEntity.msg = "USB打印机打开失败";
@@ -55,7 +56,7 @@ namespace ZlPos.Utils
                     PrinterManager.Instance.UsbPrinter = usbPrinter;
                     PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
 
-                    usbPrinter.PrintString("usb打印机测试成功\n\n\n\n\n");
+                    usbPrinter.PrintString("USB打印机连接成功\n\n\n\n\n");
                     responseEntity.code = ResponseCode.SUCCESS;
                     responseEntity.msg = "打印机设置成功";
                     //if (listener != null)
@@ -64,15 +65,15 @@ namespace ZlPos.Utils
                     //}
 
                 }
-                else
-                {
-                    if (PrinterManager.Instance.Init)
-                    {
-                        PrinterManager.Instance.UsbPrinter.PrintString("usb打印机测试成功\r\n\r\n\r\n\r\n");
-                        responseEntity.code = ResponseCode.SUCCESS;
-                        responseEntity.msg = "打印机设置成功";
-                    }
-                }
+                //else
+                //{
+                //    if (PrinterManager.Instance.Init)
+                //    {
+                //        PrinterManager.Instance.UsbPrinter.PrintString("usb打印机测试成功\r\n\r\n\r\n\r\n");
+                //        responseEntity.code = ResponseCode.SUCCESS;
+                //        responseEntity.msg = "打印机设置成功";
+                //    }
+                //}
 
 
                 //getUsbDevices();

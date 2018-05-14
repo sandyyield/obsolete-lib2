@@ -50,7 +50,7 @@ namespace ZlPos.Bizlogic
         {
             using (var db = SugarDao.GetInstance())
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                if (db.DbMaintenance.IsAnyTable(typeof(ContextEntity).Name,false))
                 {
                     ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                     if (contextEntity == null)
@@ -76,6 +76,15 @@ namespace ZlPos.Bizlogic
                     contextEntity = new ContextEntity();
                 }
                 contextEntity.scale = v;
+                //contextEntity.id = 1;
+                //if(db.Queryable<ContextEntity>().First() == null)
+                //{
+                //    db.Insertable(contextEntity).ExecuteCommand();
+                //}
+                //else
+                //{
+                //    db.Updateable(contextEntity).ExecuteCommand();
+                //}
                 DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
             }
         }

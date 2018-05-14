@@ -166,14 +166,13 @@ namespace ZlPos.Dao
                     //else
                     //{
                     //db.Ado.BeginTran();
-                    if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name))
+                    if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name,false))
                     {
                         //db.CodeFirst.InitTables(entity.GetType().Name);
                         db.CodeFirst.InitTables(entity.GetType());
 
                     }
-                    //db.Ado.CommitTran();
-
+                    
                     int rsCount = db.Updateable(entity).ExecuteCommand();
 
                     if (rsCount == 0)
@@ -181,7 +180,7 @@ namespace ZlPos.Dao
                         db.Insertable(entity).ExecuteCommand();
                     }
                     //}
-
+                    //db.Ado.CommitTran();
 
 
                 }
