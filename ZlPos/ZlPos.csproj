@@ -106,6 +106,7 @@
     <Compile Include="Bizlogic\DeException.cs" />
     <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
+    <Compile Include="Bizlogic\InternetHelper.cs" />
     <Compile Include="Bizlogic\RegHelper.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Forms\SecondScreenFrm.cs">

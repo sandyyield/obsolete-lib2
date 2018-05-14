@@ -49,6 +49,12 @@ namespace ZlPos.Bizlogic
 
         public delegate void JsCallbackHandle(object state);
 
+        //网络检查开关
+        private bool _NetworkChecking = false;
+
+        //网络状态
+        private bool _NetworkStatus = false;
+
         //内存镜像
         PrinterConfigEntity _printerConfigEntity;
 
@@ -119,7 +125,65 @@ namespace ZlPos.Bizlogic
 
         public string GetNetWorkStatus()
         {
-            return "json";
+            ResponseEntity responseEntity = new ResponseEntity();
+            try
+            {
+                if (InternetHelper.IsConnectInternet())
+                {
+                    responseEntity.code = ResponseCode.SUCCESS;
+                    responseEntity.msg = "获取网络状态操作成功！";
+                    _NetworkStatus = true;
+                    if (!_NetworkChecking)
+                    {
+                        NetWorkListener();
+                    }
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "NETTYPE_NONE";
+                    _NetworkStatus = false;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info(e.Message + e.StackTrace);
+            }
+            return JsonConvert.SerializeObject(responseEntity);
+        }
+
+        private void NetWorkListener()
+        {
+            _NetworkChecking = true;
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                while (_NetworkChecking)
+                {
+                    bool isConnectInternet = InternetHelper.IsConnectInternet();
+                    if (!isConnectInternet)
+                    {
+                        //即当前网络发生变化时
+                        if (isConnectInternet != _NetworkStatus)
+                        {
+                            _NetworkStatus = isConnectInternet;
+                            responseEntity.code = ResponseCode.Failed;
+                            mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+
+                        }
+                    }
+                    else
+                    {
+                        if (isConnectInternet != _NetworkStatus)
+                        {
+                            _NetworkStatus = isConnectInternet;
+                            responseEntity.code = ResponseCode.SUCCESS;
+                            mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                        }
+                    }
+                    Thread.Sleep(7000);
+                }
+            });
         }
 
         public void SetZoomLevel(double ZoomLevel)
