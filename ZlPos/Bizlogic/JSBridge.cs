@@ -141,7 +141,7 @@ namespace ZlPos.Bizlogic
             }
             //else
             //{
-            //    //加载副屏但不现实
+            //    //加载副屏但不展示
             //    if (SecondScreen == null)
             //    {
             //        SecondScreen = new SecondScreenFrm(_SecondScreenWebView);
@@ -2071,6 +2071,21 @@ namespace ZlPos.Bizlogic
         public void DownLoadFile2()
         {
 
+        }
+
+
+        /// <summary>
+        /// 跳转网址
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public bool IntentTo(string url)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                browser.ExecuteScriptAsync("intentToCallBack('" + url + "')");
+            });
+            return true;
         }
 
 

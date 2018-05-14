@@ -108,7 +108,7 @@ namespace ZlPos.Forms
             }
             this.WindowState = FormWindowState.Maximized;// 最大化
             this.ControlBox = true;
-            this.TopMost = true;// 置顶
+            //this.TopMost = true;// 置顶
         }
     }
 }
