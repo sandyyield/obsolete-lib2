@@ -1275,13 +1275,17 @@ namespace ZlPos.Bizlogic
             {
                 if (commodityEntities.Count > (pageindex * pagesize + pagesize))
                 {
-                    selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, pageindex * pagesize + pagesize);
+                    selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, pagesize);
                 }
                 else
                 {
-                    if (pageindex * pagesize < commodityEntities.Count)
+                    if (commodityEntities.Count - pageindex * pagesize >= 0)
                     {
-                        selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, commodityEntities.Count);
+                        if (commodityEntities.Count < (pageindex * pagesize + pageindex * pagesize + pagesize))
+                        {
+                            selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, commodityEntities.Count - pageindex * pagesize);
+                        }
+
                     }
                 }
             }

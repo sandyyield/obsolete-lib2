@@ -103,6 +103,7 @@
     <Compile Include="Bean\ResposeEntity.cs" />
     <Compile Include="Bizlogic\AppContext.cs" />
     <Compile Include="Bizlogic\ContextCache.cs" />
+    <Compile Include="Bizlogic\MyDataRowComparer.cs" />
     <Compile Include="Bizlogic\DeException.cs" />
     <Compile Include="Bizlogic\ICallback.cs" />
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />

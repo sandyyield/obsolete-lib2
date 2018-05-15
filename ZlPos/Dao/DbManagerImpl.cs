@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using ZlPos.Bizlogic;
 using ZlPos.Utils;
 
 namespace ZlPos.Dao
@@ -31,6 +32,7 @@ namespace ZlPos.Dao
                         if (!(dataArr.Count > 0))
                         {
                             logger.Info("BulkSaveOrUpdate:array bound error");
+                            return;
                         }
 
                         Type tp = dataArr[0].GetType();
@@ -46,42 +48,63 @@ namespace ZlPos.Dao
                         }
                         else
                         {
-                            var table = db.Queryable<T>().ToList();
                             var data = dataArr;
+                            var table = db.Queryable<T>().ToList();
 
                             DataTable dt1 = ConvertUtils.ToDataTable(data);
                             DataTable dt2 = ConvertUtils.ToDataTable(table);
 
-                            //差集
+                            //这里还是可以寻求一种高效的内存处理方式 取代数据库多次读取
+                            /////筛选出主键相同需要更新的数据
+                            //var dtt = from r in dt1.AsEnumerable()
+                            //          where !(from rr in dt2.AsEnumerable() select rr.Field<int>("id")).Contains(r.Field<int>("id"))
+                            //          select r;
+
+                            //差集(所有值 非只主键）
                             IEnumerable<DataRow> query1 = dt1.AsEnumerable().Except(dt2.AsEnumerable(), DataRowComparer.Default);
+                            //IEnumerable<DataRow> query1 = dt1.AsEnumerable().Except(dt2.AsEnumerable(), new MyDataRowComparer());
                             //两个数据源的差集集合
                             if (query1.Any())
                             {
                                 DataTable dt3 = query1.CopyToDataTable();
                                 var ls1 = ConvertUtils.ToList<T>(dt3).ToArray();
-                                if (ls1.Length > 0)
+                                //这个差值包含了insert和update的数据 用foreach挑拣出来
+                                foreach (var item in ls1)
                                 {
-                                    db.Insertable(ls1).Where(true, true).ExecuteCommand();
+                                    //一条一条判断 暂时先这个等速度吃不消了再说
+                                    int rsCount = db.Updateable(item).ExecuteCommand();
+                                    if(rsCount == 0)
+                                    {
+                                        db.Insertable(item).ExecuteCommand();
+                                    }
                                 }
-                                dt3.Clear();dt3.Dispose();dt3 = null;
+
+                                //因为包含了update和insert的数据 所以不能直接insertable
+                                //if (ls1.Length > 0)
+                                //{
+                                //    db.Insertable(ls1).Where(true, true).ExecuteCommand();
+                                //}
+                                dt3.Clear(); dt3.Dispose(); dt3 = null;
 
                             }
-                            //交集
-                            IEnumerable<DataRow> query2 = dt1.AsEnumerable().Intersect(dt2.AsEnumerable(), DataRowComparer.Default);
-                            if (query2.Any())
-                            {
-                                DataTable dt4 = query2.CopyToDataTable();
 
-                                var ls2 = ConvertUtils.ToList<T>(dt4).ToList();
-                                if (ls2.Count > 0)
-                                {
-                                    db.Updateable(ls2).ExecuteCommand();
-                                }
-                                dt4.Clear(); dt4.Dispose(); dt4 = null;
+                            //这里的交集是完全一样的交集  并不是类似于主键相同 其余有不同更新 所以没用
+                            ////交集
+                            //IEnumerable<DataRow> query2 = dt1.AsEnumerable().Intersect(dt2.AsEnumerable(), DataRowComparer.Default);
+                            //if (query2.Any())
+                            //{
+                            //    DataTable dt4 = query2.CopyToDataTable();
 
-                            }
-                            dt1.Clear(); dt1.Dispose(); dt1 = null;
-                            dt2.Clear(); dt2.Dispose(); dt2 = null;
+                            //    var ls2 = ConvertUtils.ToList<T>(dt4).ToList();
+                            //    if (ls2.Count > 0)
+                            //    {
+                            //        db.Updateable(ls2).ExecuteCommand();
+                            //    }
+                            //    dt4.Clear(); dt4.Dispose(); dt4 = null;
+
+                            //}
+                            //dt1.Clear(); dt1.Dispose(); dt1 = null;
+                            //dt2.Clear(); dt2.Dispose(); dt2 = null;
 
                             ////交集
                             //var intersectedList = data.Intersect(table).ToList();
@@ -166,13 +189,13 @@ namespace ZlPos.Dao
                     //else
                     //{
                     //db.Ado.BeginTran();
-                    if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name,false))
+                    if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name, false))
                     {
                         //db.CodeFirst.InitTables(entity.GetType().Name);
                         db.CodeFirst.InitTables(entity.GetType());
 
                     }
-                    
+
                     int rsCount = db.Updateable(entity).ExecuteCommand();
 
                     if (rsCount == 0)
