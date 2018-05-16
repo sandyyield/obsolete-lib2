@@ -121,7 +121,7 @@ namespace ZlPos.Bizlogic
                 var os = Environment.OSVersion.Version;
                 string osVer = os.Major + "." + os.Minor;
 
-                browser.ExecuteScriptAsync("getDeviceIdCallback('" + os + "')");
+                browser.ExecuteScriptAsync("getDeviceIdCallBack('" + os + "')");
             });
 
 
@@ -142,6 +142,7 @@ namespace ZlPos.Bizlogic
                 {
                     responseEntity.code = ResponseCode.SUCCESS;
                     responseEntity.msg = "获取网络状态操作成功！";
+                    logger.Info("获取网络状态操作成功");
                     _NetworkStatus = true;
                     if (!_NetworkChecking)
                     {
@@ -152,6 +153,7 @@ namespace ZlPos.Bizlogic
                 {
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = "NETTYPE_NONE";
+                    logger.Info("获取网络状态: NETTYPE_NONE");
                     _NetworkStatus = false;
                 }
             }
@@ -173,6 +175,7 @@ namespace ZlPos.Bizlogic
                     bool isConnectInternet = InternetHelper.IsConnectInternet();
                     if (!isConnectInternet)
                     {
+                        logger.Info("isConnectInternet>>>" + isConnectInternet);
                         //即当前网络发生变化时
                         if (isConnectInternet != _NetworkStatus)
                         {
@@ -184,6 +187,7 @@ namespace ZlPos.Bizlogic
                     }
                     else
                     {
+                        logger.Info("isConnectInternet>>>" + isConnectInternet);
                         if (isConnectInternet != _NetworkStatus)
                         {
                             _NetworkStatus = isConnectInternet;
@@ -370,6 +374,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         public void SaveOrUpdateCommodityInfo(string json)
         {
+            CommodityCacheManager.Instance.cleanCache();
             ResponseEntity responseEntity = new ResponseEntity();
             if (_LoginUserManager.Login)
             {
@@ -1048,10 +1053,11 @@ namespace ZlPos.Bizlogic
             {
                 try
                 {
-
+                    string shopcode = _LoginUserManager.UserEntity.shopcode;
+                    string branchcode = _LoginUserManager.UserEntity.branchcode;
                     number = db.Queryable<BillEntity>().Where(it => it.ticketstatue == "hangup"
-                                                        && it.shopcode == _LoginUserManager.UserEntity.shopcode
-                                                        && it.branchcode == _LoginUserManager.UserEntity.branchcode).ToList().Count;
+                                                        && it.shopcode == shopcode
+                                                        && it.branchcode == branchcode).ToList().Count;
                 }
                 catch (Exception e)
                 {

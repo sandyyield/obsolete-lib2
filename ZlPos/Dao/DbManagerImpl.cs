@@ -75,7 +75,7 @@ namespace ZlPos.Dao
                                     int rsCount = db.Updateable(item).ExecuteCommand();
                                     if(rsCount == 0)
                                     {
-                                        db.Insertable(item).ExecuteCommand();
+                                        db.Insertable(item).Where(true,true).ExecuteCommand();
                                     }
                                 }
 
