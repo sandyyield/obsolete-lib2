@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZlPos.Bizlogic;
@@ -16,6 +17,8 @@ namespace ZlPos
     static class Program
     {
         private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        public static Mutex mutex { get; set; }
 
         /// <summary>
         /// 应用程序的主入口点。
@@ -33,6 +36,16 @@ namespace ZlPos
             logger = LogManager.GetLogger("Logger");
 
             logger.Info("Initiallize chromium core..");
+
+            #region " 不允许多个实例运行 "
+            mutex = new System.Threading.Mutex(true, "aabbccdd");
+            if (!mutex.WaitOne(0, false))
+            {
+                MessageBox.Show("程序已经在运行！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Application.Exit();
+                return;
+            }
+            #endregion
 
             CefSettings cefSettings = new CefSettings();
             //禁用调试日志
