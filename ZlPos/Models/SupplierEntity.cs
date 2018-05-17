@@ -8,28 +8,35 @@ namespace ZlPos.Models
 {
     public class SupplierEntity
     {
-        [SugarColumn(IsNullable = true,IsPrimaryKey = true)]
-        public String id { get; set; }
+        [SugarColumn(IsNullable = true, IsPrimaryKey = true)]
+        public string id { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String contactaddress { get; set; }
+        public string contactaddress { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String mnemonic { get; set; }
+        public string mnemonic { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String name { get; set; }
+        public string name { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String suppliercode { get; set; }
+        public string suppliercode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String shopcode { get; set; }
+        public string shopcode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String contact { get; set; }
+        public string contact { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String contactnum { get; set; }
+        public string contactnum { get; set; }
 
         //2018年1月30日 add
         [SugarColumn(IsNullable = true)]
-        public String branchcode { get; set; }
+        public string branchcode { get; set; }
 
         [SugarColumn(IsNullable = true)]
-        public String del { get; set; }
+        public string del { get; set; }
+
+        // add: 2018/4/10
+        [SugarColumn(IsNullable = true)]
+        public string businessmodel { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string businessmodelname { get; set; }
+
     }
 }
