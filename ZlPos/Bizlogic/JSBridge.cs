@@ -230,7 +230,7 @@ namespace ZlPos.Bizlogic
 
         //null method debug
         #region SecondScreenAction
-        public void SecondScreenAction(string p1, string p2)
+        public void SecondScreenAction(string p1, string p2 = "")
         {
             Task.Factory.StartNew(() =>
             {
@@ -773,6 +773,7 @@ namespace ZlPos.Bizlogic
                 }
                 List<BillCommodityEntity> commoditys = billEntity.commoditys;
                 List<PayDetailEntity> paydetails = billEntity.paydetails;
+                List<DisCountDetailEntity> discountdetails = billEntity.discountdetails;
                 if (commoditys == null || commoditys.Count == 0)
                 {
                     logger.Info("保存销售单据接口：该单据没有商品信息");
@@ -802,9 +803,26 @@ namespace ZlPos.Bizlogic
                 }
                 else
                 {
-                    //edit by sVen 2018年5月9日 优化为块存方式提高效率
-                    dbManager.BulkSaveOrUpdate(paydetails);
+                    ////edit by sVen 2018年5月9日 优化为块存方式提高效率
+                    //dbManager.BulkSaveOrUpdate(paydetails);
+                    foreach (PayDetailEntity payDetailEntity in paydetails)
+                    {
+                        dbManager.SaveOrUpdate(payDetailEntity);
+                    }
                 }
+
+                if (discountdetails == null || discountdetails.Count == 0)
+                {
+                    logger.Info("保存销售单据接口：该单据没有支付行信息");
+                }
+                else
+                {
+                    foreach(DisCountDetailEntity disCountDetailEntity in discountdetails)
+                    {
+                        dbManager.SaveOrUpdate(disCountDetailEntity);
+                    }
+                }
+
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.msg = "保存单据成功";
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
