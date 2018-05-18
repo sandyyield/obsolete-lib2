@@ -143,7 +143,7 @@ namespace ZlPos.Dao
                 try
                 {
                     //TODEBUG...
-                    db.Deleteable<T>().ExecuteCommand();
+                    db.Deleteable<T>(entity).ExecuteCommand();
                 }
                 catch (Exception e)
                 {
