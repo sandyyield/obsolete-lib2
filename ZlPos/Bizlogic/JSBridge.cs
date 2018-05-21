@@ -58,6 +58,9 @@ namespace ZlPos.Bizlogic
         //内存镜像
         PrinterConfigEntity _printerConfigEntity;
 
+        //操作系统版本
+        private string OSVer = "";
+
         /// <summary>
         /// 委托方式托管回调
         /// </summary>
@@ -119,9 +122,9 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 var os = Environment.OSVersion.Version;
-                string osVer = os.Major + "." + os.Minor;
+                OSVer = os.Major + "." + os.Minor;
 
-                browser.ExecuteScriptAsync("getDeviceIdCallBack('" + os + "')");
+                browser.ExecuteScriptAsync("getDeviceIdCallBack('" + OSVer + "')");
             });
 
 
@@ -136,30 +139,39 @@ namespace ZlPos.Bizlogic
         public string GetNetWorkStatus()
         {
             ResponseEntity responseEntity = new ResponseEntity();
-            try
+            //xp系统暂时去掉网络检测功能
+            if (OSVer.Equals("5.1"))
             {
-                if (InternetHelper.IsConnectInternet())
+                responseEntity.code = ResponseCode.SUCCESS;
+                responseEntity.msg = "获取网络状态操作成功！";
+            }
+            else
+            {
+                try
                 {
-                    responseEntity.code = ResponseCode.SUCCESS;
-                    responseEntity.msg = "获取网络状态操作成功！";
-                    logger.Info("获取网络状态操作成功");
-                    _NetworkStatus = true;
-                    if (!_NetworkChecking)
+                    if (InternetHelper.IsConnectInternet())
                     {
-                        NetWorkListener();
+                        responseEntity.code = ResponseCode.SUCCESS;
+                        responseEntity.msg = "获取网络状态操作成功！";
+                        logger.Info("获取网络状态操作成功");
+                        _NetworkStatus = true;
+                        if (!_NetworkChecking)
+                        {
+                            NetWorkListener();
+                        }
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "NETTYPE_NONE";
+                        logger.Info("获取网络状态: NETTYPE_NONE");
+                        _NetworkStatus = false;
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    responseEntity.code = ResponseCode.Failed;
-                    responseEntity.msg = "NETTYPE_NONE";
-                    logger.Info("获取网络状态: NETTYPE_NONE");
-                    _NetworkStatus = false;
+                    logger.Info(e.Message + e.StackTrace);
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Info(e.Message + e.StackTrace);
             }
             return JsonConvert.SerializeObject(responseEntity);
         }
@@ -817,7 +829,7 @@ namespace ZlPos.Bizlogic
                 }
                 else
                 {
-                    foreach(DisCountDetailEntity disCountDetailEntity in discountdetails)
+                    foreach (DisCountDetailEntity disCountDetailEntity in discountdetails)
                     {
                         dbManager.SaveOrUpdate(disCountDetailEntity);
                     }
