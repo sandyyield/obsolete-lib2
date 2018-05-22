@@ -139,40 +139,40 @@ namespace ZlPos.Bizlogic
         public string GetNetWorkStatus()
         {
             ResponseEntity responseEntity = new ResponseEntity();
-            //xp系统暂时去掉网络检测功能
-            if (OSVer.Equals("5.1"))
+            ////xp系统暂时去掉网络检测功能
+            //if (OSVer.Equals("5.1"))
+            //{
+            //    responseEntity.code = ResponseCode.SUCCESS;
+            //    responseEntity.msg = "获取网络状态操作成功！";
+            //}
+            //else
+            //{
+            try
             {
-                responseEntity.code = ResponseCode.SUCCESS;
-                responseEntity.msg = "获取网络状态操作成功！";
-            }
-            else
-            {
-                try
+                if (InternetHelper.IsConnectInternet())
                 {
-                    if (InternetHelper.IsConnectInternet())
+                    responseEntity.code = ResponseCode.SUCCESS;
+                    responseEntity.msg = "获取网络状态操作成功！";
+                    logger.Info("获取网络状态操作成功");
+                    _NetworkStatus = true;
+                    if (!_NetworkChecking)
                     {
-                        responseEntity.code = ResponseCode.SUCCESS;
-                        responseEntity.msg = "获取网络状态操作成功！";
-                        logger.Info("获取网络状态操作成功");
-                        _NetworkStatus = true;
-                        if (!_NetworkChecking)
-                        {
-                            NetWorkListener();
-                        }
-                    }
-                    else
-                    {
-                        responseEntity.code = ResponseCode.Failed;
-                        responseEntity.msg = "NETTYPE_NONE";
-                        logger.Info("获取网络状态: NETTYPE_NONE");
-                        _NetworkStatus = false;
+                        NetWorkListener();
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    logger.Info(e.Message + e.StackTrace);
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "NETTYPE_NONE";
+                    logger.Info("获取网络状态: NETTYPE_NONE");
+                    _NetworkStatus = false;
                 }
             }
+            catch (Exception e)
+            {
+                logger.Info(e.Message + e.StackTrace);
+            }
+            //}
             return JsonConvert.SerializeObject(responseEntity);
         }
 
