@@ -1,4 +1,5 @@
-﻿using CefSharp.WinForms;
+﻿using CefSharp;
+using CefSharp.WinForms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -109,6 +110,39 @@ namespace ZlPos.Forms
             this.WindowState = FormWindowState.Maximized;// 最大化
             this.ControlBox = true;
             //this.TopMost = true;// 置顶
+        }
+
+        /// <summary>
+        /// 这里的逻辑可以后面在做退出的时候用
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PosForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            //try
+            //{
+            //    //chromiumBrowser.browser.CloseDevTools();
+            //    chromiumBrowser.browser.GetBrowser().CloseBrowser(true);
+            //    secondScreenWebView.GetBrowser().CloseBrowser(true);
+            //}
+            //catch { }
+
+            //try
+            //{
+            //    if (chromiumBrowser.browser != null)
+            //    {
+            //        chromiumBrowser.browser.Dispose();
+            //        if (secondScreenWebView != null)
+            //        {
+            //            secondScreenWebView.Dispose();
+            //        }
+            //        Cef.Shutdown();
+            //    }
+            //}
+            //catch { }
+            //Cef.Shutdown();
+            //Application.Exit();
+            //this.Dispose();
         }
     }
 }

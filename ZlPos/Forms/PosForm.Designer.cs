@@ -39,6 +39,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "PosForm";
             this.Text = "PosForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.PosForm_FormClosed);
             this.Load += new System.EventHandler(this.PosForm_Load);
             this.ResumeLayout(false);
 

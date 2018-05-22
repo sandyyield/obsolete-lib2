@@ -47,6 +47,48 @@ namespace ZlPos
             }
             #endregion
 
+            #region "升级"
+            var updater = FSLib.App.SimpleUpdater.Updater.Instance;
+            //当检查发生错误时,这个事件会触发
+            updater.Error += (s, e) =>
+            {
+                var updater1 = s as FSLib.App.SimpleUpdater.Updater;
+                logger.Info("update error!");
+            };
+            //没有找到更新的事件
+            updater.NoUpdatesFound += (s, e) => { logger.Info("没有找到更新"); };
+            //找到更新的事件.但在此实例中,找到更新会自动进行处理,所以这里并不需要操作
+            updater.UpdatesFound += (s, e) =>
+            {
+                logger.Info("已找到更新");
+            };
+
+            /* 
+			 * 1.注册程序集。当程序集被注册的时候，任何程序集中实现了 FSLib.App.SimpleUpdater.Defination.IUpdateNotify 接口的都将会被自动实例化并调用
+			 *   通过此方法可以实现自己的事件捕捉以及处理类
+			 *   此例中， 类 CustomConnect 将会被实例化并调用
+			 */
+            updater.UsingAssembly(System.Reflection.Assembly.GetExecutingAssembly());
+            /*
+			 * 2.自定义界面UI。此调用将会替换掉默认的更新界面（此例中将会把更新界面替换为 MainForm）
+			 *   和上面的使用方法类似，但可实现完全自定义的效果
+			 *   要用来替换的界面必须是基于 FSLib.App.SimpleUpdater.Dialogs.AbstractUpdateBase 派生的子类
+			 */
+            //updater.UsingFormUI<UpdateDialog>();
+
+            //开始检查更新-这是最简单的模式.请现在 assemblyInfo.cs 中配置更新地址,参见对应的文件.
+            FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple();
+
+            ///*
+            // * 如果您希望更加简单的使用而不用去加这样的属性，或者您想程序运行的时候自定义，您可以通过下列方式的任何一种方式取代上面的属性声明：
+            // * 使用Updater.CheckUpdateSimple 的重载方法。这个重载方法允许你传入一个升级包的地址；
+            // * 在检查前手动设置 FSLib.App.SimpleUpdater.Updater.UpdateUrl 属性。这是一个静态属性，也就是说，您并不需要创建 FSLib.App.SimpleUpdater.Updater.UpdateUrl 的对象实例就可以修改它。
+            // */
+
+            //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple("升级网址");
+
+            #endregion
+
             CefSettings cefSettings = new CefSettings();
             //禁用调试日志
             cefSettings.LogSeverity = LogSeverity.Disable;
@@ -62,10 +104,11 @@ namespace ZlPos
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-           
+
 
             logger.Info("Start run " + AppContext.Instance.AppName + " services");
             Application.Run(new PosForm());
+
         }
 
         private static void InitLog4netCfg(Level level)

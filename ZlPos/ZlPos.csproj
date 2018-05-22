@@ -117,6 +117,12 @@
       <DependentUpon>SecondScreenFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\PrinterTypeEnum.cs" />
+    <Compile Include="Forms\UpdateDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\UpdateDialog.Designer.cs">
+      <DependentUpon>UpdateDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Listener\IPublish.cs" />
     <Compile Include="Listener\ISubscribe.cs" />
     <Compile Include="Listener\Publisher.cs" />
@@ -316,6 +322,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FSLib.App.SimpleUpdater\SimpleUpdater\FSLib.App.SimpleUpdater\FSLib.App.SimpleUpdater.DLL_NET4.csproj">
+      <Project>{69e699a5-8624-4a02-88c6-75e9cb31ffb6}</Project>
+      <Name>FSLib.App.SimpleUpdater.DLL_NET4</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\SqlSugar\Src\Asp.Net\SqlSugar\SqlSugar.csproj">
       <Project>{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}</Project>
       <Name>SqlSugar</Name>
