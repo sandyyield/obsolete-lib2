@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZlPos", "ZlPos\ZlPos.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlSugar", "..\SqlSugar\Src\Asp.Net\SqlSugar\SqlSugar.csproj", "{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSLib.App.SimpleUpdater.DLL_NET4", "..\FSLib.App.SimpleUpdater\SimpleUpdater\FSLib.App.SimpleUpdater\FSLib.App.SimpleUpdater.DLL_NET4.csproj", "{69E699A5-8624-4A02-88C6-75E9CB31FFB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Release|x86.ActiveCfg = Release|Any CPU
 		{489BB790-226C-4FAD-8D1E-51D72A7FF8E5}.Release|x86.Build.0 = Release|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Debug|x86.Build.0 = Debug|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Release|x86.ActiveCfg = Release|Any CPU
+		{69E699A5-8624-4A02-88C6-75E9CB31FFB6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
