@@ -76,15 +76,6 @@ namespace ZlPos.Bizlogic
                     contextEntity = new ContextEntity();
                 }
                 contextEntity.scale = v;
-                //contextEntity.id = 1;
-                //if(db.Queryable<ContextEntity>().First() == null)
-                //{
-                //    db.Insertable(contextEntity).ExecuteCommand();
-                //}
-                //else
-                //{
-                //    db.Updateable(contextEntity).ExecuteCommand();
-                //}
                 DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
             }
         }
@@ -115,20 +106,15 @@ namespace ZlPos.Bizlogic
         {
             using (var db = SugarDao.GetInstance())
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
                 {
-                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
-                    if (contextEntity == null)
-                    {
-                        contextEntity = new ContextEntity();
-                    }
-                    contextEntity.shopcode = v;
-                    DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+                    contextEntity = new ContextEntity();
                 }
-                else
-                {
-                    return;
-                }
+                contextEntity.shopcode = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+
+                
             }
         }
         #endregion

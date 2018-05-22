@@ -735,33 +735,39 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetLastUserName()
+        public void GetLastUserName()
         {
             string shopcode = "";
-            ResponseEntity responseEntity = new ResponseEntity();
-            try
+            shopcode = ContextCache.GetShopcode();
+            Task.Factory.StartNew(() =>
             {
-                shopcode = ContextCache.GetShopcode();
+                browser.ExecuteScriptAsync("getLastUserNameCallBack('" + shopcode + "')");
+            });
+            //ResponseEntity responseEntity = new ResponseEntity();
+            //try
+            //{
+            //    shopcode = ContextCache.GetShopcode();
 
-                responseEntity.code = ResponseCode.SUCCESS;
-                responseEntity.data = shopcode;
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
-                Task.Factory.StartNew(() =>
-                {
-                    mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
-                });
-            }
-            catch (Exception e)
-            {
-                responseEntity.code = ResponseCode.Failed;
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
-                Task.Factory.StartNew(() =>
-                {
-                    mWebViewHandle.Invoke("getLastUserNameCallBack", responseEntity);
-                });
-                logger.Error(e.Message + e.StackTrace);
-            }
-            return shopcode;
+            //    responseEntity.code = ResponseCode.SUCCESS;
+            //    responseEntity.data = shopcode;
+            //    //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
+            //    Task.Factory.StartNew(() =>
+            //    {
+            //        browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
+            //    });
+            //}
+            //catch (Exception e)
+            //{
+            //    responseEntity.code = ResponseCode.Failed;
+            //    responseEntity.data = shopcode;
+            //    //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "getLastUserNameCallBack", responseEntity });
+            //    Task.Factory.StartNew(() =>
+            //    {
+            //        mWebViewHandle.Invoke("getLastUserNameCallBack", shopcode);
+            //    });
+            //    logger.Error(e.Message + e.StackTrace);
+            //}
+            ////return shopcode;
         }
         #endregion
 
