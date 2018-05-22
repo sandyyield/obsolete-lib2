@@ -117,12 +117,6 @@
       <DependentUpon>SecondScreenFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\PrinterTypeEnum.cs" />
-    <Compile Include="Forms\UpdateDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\UpdateDialog.Designer.cs">
-      <DependentUpon>UpdateDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="Listener\IPublish.cs" />
     <Compile Include="Listener\ISubscribe.cs" />
     <Compile Include="Listener\Publisher.cs" />
