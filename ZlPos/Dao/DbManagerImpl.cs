@@ -238,7 +238,7 @@ namespace ZlPos.Dao
                     if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name))
                     {
                         //db.CodeFirst.InitTables(entity.GetType().Name);
-                        db.CodeFirst.InitTables(typeof(CommodityEntity).Name);
+                        db.CodeFirst.InitTables(typeof(CommodityEntity));
                         //第一次建表直接插入完事
                         db.Insertable(commoditys).Where(true, true).ExecuteCommand();
                         return;

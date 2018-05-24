@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using ZlPos.Bizlogic;
@@ -30,6 +32,12 @@ namespace ZlPos.Forms
             //hostApp = new HostApp();
 
             InitializeComponent();
+
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            var fileVersion = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).FileVersion);
+
+            Text = version.ToString() + "_" + fileVersion.ToString(); 
 
             chromiumBrowser = new ChromiumBrowserControl()
             {

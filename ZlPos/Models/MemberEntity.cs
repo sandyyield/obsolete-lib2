@@ -42,5 +42,9 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public String del { get; set; }
+
+        // add: 2018/5/15
+        [SugarColumn(IsNullable = true)]
+        public String membermodel { get; set; }
     }
 }

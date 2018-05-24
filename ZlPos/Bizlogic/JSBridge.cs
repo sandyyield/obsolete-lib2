@@ -597,15 +597,17 @@ namespace ZlPos.Bizlogic
                         commodityPriceList = db.Queryable<CommodityPriceEntity>().Where(it => it.shopcode == userEntity.shopcode
                                                                                     && it.branchcode == userEntity.branchcode).ToList();
 
-                        //按 membermode 区分SSM和CSM
-                        if ("CSM".Equals(userEntity.membermodel)) //跨店
-                        {
-                            memberEntities = db.Queryable<MemberEntity>().Where(it => it.shopcode == userEntity.shopcode).ToList();
-                        }
-                        else //单店
+                        //按 membermode 区分1共享和0非共享
+                        if ("1".Equals(userEntity.membermodel)) //共享
                         {
                             memberEntities = db.Queryable<MemberEntity>().Where(it => it.shopcode == userEntity.shopcode
-                                                                            && it.branchcode == userEntity.branchcode).ToList();
+                                                                            && it.membermodel == "1").ToList();
+                        }
+                        else //非共享
+                        {
+                            memberEntities = db.Queryable<MemberEntity>().Where(it => it.shopcode == userEntity.shopcode
+                                                                            && it.branchcode == userEntity.branchcode
+                                                                            && it.membermodel == "0").ToList();
                         }
 
 
@@ -1312,7 +1314,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetCommodityByCategoryCode(String categoryCode, int pageindex, int pagesize)
+        public string GetCommodityByCategoryCode(string categoryCode, int pageindex, int pagesize)
         {
             logger.Info("getCommodityByCategory\n" + "categoryCode:" + categoryCode + "\tpageindex:" + pageindex + "\tpagesize:" + pagesize);
             ResponseEntity responseEntity = new ResponseEntity();
