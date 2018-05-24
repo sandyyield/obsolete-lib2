@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ZlPos.Bizlogic;
+using ZlPos.Models;
 using ZlPos.Utils;
 
 namespace ZlPos.Dao
@@ -73,9 +74,9 @@ namespace ZlPos.Dao
                                 {
                                     //一条一条判断 暂时先这个等速度吃不消了再说
                                     int rsCount = db.Updateable(item).ExecuteCommand();
-                                    if(rsCount == 0)
+                                    if (rsCount == 0)
                                     {
-                                        db.Insertable(item).Where(true,true).ExecuteCommand();
+                                        db.Insertable(item).Where(true, true).ExecuteCommand();
                                     }
                                 }
 
@@ -212,6 +213,129 @@ namespace ZlPos.Dao
                     db.Ado.RollbackTran();
                     throw e;
                 }
+            }
+        }
+
+        public void SaveOrUpdateCommodityEntities(CommodityEntity[] commoditys)
+        {
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+
+                    if (commoditys == null)
+                    {
+                        logger.Info("SaveOrUpdateCommodityEntities:commoditys is null");
+                        return;
+                    }
+                    if (commoditys.Length == 0)
+                    {
+                        logger.Info("SaveOrUpdateCommodityEntities:commoditys coult is 0");
+                        return;
+                    }
+
+                    //数据处理
+                    if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name))
+                    {
+                        //db.CodeFirst.InitTables(entity.GetType().Name);
+                        db.CodeFirst.InitTables(typeof(CommodityEntity).Name);
+                        //第一次建表直接插入完事
+                        db.Insertable(commoditys).Where(true, true).ExecuteCommand();
+                        return;
+
+                    }
+                    else
+                    {
+                        var data = commoditys;
+                        var table = db.Queryable<CommodityEntity>().ToList();
+
+                        DataTable dt1 = ConvertUtils.ToDataTable(data);
+                        DataTable dt2 = ConvertUtils.ToDataTable(table);
+
+                        //这里还是可以寻求一种高效的内存处理方式 取代数据库多次读取
+                        /////筛选出主键相同需要更新的数据
+                        //var dtt = from r in dt1.AsEnumerable()
+                        //          where !(from rr in dt2.AsEnumerable() select rr.Field<int>("id")).Contains(r.Field<int>("id"))
+                        //          select r;
+
+                        //差集(所有值 非只主键）
+                        IEnumerable<DataRow> query1 = dt1.AsEnumerable().Except(dt2.AsEnumerable(), DataRowComparer.Default);
+                        //IEnumerable<DataRow> query1 = dt1.AsEnumerable().Except(dt2.AsEnumerable(), new MyDataRowComparer());
+                        //两个数据源的差集集合
+                        if (query1.Any())
+                        {
+                            DataTable dt3 = query1.CopyToDataTable();
+
+                            var dataFilter = from r in dt2.AsEnumerable()
+                                             select r.Field<string>("id");
+
+                            DataTable dtUpdate = dt3.Clone();
+                            DataTable dtInsert = dt3.Clone();
+                            foreach (DataRow item in dt3.Rows)
+                            {
+                                if (dataFilter.Contains(item["id"]))
+                                {
+                                    dtUpdate.Rows.Add(item.ItemArray);
+                                }
+                                else
+                                {
+                                    dtInsert.Rows.Add(item.ItemArray);
+                                }
+                            }
+
+                            //需要更新的数据
+                            var lsUpdate = ConvertUtils.ToList<CommodityEntity>(dtUpdate).ToArray();
+                            if(lsUpdate.Count() > 0)
+                            {
+                                db.Updateable(lsUpdate).ExecuteCommand();
+                            }
+
+                            var lsInsert = ConvertUtils.ToList<CommodityEntity>(dtInsert).ToArray();
+                            if(lsInsert.Count() > 0)
+                            {
+                                db.Insertable(lsInsert).Where(true,true).ExecuteCommand();
+                            }
+
+                            dtUpdate.Clear(); dtUpdate.Dispose(); dtUpdate = null;
+                            dtInsert.Clear(); dtInsert.Dispose(); dtInsert = null;
+
+                            ////需要插入的数据 
+                            ////TODO...
+
+
+                            //var ls1 = ConvertUtils.ToList<CommodityEntity>(dt3).ToArray();
+                            ////这个差值包含了insert和update的数据 用foreach挑拣出来
+                            //foreach (var item in ls1)
+                            //{
+                            //    //一条一条判断 暂时先这个等速度吃不消了再说
+                            //    int rsCount = db.Updateable(item).ExecuteCommand();
+                            //    if (rsCount == 0)
+                            //    {
+                            //        db.Insertable(item).Where(true, true).ExecuteCommand();
+                            //    }
+                            //}
+
+                            //因为包含了update和insert的数据 所以不能直接insertable
+                            //if (ls1.Length > 0)
+                            //{
+                            //    db.Insertable(ls1).Where(true, true).ExecuteCommand();
+                            //}
+
+                            dt3.Clear(); dt3.Dispose(); dt3 = null;
+
+                        }
+
+
+                        else
+                        {
+                            logger.Info("SaveOrUpdateCommodityEntities：Array error");
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("SaveOrUpdateCommodityEntities:" + e.Message + e.StackTrace);
             }
         }
     }

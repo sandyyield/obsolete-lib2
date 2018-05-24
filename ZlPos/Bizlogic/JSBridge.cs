@@ -460,7 +460,11 @@ namespace ZlPos.Bizlogic
                         if (commoditys != null)
                         {
                             //这里是数据的大头
-                            dbManager.BulkSaveOrUpdate(commoditys);
+                            //dbManager.BulkSaveOrUpdate(commoditys);
+
+                            //后台数据主键设置不统一  还要兼容android数据库不能自定义字段  只能写死的方式更新提升速度
+                            dbManager.SaveOrUpdateCommodityEntities(commoditys.ToArray());
+
                         }
                         //保存会员等级信息
                         if (memberEntities != null)

@@ -9,91 +9,91 @@ namespace ZlPos.Models
     public class CommodityEntity
     {
         [SugarColumn(IsPrimaryKey = true, IsNullable = true)]
-        public String id { get; set; }
+        public string id { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commodityname { get; set; }
+        public string commodityname { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commoditypic { get; set; }
+        public string commoditypic { get; set; }
 
         [SugarColumn(IsNullable = true)]
-        public String spec { get; set; }
+        public string spec { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String buyprice { get; set; }
+        public string buyprice { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String saleprice { get; set; }
+        public string saleprice { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String wholesaleprice { get; set; }
+        public string wholesaleprice { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String memberprice { get; set; }
+        public string memberprice { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String categorycode { get; set; }
+        public string categorycode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String categoryname { get; set; }
+        public string categoryname { get; set; }
 
         [SugarColumn(IsNullable = true)]
-        public String canscore { get; set; }
+        public string canscore { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String score { get; set; }
+        public string score { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String shortname { get; set; }
+        public string shortname { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String mnemonic { get; set; }
+        public string mnemonic { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String brandcode { get; set; }
+        public string brandcode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String brandname { get; set; }
+        public string brandname { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String unitcode { get; set; }
+        public string unitcode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String unitname { get; set; }
+        public string unitname { get; set; }
 
         [SugarColumn(IsNullable = true)]
-        public String expiretime { get; set; }
+        public string expiretime { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String suppliercode { get; set; }
+        public string suppliercode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String suppliername { get; set; }
+        public string suppliername { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String shopcode { get; set; }
+        public string shopcode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String buyspec { get; set; }
+        public string buyspec { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commoditystatus { get; set; }
+        public string commoditystatus { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commoditytype { get; set; }
+        public string commoditytype { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String pricing { get; set; }
+        public string pricing { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commission { get; set; }
+        public string commission { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commissionratio { get; set; }
+        public string commissionratio { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commissionmoney { get; set; }
+        public string commissionmoney { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String del { get; set; }
+        public string del { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String creattime { get; set; }
+        public string creattime { get; set; }
 
         // TODO: 2017/10/17
         [SugarColumn(IsNullable = true)]
-        public String branchcode { get; set; }
+        public string branchcode { get; set; }
         // add: 2018/2/26
         [SugarColumn(IsNullable = true)]
-        public String commoditycode { get; set; }
+        public string commoditycode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String businessmodel { get; set; }
+        public string businessmodel { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String businessmodelname { get; set; }
+        public string businessmodelname { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String commissionrate { get; set; }
+        public string commissionrate { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String intaxrate { get; set; }
+        public string intaxrate { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String outtaxrate { get; set; }
+        public string outtaxrate { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String canstock { get; set; }
+        public string canstock { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String dispatchprice { get; set; }
+        public string dispatchprice { get; set; }
 
 
 

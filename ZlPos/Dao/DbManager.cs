@@ -9,8 +9,8 @@ namespace ZlPos.Dao
     interface DbManager
     {
         void SaveOrUpdate<T>(T entity) where T : class, new();
-
         void BulkSaveOrUpdate<T>(List<T> list) where T : class, new();
         void Delete<T> (T payDetailEntity) where T : class, new();
+        void SaveOrUpdateCommodityEntities(CommodityEntity[] commodityEntity);
     }
 }
