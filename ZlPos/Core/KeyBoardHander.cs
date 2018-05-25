@@ -18,7 +18,7 @@ namespace ZlPos.Core
                 {
                     browser.Reload(); //此处可以添加想要实现的代码段
                 }
-                else if (windowsKeyCode == (int)Keys.F12)
+                if (windowsKeyCode == (int)Keys.F12)
                 {
                     browser.ShowDevTools();
                 }
