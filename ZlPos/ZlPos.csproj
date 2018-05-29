@@ -130,6 +130,7 @@
     <Compile Include="Manager\CommodityCacheManager.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\LoadPOSDll.cs" />
+    <Compile Include="PrintServices\LPTPrinter.cs" />
     <Compile Include="PrintServices\PrintBridge.cs" />
     <Compile Include="Config\ResponseCode.cs" />
     <Compile Include="Core\CallbackResponseStruct.cs" />
@@ -204,6 +205,7 @@
     <Compile Include="Utils\BluethoothPrinterSetter.cs" />
     <Compile Include="Utils\CacheManager.cs" />
     <Compile Include="Utils\LPTControl.cs" />
+    <Compile Include="Utils\LPTPrinterSetter.cs" />
     <Compile Include="Utils\ModelComperar.cs" />
     <Compile Include="Utils\ConvertUtils.cs" />
     <Compile Include="Utils\DateUtils.cs" />
