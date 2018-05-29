@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ namespace ZlPos.Utils
         private static object obj = new object();
         internal Action<string> Listener;
         private SerialPort mSerialPort;
+
+        private log4net.ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private WeightUtil() { }
 
@@ -33,7 +36,7 @@ namespace ZlPos.Utils
         }
 
         string sBuffer = "asdfsdfa";
-        internal void Open(string port,string brand)
+        internal void Open(string port, string brand)
         {
             if (mSerialPort == null)
             {
@@ -67,7 +70,7 @@ namespace ZlPos.Utils
                                 }
                             });
                             break;
-                        case "DEMO":
+                        case "EH100":
                             Task.Factory.StartNew(() =>
                             {
                                 int size;
@@ -81,25 +84,37 @@ namespace ZlPos.Utils
                                     if (!sBuffer.Equals(s))
                                     {
                                         sBuffer = s;
-                                        Listener?.Invoke(s);
+                                        if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
+                                        {
+                                            string ss = s.Substring(4, 6);
+                                            try
+                                            {
+                                                Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
+                                            }
+                                            catch(Exception e)
+                                            {
+                                                logger.Info(e.Message + e.StackTrace);
+                                            }
+                                        }
+
                                     }
                                 }
                             });
                             break;
 
                     }
-                    
+
                 }
                 catch (Exception e)
                 {
-                    System.Windows.Forms.MessageBox.Show(e.Message + e.StackTrace);
+                    logger.Info(e.Message + e.StackTrace);
                 }
             }
         }
 
         private void onDataReceived(byte[] buffer, int size)
         {
-            if(buffer[0] == 32)
+            if (buffer[0] == 32)
             {
                 return;
             }
@@ -107,7 +122,7 @@ namespace ZlPos.Utils
             string[] data = s64.Replace("\n\r", "@").Split('@');
             Listener?.Invoke(data[1]);
 
-            
+
 
 
 

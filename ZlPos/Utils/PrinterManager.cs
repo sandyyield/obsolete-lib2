@@ -20,6 +20,8 @@ namespace ZlPos.Utils
         private USBPrinter usbPrinter;
         private BluetoothPrinter bluetoothPrinter;
         private serialPort portPrinter;
+        //add 2018年5月29日
+        private LPTPrinter lptPrinter;
 
         private PrinterConfigEntity printerConfigEntity;
 
@@ -64,5 +66,6 @@ namespace ZlPos.Utils
         public List<BluetoothDeviceInfo> BluetoothDeviceArrayList { get => bluetoothDeviceArrayList; set => bluetoothDeviceArrayList = value; }
         internal BluetoothPrinter BluetoothPrinter { get => bluetoothPrinter; set => bluetoothPrinter = value; }
         internal serialPort PortPrinter { get => portPrinter; set => portPrinter = value; }
+        public LPTPrinter LptPrinter { get => lptPrinter; set => lptPrinter = value; }
     }
 }

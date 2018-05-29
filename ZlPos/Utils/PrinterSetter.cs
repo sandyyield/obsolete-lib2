@@ -41,6 +41,10 @@ namespace ZlPos.Utils
                     case "port":
                         SerialPortPrinterSetter.setSerialPort(printerConfigEntity, webCallback);
                         break;
+                    //add 增加并口 2018年5月29日
+                    case "LPT":
+                        LPTPrinterSetter.setLPT(printerConfigEntity, webCallback);
+                        break;
                     default:
                         responseEntity.code = ResponseCode.Failed;
                         responseEntity.msg = "打印机类型不可用";

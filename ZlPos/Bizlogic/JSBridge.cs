@@ -1531,6 +1531,18 @@ namespace ZlPos.Bizlogic
 
             return JsonConvert.SerializeObject(arrSerial);
         }
+
+        /// <summary>
+        /// 获取本机所有并口 这里目前只有一台一体机  直接以写死的形式来
+        /// </summary>
+        /// <returns></returns>
+        public string GetLPT()
+        {
+            string[] arrLPT = new string[] { "LPT1" };
+
+            return JsonConvert.SerializeObject(arrLPT);
+        }
+
         #endregion
 
         #region GetUsbDevices
@@ -1852,92 +1864,92 @@ namespace ZlPos.Bizlogic
         /// </summary>
         public void Print2(string content)
         {
-            Task.Factory.StartNew(() =>
-            {
-                ResponseEntity responseEntity = new ResponseEntity();
-                LPTControl lpt1 = new LPTControl("lpt1");
-                if (string.IsNullOrEmpty(content))
-                {
-                    return;
-                }
-                lpt1.Open();
-                List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
-
-                if (printEntities != null && printEntities.Count > 0)
-                {
-                    //portPrinter.initUSB();
-                    for (int i = 0; i < printEntities.Count; i++)
-                    {
-                        lpt1.Write(printEntities[i].content);
-                    }
-                }
-                lpt1.Write("\n\n\n\n\n\n");
-
-                responseEntity.code = ResponseCode.SUCCESS;
-                responseEntity.msg = "小票打印成功";
-                lpt1.Close();
-
-                mWebViewHandle.Invoke("print2CallBack", responseEntity);
-
-
-            });
             //Task.Factory.StartNew(() =>
             //{
             //    ResponseEntity responseEntity = new ResponseEntity();
-            //    if (!string.IsNullOrEmpty(content))
+            //    LPTControl lpt1 = new LPTControl("lpt1");
+            //    if (string.IsNullOrEmpty(content))
             //    {
-            //        try
-            //        {
-            //            if (PrinterManager.Instance.Init)
-            //            {
-            //                switch (PrinterManager.Instance.PrinterTypeEnum)
-            //                {
-            //                    case Enums.PrinterTypeEnum.usb:
-            //                        USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
-            //                        PrintUtils.printModel(content, usbPrinter);
-            //                        responseEntity.code = ResponseCode.SUCCESS;
-            //                        responseEntity.msg = "小票打印成功";
-            //                        break;
-            //                    case Enums.PrinterTypeEnum.bluetooth:
-            //                        BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
-            //                        PrintUtils.printModel(content, bluetoothPrinter);
-            //                        responseEntity.code = ResponseCode.SUCCESS;
-            //                        responseEntity.msg = "小票打印成功";
-            //                        break;
-            //                    case Enums.PrinterTypeEnum.port:
-            //                        serialPort portPrinter = PrinterManager.Instance.PortPrinter;
-            //                        PrintUtils.printModel(content, portPrinter);
-            //                        responseEntity.code = ResponseCode.SUCCESS;
-            //                        responseEntity.msg = "小票打印成功";
-            //                        break;
-            //                    default:
-            //                        responseEntity.code = ResponseCode.Failed;
-            //                        responseEntity.msg = "非法打印机类型";
-            //                        break;
-            //                }
-            //            }
-            //            else
-            //            {
-            //                responseEntity.code = ResponseCode.Failed;
-            //                responseEntity.msg = "打印机未设置，请设置打印机";
-            //            }
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            responseEntity.code = ResponseCode.Failed;
-            //            responseEntity.msg = "打印出现异常";
-            //            logger.Error(e.Message + e.StackTrace);
-            //        }
+            //        return;
+            //    }
+            //    lpt1.Open();
+            //    List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
 
-            //    }
-            //    else
+            //    if (printEntities != null && printEntities.Count > 0)
             //    {
-            //        responseEntity.code = ResponseCode.Failed;
-            //        responseEntity.msg = "打印内容不能为空";
+            //        //portPrinter.initUSB();
+            //        for (int i = 0; i < printEntities.Count; i++)
+            //        {
+            //            lpt1.Write(printEntities[i].content);
+            //        }
             //    }
+            //    lpt1.Write("\n\n\n\n\n\n");
+
+            //    responseEntity.code = ResponseCode.SUCCESS;
+            //    responseEntity.msg = "小票打印成功";
+            //    lpt1.Close();
 
             //    mWebViewHandle.Invoke("print2CallBack", responseEntity);
+
+
             //});
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (!string.IsNullOrEmpty(content))
+                {
+                    try
+                    {
+                        if (PrinterManager.Instance.Init)
+                        {
+                            switch (PrinterManager.Instance.PrinterTypeEnum)
+                            {
+                                case Enums.PrinterTypeEnum.usb:
+                                    USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
+                                    PrintUtils.printModel(content, usbPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                case Enums.PrinterTypeEnum.bluetooth:
+                                    BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
+                                    PrintUtils.printModel(content, bluetoothPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                case Enums.PrinterTypeEnum.port:
+                                    serialPort portPrinter = PrinterManager.Instance.PortPrinter;
+                                    PrintUtils.printModel(content, portPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                default:
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "非法打印机类型";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "打印机未设置，请设置打印机";
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印出现异常";
+                        logger.Error(e.Message + e.StackTrace);
+                    }
+
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "打印内容不能为空";
+                }
+
+                mWebViewHandle.Invoke("print2CallBack", responseEntity);
+            });
             return;
         }
         #endregion
@@ -2031,7 +2043,9 @@ namespace ZlPos.Bizlogic
                             case "YK":
                                 //                            portPrinter.Write("1B73009640", portPrinter.CMD);//开关钱箱代码
                                 //portPrinter.PrintString("1B70001080");
-                                portPrinter.OpenCash("1B70001080");
+                                //portPrinter.OpenCash("1B70001080");
+                                //这里yk那边说是1B 70 00 10 90 2018年5月29日 暂时用这个调试以下
+                                portPrinter.OpenCash("1B70001090");
                                 break;
                             case "FX":
                                 //portPrinter.PrintString("1014010005");//开关钱箱代码
@@ -2181,65 +2195,36 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public void GetWeight()
         {
+
             Task.Factory.StartNew(() =>
             {
-                ScaleConfigEntity scaleConfigEntity = new ScaleConfigEntity();
-                scaleConfigEntity.port = "COM1";
-                scaleConfigEntity.brand = "DEMO";
-                try
+                string scale = CacheManager.GetScale(SPCode.scale) as string;
+                if (!string.IsNullOrEmpty(scale))
                 {
-
-                    if (!string.IsNullOrEmpty(scaleConfigEntity.port))
+                    try
                     {
-                        WeightUtil.Instance.Open(scaleConfigEntity.port,scaleConfigEntity.brand);
-                        WeightUtil.Instance.Listener = (number) =>
+                        ScaleConfigEntity scaleConfigEntity = JsonConvert.DeserializeObject<ScaleConfigEntity>(scale);
+                        if (!string.IsNullOrEmpty(scaleConfigEntity.port))
                         {
-                            browser.ExecuteScriptAsync("getWeightCallBack('" + JsonConvert.SerializeObject(number) + "')");
-                        };
+                            WeightUtil.Instance.Open(scaleConfigEntity.port,scaleConfigEntity.brand);
+                            WeightUtil.Instance.Listener = (number) =>
+                            {
+                                browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
+                            };
 
+                        }
+                        else
+                        {
+                            browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
+                        logger.Error(e.Message + e.StackTrace);
                         browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
                     }
                 }
-                catch (Exception e)
-                {
-                    logger.Error(e.Message + e.StackTrace);
-                    browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
-                }
-
             });
-
-            //Task.Factory.StartNew(() =>
-            //{
-            //    string scale = CacheManager.GetScale(SPCode.scale) as string;
-            //    if (!string.IsNullOrEmpty(scale))
-            //    {
-            //        try
-            //        {
-            //            ScaleConfigEntity scaleConfigEntity = JsonConvert.DeserializeObject<ScaleConfigEntity>(scale);
-            //            if (!string.IsNullOrEmpty(scaleConfigEntity.port))
-            //            {
-            //                WeightUtil.Instance.Open(scaleConfigEntity.port);
-            //                WeightUtil.Instance.Listener = (number) =>
-            //                {
-            //                    browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
-            //                };
-
-            //            }
-            //            else
-            //            {
-            //                browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
-            //            }
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            logger.Error(e.Message + e.StackTrace);
-            //            browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
-            //        }
-            //    }
-            //});
 
         }
 
