@@ -51,6 +51,7 @@ namespace ZlPos.Core
                 KeyboardHandler = new KeyBoardHander(),
                 Dock = DockStyle.Fill,
             };
+            browser.MenuHandler = new MenuHandler();
             Controls.Add(browser);
 
             BrowserLoading();

@@ -33,43 +33,66 @@ namespace ZlPos.Utils
         }
 
         string sBuffer = "asdfsdfa";
-        internal void Open(string port)
+        internal void Open(string port,string brand)
         {
             if (mSerialPort == null)
             {
                 try
                 {
-                    mSerialPort = new SerialPort(port, 9600);
+                    //mSerialPort = new SerialPort(port, 9600);
+                    //2018年5月25日 临时写法{
+                    mSerialPort = new SerialPort();
+                    mSerialPort.PortName = SerialPort.GetPortNames()[0];
+                    mSerialPort.BaudRate = 9600;
+                    //}
+
                     mSerialPort.Open();
-                    Task.Factory.StartNew(() =>
+                    switch (brand)
                     {
-                        int size;
-                        byte[] buffer = new byte[64];
-                        while (mSerialPort.IsOpen)
-                        {
-                            Thread.Sleep(40);
-                            //size = mSerialPort.Read(buffer, 0, 1);
-                            string s = mSerialPort.ReadLine();
-                            if (!sBuffer.Equals(s))
+                        case "ACS-A":
+                            Task.Factory.StartNew(() =>
                             {
-                                
-                                sBuffer = s;
-                                Listener?.Invoke(s.Replace("\r","").Replace("\n",""));
-                            }
-                            
-                            //if (size > 0)
-                            //{
-                            //    lock (obj)
-                            //    {
-                            //        onDataReceived(buffer, size);
-                            //    }
-                            //}
-                        }
-                    });
+                                int size;
+                                byte[] buffer = new byte[64];
+                                while (mSerialPort.IsOpen)
+                                {
+                                    Thread.Sleep(40);
+                                    //size = mSerialPort.Read(buffer, 0, 1);
+                                    string s = mSerialPort.ReadLine();
+                                    if (!sBuffer.Equals(s))
+                                    {
+                                        sBuffer = s;
+                                        Listener?.Invoke(s.Replace("\r", "").Replace("\n", ""));
+                                    }
+                                }
+                            });
+                            break;
+                        case "DEMO":
+                            Task.Factory.StartNew(() =>
+                            {
+                                int size;
+                                byte[] buffer = new byte[64];
+                                while (mSerialPort.IsOpen)
+                                {
+                                    Thread.Sleep(100);
+                                    //size = mSerialPort.Read(buffer, 0, 1);
+                                    mSerialPort.Read(buffer, 0, 64);
+                                    string s = Encoding.Default.GetString(buffer);
+                                    if (!sBuffer.Equals(s))
+                                    {
+                                        sBuffer = s;
+                                        Listener?.Invoke(s);
+                                    }
+                                }
+                            });
+                            break;
+
+                    }
+                    
                 }
                 catch (Exception e)
                 {
-                    //LOG
+                    System.Windows.Forms.MessageBox.Show(e.Message + e.StackTrace);
                 }
             }
         }

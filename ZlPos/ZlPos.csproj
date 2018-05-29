@@ -110,6 +110,7 @@
     <Compile Include="Bizlogic\InternetHelper.cs" />
     <Compile Include="Bizlogic\RegHelper.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
+    <Compile Include="Core\MenuHandler.cs" />
     <Compile Include="Forms\SecondScreenFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,6 +203,7 @@
     </Compile>
     <Compile Include="Utils\BluethoothPrinterSetter.cs" />
     <Compile Include="Utils\CacheManager.cs" />
+    <Compile Include="Utils\LPTControl.cs" />
     <Compile Include="Utils\ModelComperar.cs" />
     <Compile Include="Utils\ConvertUtils.cs" />
     <Compile Include="Utils\DateUtils.cs" />
