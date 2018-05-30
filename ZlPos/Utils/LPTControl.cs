@@ -60,7 +60,7 @@ namespace ZlPos.Utils
             }
             else
             {
-                MessageBox.Show("不能连接到打印机!");
+                //MessageBox.Show("不能连接到打印机!");
                 return false;
             }
         }
@@ -75,7 +75,7 @@ namespace ZlPos.Utils
             }
             else
             {
-                MessageBox.Show("不能连接到打印机!");
+                //MessageBox.Show("不能连接到打印机!");
                 return false;
             }
         }

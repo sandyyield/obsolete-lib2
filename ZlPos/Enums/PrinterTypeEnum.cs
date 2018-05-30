@@ -9,6 +9,7 @@ namespace ZlPos.Enums
     {
         usb,
         bluetooth,
-        port
+        port,
+        LPT
     }
 }

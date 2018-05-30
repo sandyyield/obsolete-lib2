@@ -58,5 +58,13 @@ namespace ZlPos.PrintServices
             }
         }
 
+        internal void OpenCash()
+        {
+            if (Enable)
+            {
+
+                lptControl.Write(new byte[] { 0x1b, 0x70, 0x00, 0x10, 0x90 });
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ZlPos.Bean;
 using ZlPos.Config;
+using ZlPos.Enums;
 using ZlPos.Models;
 using ZlPos.PrintServices;
 
@@ -35,6 +36,8 @@ namespace ZlPos.Utils
                     {
                         PrinterManager.Instance.Init = true;
                         PrinterManager.Instance.LptPrinter = lptPrinter;
+                        PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.LPT;
+                        PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
 
                         lptPrinter.PrintString("并口打印机连接成功!\n\n\n\n\n");
                         responseEntity.code = ResponseCode.SUCCESS;

@@ -2078,6 +2078,16 @@ namespace ZlPos.Bizlogic
                             return false;
 
                         }
+                    case PrinterTypeEnum.LPT:
+                        if(PrinterManager.Instance.LptPrinter != null && PrinterManager.Instance.LptPrinter.Enable)
+                        {
+                            PrinterManager.Instance.LptPrinter.OpenCash();
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     default:
                         return false;
                 }
