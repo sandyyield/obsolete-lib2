@@ -32,7 +32,7 @@ namespace ZlPos.Utils
                 }
                 if (PrinterManager.Instance.BluetoothDeviceArrayList != null)
                 {
-                    if (!setBluetooth())
+                    if (!setBluetooth(printerConfigEntity))
                     {
                         responseEntity.code = ResponseCode.Failed;
                         responseEntity.msg = "该设备不可用";
@@ -59,7 +59,7 @@ namespace ZlPos.Utils
             //}
         }
 
-        private bool setBluetooth()
+        private bool setBluetooth(PrinterConfigEntity printerConfigEntity)
         {
             List<BluetoothDeviceInfo> bluetoothDeviceArrayList = PrinterManager.Instance.BluetoothDeviceArrayList;
             foreach (BluetoothDeviceInfo bluetoothDevice in bluetoothDeviceArrayList)
@@ -77,6 +77,7 @@ namespace ZlPos.Utils
                         {
                             PrinterManager.Instance.BluetoothPrinter.closeConnection();//关闭之前的蓝牙打印机
                             bluetoothPrinter = new BluetoothPrinter(bluetoothDevice);//创建新的蓝牙打印机实例
+                            bluetoothPrinter.pageWidth = printerConfigEntity.pageWidth;
                         }
 
                     }

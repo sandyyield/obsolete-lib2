@@ -15,6 +15,7 @@ namespace ZlPos.PrintServices
         private BluetoothDeviceInfo bluetoothDevice;
         private BluetoothAddress bluetoothAddress;
         private bool init;
+        public string pageWidth { get; set; }
 
         public BluetoothPrinter(BluetoothDeviceInfo bluetoothDevice)
         {

@@ -21,6 +21,8 @@ namespace ZlPos.PrintServices
 
         private bool init = false;
 
+        public string pageWidth { get; set; }
+
         public IntPtr HDevice { get => hDevice; set => hDevice = value; }
         public PrinterType CurrentPrintType { get => currentPrintType; set => currentPrintType = value; }
         public bool Init { get => init; set => init = value; }

@@ -9,6 +9,7 @@ namespace ZlPos.PrintServices
     public class LPTPrinter
     {
         public string lptPort { get; set; }
+        public string pageWidth { get; set; }
 
         public bool Enable { get => enable; set => enable = value; }
 

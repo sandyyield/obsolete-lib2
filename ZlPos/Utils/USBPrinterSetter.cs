@@ -51,6 +51,7 @@ namespace ZlPos.Utils
                         }
                         usbPrinter.HDevice = hUsb;
                     }
+                    usbPrinter.pageWidth = printerConfigEntity.pageWidth;
                     PrinterManager.Instance.Init = true;
                     PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.usb;
                     PrinterManager.Instance.UsbPrinter = usbPrinter;

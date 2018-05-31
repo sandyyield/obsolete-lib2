@@ -210,7 +210,7 @@ namespace ZlPos.Bizlogic
                                 mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
                             }
                         }
-                        Thread.Sleep(7000);
+                        Thread.Sleep(3000);
                     }
                 }
                 ));
@@ -310,8 +310,6 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-
-
                 ResponseEntity responseEntity = new ResponseEntity();
                 if (string.IsNullOrEmpty(json))
                 {
@@ -334,7 +332,7 @@ namespace ZlPos.Bizlogic
                             using (var db = SugarDao.GetInstance())
                             {
                                 List<UserEntity> userList;
-                                if (String.IsNullOrEmpty(loginEntity.account) || loginEntity.account == "0")
+                                if (!(String.IsNullOrEmpty(loginEntity.account)))
                                 {
                                     userList = db.Queryable<UserEntity>().Where(it => it.account == loginEntity.account
                                                                                 && it.password == loginEntity.password).ToList();
@@ -354,24 +352,47 @@ namespace ZlPos.Bizlogic
                                     userVM.user_info = userEntity;
                                     List<ShopConfigEntity> configEntities = db.Queryable<ShopConfigEntity>().Where(
                                                                             it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).ToList();
-                                    //TODO...先去写saveOrUpadteUserInfo 再来完成这边login的逻辑
-
+                                    if (configEntities != null && configEntities.Count == 1)
+                                    {
+                                        ShopConfigEntity shopConfigEntity = configEntities[0];
+                                        userVM.config = shopConfigEntity;
+                                    }
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "登陆成功";
+                                    responseEntity.data = userVM;
+                                    mWebViewHandle.Invoke("loginCallBack", responseEntity);
+                                }
+                                else
+                                {
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "登陆失败";
+                                    mWebViewHandle.Invoke("loginCallBack", responseEntity);
                                 }
                             }
                         }
+                        else
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "登陆失败";
+                            mWebViewHandle.Invoke("loginCallBack", responseEntity);
+                        }
                         //只是为了调试加的
                         //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "loginCallBack", responseEntity });
-                        mWebViewHandle.Invoke("loginCallBack", responseEntity);
+                        //mWebViewHandle.Invoke("loginCallBack", responseEntity);
                         //System.Windows.Forms.MessageBox.Show("called loginCallBack js method!!!");
                     }
                     catch (Exception e)
                     {
-
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "参数格式错误";
+                        mWebViewHandle.Invoke("loginCallBack", responseEntity);
                     }
                 }
             });
         }
         #endregion
+
+
 
         #region SaveOrUpdateUserInfo
         /// <summary>
@@ -1922,6 +1943,12 @@ namespace ZlPos.Bizlogic
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
+                                case PrinterTypeEnum.LPT:
+                                    LPTPrinter lptPrinter = PrinterManager.Instance.LptPrinter;
+                                    PrintUtils.printModel(content, lptPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
                                 default:
                                     responseEntity.code = ResponseCode.Failed;
                                     responseEntity.msg = "非法打印机类型";
@@ -1989,6 +2016,12 @@ namespace ZlPos.Bizlogic
                                 case PrinterTypeEnum.port:
                                     serialPort portPrinter = PrinterManager.Instance.PortPrinter;
                                     PrintUtils.printNote(statisticsVM, portPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "小票打印成功";
+                                    break;
+                                case PrinterTypeEnum.LPT:
+                                    LPTPrinter lptPrinter = PrinterManager.Instance.LptPrinter;
+                                    PrintUtils.printNote(statisticsVM, lptPrinter);
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
@@ -2079,7 +2112,7 @@ namespace ZlPos.Bizlogic
 
                         }
                     case PrinterTypeEnum.LPT:
-                        if(PrinterManager.Instance.LptPrinter != null && PrinterManager.Instance.LptPrinter.Enable)
+                        if (PrinterManager.Instance.LptPrinter != null && PrinterManager.Instance.LptPrinter.Enable)
                         {
                             PrinterManager.Instance.LptPrinter.OpenCash();
                             return true;
@@ -2216,7 +2249,7 @@ namespace ZlPos.Bizlogic
                         ScaleConfigEntity scaleConfigEntity = JsonConvert.DeserializeObject<ScaleConfigEntity>(scale);
                         if (!string.IsNullOrEmpty(scaleConfigEntity.port))
                         {
-                            WeightUtil.Instance.Open(scaleConfigEntity.port,scaleConfigEntity.brand);
+                            WeightUtil.Instance.Open(scaleConfigEntity.port, scaleConfigEntity.brand);
                             WeightUtil.Instance.Listener = (number) =>
                             {
                                 browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");

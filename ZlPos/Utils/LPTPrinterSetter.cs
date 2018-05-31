@@ -25,6 +25,7 @@ namespace ZlPos.Utils
                     {
                         lptPrinter = new LPTPrinter();
                         lptPrinter.lptPort = lpt;
+                        lptPrinter.pageWidth = printerConfigEntity.pageWidth;
                     }
                     else
                     {
@@ -34,6 +35,7 @@ namespace ZlPos.Utils
 
                     if (lptPrinter.Init())
                     {
+                        lptPrinter.pageWidth = printerConfigEntity.pageWidth;
                         PrinterManager.Instance.Init = true;
                         PrinterManager.Instance.LptPrinter = lptPrinter;
                         PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.LPT;
