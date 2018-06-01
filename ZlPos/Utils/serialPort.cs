@@ -54,6 +54,24 @@ namespace ZlPos.Utils
             }
         }
 
+        public void CustomerWrite(string s)
+        {
+            byte[] buffer = strToToHexByte(s as string);
+            m_SerialPort.Write(buffer, 0, buffer.Length);
+        }
+
+        private static byte[] strToToHexByte(string hexString)
+        {
+            hexString = hexString.Replace(" ", "");
+            if ((hexString.Length % 2) != 0)
+                hexString += " ";
+            byte[] returnBytes = new byte[hexString.Length / 2];
+            for (int i = 0; i < returnBytes.Length; i++)
+                returnBytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+            return returnBytes;
+        }
+
+
         public void OpenCash(string str)
         {
             if (m_SerialPort.IsOpen)

@@ -128,6 +128,7 @@
     <Compile Include="Enums\EnStateFlag.cs" />
     <Compile Include="Enums\PrinterType.cs" />
     <Compile Include="Manager\CommodityCacheManager.cs" />
+    <Compile Include="Manager\CustomerShowManager.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\LoadPOSDll.cs" />
     <Compile Include="PrintServices\LPTPrinter.cs" />

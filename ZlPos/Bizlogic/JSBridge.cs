@@ -1927,25 +1927,37 @@ namespace ZlPos.Bizlogic
                             {
                                 case Enums.PrinterTypeEnum.usb:
                                     USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
-                                    PrintUtils.printModel(content, usbPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printModel(content, usbPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
                                 case Enums.PrinterTypeEnum.bluetooth:
                                     BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
-                                    PrintUtils.printModel(content, bluetoothPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printModel(content, bluetoothPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
                                 case Enums.PrinterTypeEnum.port:
                                     serialPort portPrinter = PrinterManager.Instance.PortPrinter;
-                                    PrintUtils.printModel(content, portPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printModel(content, portPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
                                 case PrinterTypeEnum.LPT:
                                     LPTPrinter lptPrinter = PrinterManager.Instance.LptPrinter;
-                                    PrintUtils.printModel(content, lptPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printModel(content, lptPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
@@ -2142,8 +2154,44 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 ResponseEntity responseEntity = new ResponseEntity();
-                responseEntity.code = ResponseCode.SUCCESS;
-                responseEntity.msg = "windows版不需要设置";
+                if (!string.IsNullOrEmpty(json))
+                {
+                    CustomerShowConfigEntity customerShowConfigEntity = JsonConvert.DeserializeObject<CustomerShowConfigEntity>(json);
+                    if (customerShowConfigEntity != null)
+                    {
+                        serialPort serialport = new serialPort(customerShowConfigEntity.port, customerShowConfigEntity.intBaud);
+                        if (serialport.Open(customerShowConfigEntity.port, Int32.Parse(customerShowConfigEntity.intBaud)))
+                        {
+                            responseEntity.code = ResponseCode.SUCCESS;
+                            responseEntity.msg = "设置成功";
+                            CustomerShowManager.Instance.Init = true;
+                            CustomerShowManager.Instance.SerialPort = serialport;
+                            using (var db = SugarDao.GetInstance())
+                            {
+                                DbManager dbManager = DBUtils.Instance.DbManager;
+                                db.DbMaintenance.DropTable(typeof(CustomerShowConfigEntity).Name);
+                                dbManager.SaveOrUpdate(customerShowConfigEntity);
+                            }
+
+                        }
+                        else
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "设置失败";
+                        }
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "参数格式错误";
+                    }
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "参数不能为空";
+                }
+
                 mWebViewHandle?.Invoke("setCustomerShowCallBack", responseEntity);
             });
 
@@ -2155,8 +2203,28 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetCustomerShow()
         {
-            var json = "{\"printerType\": \"\",             \"printernumber\": \"1\",             \"printerBrand\": \"\",             \"pageWidth\": \"small\",             \"deviceId\": \"\",             \"port\": \"\",             \"intBaud\": \"\"           }";
-            return json;
+            //var json = "{\"printerType\": \"\",             \"printernumber\": \"1\",             \"printerBrand\": \"\",             \"pageWidth\": \"small\",             \"deviceId\": \"\",             \"port\": \"\",             \"intBaud\": \"\"           }";
+            //return json;
+            ResponseEntity responseEntity = new ResponseEntity();
+            CustomerShowConfigEntity customerShowConfigEntity = null;
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            using (var db = SugarDao.GetInstance())
+            {
+                try
+                {
+                    customerShowConfigEntity = db.Queryable<CustomerShowConfigEntity>().First();
+                }
+                catch (Exception e)
+                {
+                    logger.Info("获取客显数据库信息失败");
+                }
+                if (customerShowConfigEntity == null)
+                {
+                    customerShowConfigEntity = new CustomerShowConfigEntity();
+                }
+
+                return JsonConvert.SerializeObject(customerShowConfigEntity);
+            }
         }
 
         /// <summary>
@@ -2164,10 +2232,30 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public ResponseEntity CustomerShow(string json)
+        public string CustomerShow(string s)
         {
-            //TODO...
-            return null;
+            ResponseEntity responseEntity = new ResponseEntity();
+            if (!string.IsNullOrEmpty(s))
+            {
+                serialPort serialport = CustomerShowManager.Instance.SerialPort;
+                if (CustomerShowManager.Instance.Init && serialport != null)
+                {
+                    serialport.CustomerWrite(s);
+                    responseEntity.code = ResponseCode.SUCCESS;
+                    responseEntity.msg = "成功";
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "请到设置页面设置客显端口和波特率";
+                }
+            }
+            else
+            {
+                responseEntity.code = ResponseCode.Failed;
+                responseEntity.msg = "参数不能为空";
+            }
+            return JsonConvert.SerializeObject(responseEntity);
         }
 
         public ResponseEntity SetReadCard2(string json)
