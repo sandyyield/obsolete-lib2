@@ -1885,35 +1885,6 @@ namespace ZlPos.Bizlogic
         /// </summary>
         public void Print2(string content)
         {
-            //Task.Factory.StartNew(() =>
-            //{
-            //    ResponseEntity responseEntity = new ResponseEntity();
-            //    LPTControl lpt1 = new LPTControl("lpt1");
-            //    if (string.IsNullOrEmpty(content))
-            //    {
-            //        return;
-            //    }
-            //    lpt1.Open();
-            //    List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
-
-            //    if (printEntities != null && printEntities.Count > 0)
-            //    {
-            //        //portPrinter.initUSB();
-            //        for (int i = 0; i < printEntities.Count; i++)
-            //        {
-            //            lpt1.Write(printEntities[i].content);
-            //        }
-            //    }
-            //    lpt1.Write("\n\n\n\n\n\n");
-
-            //    responseEntity.code = ResponseCode.SUCCESS;
-            //    responseEntity.msg = "小票打印成功";
-            //    lpt1.Close();
-
-            //    mWebViewHandle.Invoke("print2CallBack", responseEntity);
-
-
-            //});
             Task.Factory.StartNew(() =>
             {
                 ResponseEntity responseEntity = new ResponseEntity();
@@ -2015,25 +1986,37 @@ namespace ZlPos.Bizlogic
                             {
                                 case PrinterTypeEnum.usb:
                                     USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
-                                    PrintUtils.printNote(statisticsVM, usbPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printNote(statisticsVM, usbPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
                                 case PrinterTypeEnum.bluetooth:
                                     BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
-                                    PrintUtils.printNote(statisticsVM, bluetoothPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printNote(statisticsVM, bluetoothPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
                                 case PrinterTypeEnum.port:
                                     serialPort portPrinter = PrinterManager.Instance.PortPrinter;
-                                    PrintUtils.printNote(statisticsVM, portPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printNote(statisticsVM, portPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
                                 case PrinterTypeEnum.LPT:
                                     LPTPrinter lptPrinter = PrinterManager.Instance.LptPrinter;
-                                    PrintUtils.printNote(statisticsVM, lptPrinter);
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printNote(statisticsVM, lptPrinter);
+                                    }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
