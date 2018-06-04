@@ -110,6 +110,15 @@ namespace ZlPos.Utils
             {
                 return;
             }
+            if (mPrinter.CurrentPrintType == PrinterType.TIII || mPrinter.CurrentPrintType == PrinterType.T5)
+            {
+                mPrinter.PrintString("             收银对账             \n");
+            }
+            else
+            {
+                mPrinter.PrintString("                      收银对账                    \n");
+            }
+
             StringBuilder sb = new StringBuilder();
             if (mPrinter.CurrentPrintType == PrinterType.TIII || mPrinter.CurrentPrintType == PrinterType.T5)
             {
@@ -184,6 +193,14 @@ namespace ZlPos.Utils
             if (mPrinter == null)
             {
                 return;
+            }
+            if (mPrinter.CurrentPrintType == PrinterType.TIII || mPrinter.CurrentPrintType == PrinterType.T5)
+            {
+                mPrinter.PrintString("             收银对账             \n");
+            }
+            else
+            {
+                mPrinter.PrintString("                      收银对账                    \n");
             }
             StringBuilder sb = new StringBuilder();
             if (mPrinter.CurrentPrintType == PrinterType.TIII || mPrinter.CurrentPrintType == PrinterType.T5)
@@ -260,6 +277,14 @@ namespace ZlPos.Utils
             {
                 return;
             }
+            if (mPrinter.pageWidth == "small")
+            {
+                mPrinter.PrintString("             收银对账             \n");
+            }
+            else
+            {
+                mPrinter.PrintString("                      收银对账                    \n");
+            }
             StringBuilder sb = new StringBuilder();
             if (mPrinter.pageWidth == "small")
             {
@@ -335,6 +360,14 @@ namespace ZlPos.Utils
             if (mPrinter == null)
             {
                 return;
+            }
+            if (mPrinter.pageWidth == "small")
+            {
+                mPrinter.PrintString("             收银对账             \n");
+            }
+            else
+            {
+                mPrinter.PrintString("                      收银对账                    \n");
             }
             StringBuilder sb = new StringBuilder();
             if (mPrinter.pageWidth == "small")

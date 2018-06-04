@@ -115,7 +115,7 @@ namespace ZlPos.Forms
                 // If you intend the form to be maximized, change it to normal then maximized.  
                 this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;// 设置边框为 None
             }
-            //this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;// 最大化
             this.ControlBox = true;
             //this.TopMost = true;// 置顶

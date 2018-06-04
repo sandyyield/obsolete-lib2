@@ -187,30 +187,38 @@ namespace ZlPos.Bizlogic
                     ResponseEntity responseEntity = new ResponseEntity();
                     while (_NetworkChecking)
                     {
-                        bool isConnectInternet = InternetHelper.IsConnectInternet();
-                        if (!isConnectInternet)
+                        try
                         {
-                            logger.Info("isConnectInternet>>>" + isConnectInternet);
-                            //即当前网络发生变化时
-                            if (isConnectInternet != _NetworkStatus)
-                            {
-                                _NetworkStatus = isConnectInternet;
-                                responseEntity.code = ResponseCode.Failed;
-                                mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
 
-                            }
-                        }
-                        else
-                        {
-                            logger.Info("isConnectInternet>>>" + isConnectInternet);
-                            if (isConnectInternet != _NetworkStatus)
+                            bool isConnectInternet = InternetHelper.IsConnectInternet();
+                            if (!isConnectInternet)
                             {
-                                _NetworkStatus = isConnectInternet;
-                                responseEntity.code = ResponseCode.SUCCESS;
-                                mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                logger.Info("isConnectInternet>>>" + isConnectInternet);
+                                //即当前网络发生变化时
+                                if (isConnectInternet != _NetworkStatus)
+                                {
+                                    _NetworkStatus = isConnectInternet;
+                                    responseEntity.code = ResponseCode.Failed;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+
+                                }
+                            }
+                            else
+                            {
+                                logger.Info("isConnectInternet>>>" + isConnectInternet);
+                                if (isConnectInternet != _NetworkStatus)
+                                {
+                                    _NetworkStatus = isConnectInternet;
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                }
                             }
                         }
-                        Thread.Sleep(3000);
+                        catch(Exception e)
+                        {
+                            logger.Info("网络状态回调出现问题");
+                        }
+                        Thread.Sleep(5000);
                     }
                 }
                 ));
