@@ -84,8 +84,10 @@ namespace ZlPos.PrintServices
             try
             {
                 int sendCount = 0;
-                string sendUnicode = Encoding.Unicode.GetString(Encoding.Default.GetBytes(content));
-                PrintBridge.WriteUsb(hDevice, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendCount);
+                //string sendUnicode = Encoding.Unicode.GetString(Encoding.Default.GetBytes(content));
+                string sendUnicode = content;
+                //PrintBridge.WriteUsb(hDevice, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendCount);
+                PrintBridge.WriteUsb(hDevice, Encoding.Default.GetBytes(content), Encoding.Default.GetBytes(content).Length, ref sendCount);
                 //PrintBridge.WriteUsb(hDevice, content, Encoding.Default.GetByteCount(content), ref sendCount);
                 return sendCount;
             }

@@ -21,6 +21,9 @@ namespace ZlPos.PrintServices
         public static extern int WriteUsb(IntPtr hUsb, string sendBuffer, int bufferSize, ref int sendCount);
 
         [DllImport("Library\\JsUsbDll.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        public static extern int WriteUsb(IntPtr hUsb, byte[] sendBuffer, int bufferSize, ref int sendCount);
+
+        [DllImport("Library\\JsUsbDll.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern IntPtr OpenComA(string comn, int baud);
 
         [DllImport("Library\\JsUsbDll.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
