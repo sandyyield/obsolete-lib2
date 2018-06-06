@@ -19,8 +19,8 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public String collection { get; set; }
-        [SugarColumn(IsNullable = true)]
-        public String change { get; set; }
+        [SugarColumn(IsNullable = true,ColumnName = "change")]
+        public String changemoney { get; set; }
         [SugarColumn(IsNullable = true)]
         public String ticketstatue { get; set; }
 

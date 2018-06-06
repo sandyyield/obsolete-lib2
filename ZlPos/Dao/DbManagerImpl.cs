@@ -201,7 +201,7 @@ namespace ZlPos.Dao
 
                     if (rsCount == 0)
                     {
-                        db.Insertable(entity).ExecuteCommand();
+                        db.Insertable(entity).Where(true,true).ExecuteCommand();
                     }
                     //}
                     //db.Ado.CommitTran();

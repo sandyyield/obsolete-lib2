@@ -56,6 +56,9 @@ namespace ZlPos.Bizlogic
         //网络状态
         private bool _NetworkStatus = false;
 
+        //最近上次网络状态
+        private bool? _LastNetworkStatus = null;
+
         //内存镜像
         PrinterConfigEntity _printerConfigEntity;
 
@@ -193,6 +196,7 @@ namespace ZlPos.Bizlogic
             Thread netCheckThread = new Thread(new ThreadStart(
                 () =>
                 {
+                    int i = 0;
                     ResponseEntity responseEntity = new ResponseEntity();
                     while (_NetworkChecking)
                     {
@@ -203,24 +207,38 @@ namespace ZlPos.Bizlogic
                             if (!isConnectInternet)
                             {
                                 logger.Info("isConnectInternet = false>>>" + isConnectInternet);
+                                //第一次判断 无论什么情况都要返回
+                                if(i == 0)
+                                {
+                                    _NetworkStatus = isConnectInternet;
+                                    responseEntity.code = ResponseCode.Failed;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                }
                                 //即当前网络发生变化时
-                                //if (isConnectInternet != _NetworkStatus)
-                                //{
-                                _NetworkStatus = isConnectInternet;
-                                responseEntity.code = ResponseCode.Failed;
-                                mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                if (isConnectInternet != _NetworkStatus)
+                                {
+                                    _NetworkStatus = isConnectInternet;
+                                    responseEntity.code = ResponseCode.Failed;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
 
-                                //}
+                                }
                             }
                             else
                             {
                                 logger.Info("isConnectInternet = true>>>" + isConnectInternet);
-                                //if (isConnectInternet != _NetworkStatus)
-                                //{
-                                _NetworkStatus = isConnectInternet;
-                                responseEntity.code = ResponseCode.SUCCESS;
-                                mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
-                                //}
+                                //第一次判断 无论什么情况都要返回
+                                if (i == 0)
+                                {
+                                    _NetworkStatus = isConnectInternet;
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                }
+                                if (isConnectInternet != _NetworkStatus)
+                                {
+                                    _NetworkStatus = isConnectInternet;
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                }
                             }
                         }
                         catch (Exception e)
@@ -228,6 +246,8 @@ namespace ZlPos.Bizlogic
                             logger.Info("网络状态回调出现问题");
                         }
                         Thread.Sleep(5000);
+                        //i赋值1 让其判断是否网络改变
+                        i = 1;
                     }
                 }
                 ));
@@ -618,7 +638,7 @@ namespace ZlPos.Bizlogic
 
                         payTypeEntities = db.Queryable<PayTypeEntity>().Where(it => it.shopcode == userEntity.shopcode).ToList();
 
-                        commodityInfoVMList = db.Queryable<CommodityInfoVM>().Where(it => it.shopcode == userEntity.shopcode).ToList();
+                        commodityInfoVMList = db.Queryable<CommodityInfoVM>().Where(it => it.shopcode == userEntity.shopcode).OrderBy(it => it.id).ToList();
 
                         categoryEntities = db.Queryable<CategoryEntity>().Where(it => it.shopcode == userEntity.shopcode
                                                                             && it.del == "0").OrderBy(it => it.categorycode).ToList();
@@ -1208,12 +1228,14 @@ namespace ZlPos.Bizlogic
                     DateTime endDate = Convert.ToDateTime(end, dtFormat);
                     long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
                     long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
+                    string shopcode = _LoginUserManager.UserEntity.shopcode;
+                    string branchcode = _LoginUserManager.UserEntity.branchcode;
                     number = db.Queryable<BillEntity>().Where(it => it.ticketstatue == "cached"
                                                         || it.ticketstatue == "updated"
                                                         && it.insertTime >= startDateTime
                                                         && it.insertTime <= endDateTime
-                                                        && it.shopcode == _LoginUserManager.UserEntity.shopcode
-                                                        && it.branchcode == _LoginUserManager.UserEntity.branchcode).Count();
+                                                        && it.shopcode == shopcode
+                                                        && it.branchcode == branchcode).Count();
                 }
                 catch (Exception e)
                 {
@@ -1406,7 +1428,7 @@ namespace ZlPos.Bizlogic
                 {
                     if (commodityEntities.Count - pageindex * pagesize >= 0)
                     {
-                        if (commodityEntities.Count < (pageindex * pagesize + pageindex * pagesize + pagesize))
+                        if (commodityEntities.Count <= (pageindex * pagesize + pageindex * pagesize + pagesize))
                         {
                             selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, commodityEntities.Count - pageindex * pagesize);
                         }
