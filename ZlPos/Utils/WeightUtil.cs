@@ -77,7 +77,7 @@ namespace ZlPos.Utils
                                 byte[] buffer = new byte[64];
                                 while (mSerialPort.IsOpen)
                                 {
-                                    Thread.Sleep(100);
+                                    Thread.Sleep(200);
                                     //size = mSerialPort.Read(buffer, 0, 1);
                                     mSerialPort.Read(buffer, 0, 64);
                                     string s = Encoding.Default.GetString(buffer);
@@ -86,7 +86,8 @@ namespace ZlPos.Utils
                                         sBuffer = s;
                                         if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
                                         {
-                                            string ss = s.Substring(4, 6);
+                                            //2018年6月8日 多显示一位负数
+                                            string ss = s.Substring(3, 6);
                                             try
                                             {
                                                 Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
@@ -96,7 +97,6 @@ namespace ZlPos.Utils
                                                 logger.Info(e.Message + e.StackTrace);
                                             }
                                         }
-
                                     }
                                 }
                             });

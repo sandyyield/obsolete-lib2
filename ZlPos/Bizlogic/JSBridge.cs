@@ -115,7 +115,11 @@ namespace ZlPos.Bizlogic
             return "here is c# solution string>>>>>>>[" + state.ToString() + "]";
         }
 
-
+        #region GetDeviceId
+        /// <summary>
+        /// 获取机器唯一码
+        /// </summary>
+        /// <returns></returns>
         public string GetDeviceId()
         {
             if (RegHelper.GetKey2() == "")
@@ -130,16 +134,26 @@ namespace ZlPos.Bizlogic
 
                 browser.ExecuteScriptAsync("getDeviceIdCallBack('" + OSVer + "')");
             });
-
-
             return RegHelper.GetKey2();
         }
+        #endregion
 
+        #region GetVersionInfo
+        /// <summary>
+        /// 获取文件版本
+        /// </summary>
+        /// <returns></returns>
         public string GetVersionInfo()
         {
             return Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
+        #endregion
 
+        #region GetNetWorkStatus
+        /// <summary>
+        /// 判断网络状态 包含持续判断网络状态回调线程
+        /// </summary>
+        /// <returns></returns>
         public string GetNetWorkStatus()
         {
             ResponseEntity responseEntity = new ResponseEntity();
@@ -208,7 +222,7 @@ namespace ZlPos.Bizlogic
                             {
                                 logger.Info("isConnectInternet = false>>>" + isConnectInternet);
                                 //第一次判断 无论什么情况都要返回
-                                if(i == 0)
+                                if (i == 0)
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.Failed;
@@ -255,44 +269,24 @@ namespace ZlPos.Bizlogic
             netCheckThread.IsBackground = true;
             netCheckThread.Start();
 
-            //Task.Factory.StartNew(() =>
-            //{
-            //    ResponseEntity responseEntity = new ResponseEntity();
-            //    while (_NetworkChecking)
-            //    {
-            //        bool isConnectInternet = InternetHelper.IsConnectInternet();
-            //        if (!isConnectInternet)
-            //        {
-            //            logger.Info("isConnectInternet>>>" + isConnectInternet);
-            //            //即当前网络发生变化时
-            //            if (isConnectInternet != _NetworkStatus)
-            //            {
-            //                _NetworkStatus = isConnectInternet;
-            //                responseEntity.code = ResponseCode.Failed;
-            //                mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
-
-            //            }
-            //        }
-            //        else
-            //        {
-            //            logger.Info("isConnectInternet>>>" + isConnectInternet);
-            //            if (isConnectInternet != _NetworkStatus)
-            //            {
-            //                _NetworkStatus = isConnectInternet;
-            //                responseEntity.code = ResponseCode.SUCCESS;
-            //                mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
-            //            }
-            //        }
-            //        Thread.Sleep(7000);
-            //    }
-            //});
         }
+        #endregion
 
+        #region SetZoomLevel
+        /// <summary>
+        /// 设置浏览器分辨率大小
+        /// </summary>
+        /// <param name="ZoomLevel"></param>
         public void SetZoomLevel(double ZoomLevel)
         {
             browser.SetZoomLevel(ZoomLevel);
         }
+        #endregion
 
+        #region OpenSecondScreen
+        /// <summary>
+        /// 打开副屏
+        /// </summary>
         public void OpenSecondScreen()
         {
             Screen[] sc;
@@ -305,16 +299,9 @@ namespace ZlPos.Bizlogic
                 }
                 SecondScreen.Show();
             }
-            //else
-            //{
-            //    //加载副屏但不展示
-            //    if (SecondScreen == null)
-            //    {
-            //        SecondScreen = new SecondScreenFrm(_SecondScreenWebView);
-            //    }
-            //}
 
         }
+        #endregion
 
         //null method debug
         #region SecondScreenAction
@@ -428,8 +415,6 @@ namespace ZlPos.Bizlogic
             });
         }
         #endregion
-
-
 
         #region SaveOrUpdateUserInfo
         /// <summary>
@@ -2166,6 +2151,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region SetCustomerShow
         /// <summary>
         /// 保存客显设置
         /// </summary>
@@ -2218,15 +2204,15 @@ namespace ZlPos.Bizlogic
             });
 
         }
+        #endregion
 
+        #region GetCustomerShow
         /// <summary>
         /// 获取客显设置信息
         /// </summary>
         /// <returns></returns>
         public string GetCustomerShow()
         {
-            //var json = "{\"printerType\": \"\",             \"printernumber\": \"1\",             \"printerBrand\": \"\",             \"pageWidth\": \"small\",             \"deviceId\": \"\",             \"port\": \"\",             \"intBaud\": \"\"           }";
-            //return json;
             ResponseEntity responseEntity = new ResponseEntity();
             CustomerShowConfigEntity customerShowConfigEntity = null;
             DbManager dbManager = DBUtils.Instance.DbManager;
@@ -2248,7 +2234,9 @@ namespace ZlPos.Bizlogic
                 return JsonConvert.SerializeObject(customerShowConfigEntity);
             }
         }
+        #endregion
 
+        #region CustomerShow
         /// <summary>
         /// 推送到客显信息
         /// </summary>
@@ -2279,6 +2267,8 @@ namespace ZlPos.Bizlogic
             }
             return JsonConvert.SerializeObject(responseEntity);
         }
+        #endregion
+
 
         public ResponseEntity SetReadCard2(string json)
         {
@@ -2302,6 +2292,7 @@ namespace ZlPos.Bizlogic
             return null;
         }
 
+        #region GetScale
         /// <summary>
         /// 获取电子秤
         /// </summary>
@@ -2311,7 +2302,9 @@ namespace ZlPos.Bizlogic
             string scale = CacheManager.GetScale(SPCode.scale) as string;
             return scale;
         }
+        #endregion
 
+        #region SetScale
         /// <summary>
         /// 设置电子秤
         /// </summary>
@@ -2342,6 +2335,9 @@ namespace ZlPos.Bizlogic
             return JsonConvert.SerializeObject(responseEntity);
 
         }
+        #endregion
+
+        #region GetWeight
         /// <summary>
         /// 获取重量
         /// </summary>
@@ -2380,15 +2376,85 @@ namespace ZlPos.Bizlogic
             });
 
         }
+        #endregion
 
+        #region CloseWeighter
         /// <summary>
         /// 关闭电子秤
         /// </summary>
         /// <returns></returns>
-        public void closeWeighter()
+        public void CloseWeighter()
         {
             WeightUtil.Instance.Close();
         }
+        #endregion
+
+        #region SaveBarcodeScale
+        /// <summary>
+        /// 保存条码信息
+        /// </summary>
+        /// <param name="scaleConfig"></param>
+        public void SaveBarcodeScale(string scaleConfig)
+        {
+            if (!string.IsNullOrEmpty(scaleConfig))
+            {
+                BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
+                List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
+                //这里有一条逻辑没有看懂 TODO...等确认了再翻译
+                ///...SpUtil.putString(mWebView.getContext(), SPCode.barcodeStyle, barcodeScaleConfigEntity.getBarcodeStyle());
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                if (scaleList != null && scaleList.Count > 0)
+                {
+                    foreach (BarcodeScaleEntity barcodeScaleEntity in scaleList)
+                    {
+                        try
+                        {
+                            dbManager.SaveOrUpdate(barcodeScaleEntity);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Info("保存条码信息出错>>" + e.Message + e.StackTrace);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region GetBarcodeScale
+        /// <summary>
+        ///  获取保存的条码秤信息
+        /// </summary>
+        /// <returns></returns>
+        public string GetBarcodeScale()
+        {
+            BarcodeScaleConfigEntity barcodeScaleConfigEntity = new BarcodeScaleConfigEntity();
+            List<BarcodeScaleEntity> barcodeScaleEntityList = null;
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
+                }
+            }
+            catch(Exception e)
+            {
+                logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
+            }
+            //TOFIX
+            string barcodeStyle = "";//SpUtil.getString(mWebView.getContext(), SPCode.barcodeStyle, "");  ---???
+            barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
+            if(barcodeScaleEntityList == null)
+            {
+                barcodeScaleEntityList = new List<BarcodeScaleEntity>();
+            }
+            return JsonConvert.SerializeObject(barcodeScaleConfigEntity);
+        }
+        #endregion
+
+
+
 
 
         /// <summary>
@@ -2432,7 +2498,7 @@ namespace ZlPos.Bizlogic
 
         }
 
-
+        #region IntentTo
         /// <summary>
         /// 跳转网址
         /// </summary>
@@ -2446,8 +2512,7 @@ namespace ZlPos.Bizlogic
             });
             return true;
         }
-
-
+        #endregion
 
 
         public void TestUSBPrint()
@@ -2499,6 +2564,7 @@ namespace ZlPos.Bizlogic
         }
 
 
+        #region CallBack Methods
         /// <summary>
         /// 多线程方式回调
         /// </summary>
@@ -2548,6 +2614,7 @@ namespace ZlPos.Bizlogic
                 }
             }
         }
+        #endregion
 
 
     }

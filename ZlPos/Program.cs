@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZlPos.Bizlogic;
+using ZlPos.Dao;
 using ZlPos.Forms;
 
 namespace ZlPos
@@ -35,7 +36,12 @@ namespace ZlPos
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             logger = LogManager.GetLogger("Logger");
 
-            logger.Info("Initiallize chromium core..");
+            #region "数据库相关"
+            //初始化
+            DbHelper.Instance.Init();
+
+
+            #endregion
 
             #region " 不允许多个实例运行 "
             mutex = new System.Threading.Mutex(true, "aabbccdd");
@@ -89,6 +95,8 @@ namespace ZlPos
 
             #endregion
 
+            logger.Info("Initiallize chromium core..");
+
             CefSettings cefSettings = new CefSettings();
             //禁用调试日志
             cefSettings.LogSeverity = LogSeverity.Disable;
@@ -104,7 +112,7 @@ namespace ZlPos
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-
+            
 
             logger.Info("Start run " + AppContext.Instance.AppName + " services");
             Application.Run(new PosForm());

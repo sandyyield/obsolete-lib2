@@ -18,7 +18,7 @@ namespace ZlPos.Bizlogic
         {
             get
             {
-                if(_instance == null)
+                if (_instance == null)
                 {
                     _instance = new AppContext();
                     _instance.InitConfigParam();
@@ -29,16 +29,21 @@ namespace ZlPos.Bizlogic
 
         public string AppVersion { get => _AppVersion; set => _AppVersion = value; }
         public string AppName { get => _AppName; set => _AppName = value; }
+        public int DatebaseVersion { get => _DatebaseVersion; set => _DatebaseVersion = value; }
 
         private string _AppName;
 
         private string _AppVersion;
+
+        private int _DatebaseVersion;
 
         private void InitConfigParam()
         {
             AppName = ConfigurationManager.AppSettings["AppContextName"];
 
             AppVersion = ConfigurationManager.AppSettings["Version"];
+
+            DatebaseVersion = Convert.ToInt32(ConfigurationManager.AppSettings["DatabaseVersion"]);
 
         }
     }

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
+    [SugarTable("CommodityEntity")]
     public class CommodityEntity
     {
         [SugarColumn(IsPrimaryKey = true, IsNullable = true)]
@@ -100,5 +101,9 @@ namespace ZlPos.Models
         //add 2018年3月14日
         [SugarColumn(IsNullable = true)]
         public String commodityclassify { get; set; }
+
+        //add 2018年6月7日
+        [SugarColumn(IsNullable = true)]
+        public string validtime { get; set; }
     }
 }

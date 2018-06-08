@@ -111,6 +111,9 @@
     <Compile Include="Bizlogic\RegHelper.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Core\MenuHandler.cs" />
+    <Compile Include="Dao\DbHelper.cs" />
+    <Compile Include="Dao\UpgradingSchema.cs" />
+    <Compile Include="Enums\SyncScaleStatus.cs" />
     <Compile Include="Forms\SecondScreenFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -129,6 +132,11 @@
     <Compile Include="Enums\PrinterType.cs" />
     <Compile Include="Manager\CommodityCacheManager.cs" />
     <Compile Include="Manager\CustomerShowManager.cs" />
+    <Compile Include="Models\BarcodeScaleConfigEntity.cs" />
+    <Compile Include="Models\BarcodeScaleEntity.cs" />
+    <Compile Include="Models\PluMessageEntity.cs" />
+    <Compile Include="Models\SyncScaleEntity.cs" />
+    <Compile Include="Models\SyncScaleVM.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\LoadPOSDll.cs" />
     <Compile Include="PrintServices\LPTPrinter.cs" />
