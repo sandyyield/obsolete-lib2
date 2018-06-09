@@ -153,6 +153,26 @@ namespace ZlPos.Dao
             }
         }
 
+        public void SaveAndInsert<T>(T entity) where T : class, new()
+        {
+            using (var db = SugarDao.GetInstance())
+            {
+                try
+                {
+                    if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name, false))
+                    {
+                        db.CodeFirst.InitTables(entity.GetType());
+                    }
+                    db.Insertable(entity).Where(true).ExecuteCommand();
+                }
+                catch (Exception e)
+                {
+                    //db.Ado.RollbackTran();
+                    throw e;
+                }
+            }
+        }
+
 
 
         /// <summary>
@@ -201,7 +221,7 @@ namespace ZlPos.Dao
 
                     if (rsCount == 0)
                     {
-                        db.Insertable(entity).Where(true,true).ExecuteCommand();
+                        db.Insertable(entity).Where(true, true).ExecuteCommand();
                     }
                     //}
                     //db.Ado.CommitTran();
@@ -285,15 +305,15 @@ namespace ZlPos.Dao
 
                             //需要更新的数据
                             var lsUpdate = ConvertUtils.ToList<CommodityEntity>(dtUpdate).ToArray();
-                            if(lsUpdate.Count() > 0)
+                            if (lsUpdate.Count() > 0)
                             {
                                 db.Updateable(lsUpdate).ExecuteCommand();
                             }
 
                             var lsInsert = ConvertUtils.ToList<CommodityEntity>(dtInsert).ToArray();
-                            if(lsInsert.Count() > 0)
+                            if (lsInsert.Count() > 0)
                             {
-                                db.Insertable(lsInsert).Where(true,true).ExecuteCommand();
+                                db.Insertable(lsInsert).Where(true, true).ExecuteCommand();
                             }
 
                             dtUpdate.Clear(); dtUpdate.Dispose(); dtUpdate = null;

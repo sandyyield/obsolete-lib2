@@ -911,9 +911,18 @@ namespace ZlPos.Bizlogic
                 {
                     ////edit by sVen 2018年5月9日 优化为块存方式提高效率
                     //dbManager.BulkSaveOrUpdate(paydetails);
-                    foreach (PayDetailEntity payDetailEntity in paydetails)
+                    //paydetail直接插入 因为默认为0 saveorupdate会执行update操作覆盖
+                    try
                     {
-                        dbManager.SaveOrUpdate(payDetailEntity);
+                        foreach (PayDetailEntity payDetailEntity in paydetails)
+                        {
+                            //dbManager.SaveOrUpdate(payDetailEntity);
+                            dbManager.SaveAndInsert(payDetailEntity);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Info("payDetail save err>>" + e.Message + e.StackTrace);
                     }
                 }
 
@@ -2438,14 +2447,14 @@ namespace ZlPos.Bizlogic
                     barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
             }
             //TOFIX
             string barcodeStyle = "";//SpUtil.getString(mWebView.getContext(), SPCode.barcodeStyle, "");  ---???
             barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
-            if(barcodeScaleEntityList == null)
+            if (barcodeScaleEntityList == null)
             {
                 barcodeScaleEntityList = new List<BarcodeScaleEntity>();
             }
@@ -2524,33 +2533,22 @@ namespace ZlPos.Bizlogic
 
         public string TestORM(string json)
         {
-            Employee employees = JsonConvert.DeserializeObject<Employee>(json);
+
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            //dbManager.SaveOrUpdate(employees);
 
             try
             {
 
-                DbManager dbManager = DBUtils.Instance.DbManager;
-
-                dbManager.SaveOrUpdate(employees);
                 using (var db = SugarDao.GetInstance())
                 {
-                    //db.CodeFirst.BackupTable().InitTables(typeof(Employee));
-                    //db.DbMaintenance.IsAnyTable(typeof(Employee).Name);
-                    //db.CodeFirst.InitTables(typeof(Employee));
+                    Employee employees = JsonConvert.DeserializeObject<Employee>(json);
+                    db.Insertable(employees).ExecuteCommand();
+                    dbManager.SaveOrUpdate(employees);
 
-                    //db.Insertable(employees).ExecuteReturnEntity();
+                    //PayDetailEntity payDetails = JsonConvert.DeserializeObject<PayDetailEntity>(json);
+                    //dbManager.SaveOrUpdate(payDetails);
 
-
-                    //db.BeginTran();
-
-                    //db.IsEnableAttributeMapping = true;
-
-                    //no table ex
-                    //db.SqlBulkCopy(new List<Employee>(){ employees });
-
-                    //db.InsertOrUpdate(employees);
-
-                    //db.CommitTran();
                 }
             }
             catch (Exception ex)

@@ -1,108 +1,124 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>test call c# method</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>test call c# method</title>
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 
-		var loginJson = {
-			"deviceuniquecode": "3e76b2c1-09bb-450a-85d4-3e72dd3dddce",
-			"devicetype": "01",
-			"account": "",
-			"shopcode": "100000417",
-			"username": "1001",
-			"password": "96e79218965eb72c92a549dd5a330112"
+        var loginJson = {
+            "deviceuniquecode": "3e76b2c1-09bb-450a-85d4-3e72dd3dddce",
+            "devicetype": "01",
+            "account": "",
+            "shopcode": "100000417",
+            "username": "1001",
+            "password": "96e79218965eb72c92a549dd5a330112"
         }
 
         var testEFormJson = {
             "EmployeeID": "9527",
             "FirstName": "老吴凡",
-            "LastName":"滑雪第一人"
+            "LastName": "滑雪第一人"
         }
-		// function asyncDivOk()
-		// {
-		// 	var call = "Async call (Divide 16 / 2): " + Date();
-		// 	boundAsync.div(16, 2).then(function (res)
-		// 	{
-		// 		var end = "Result: " + res + "(" + Date() + ")";
-		// 		writeAsyncResult(call, end);
-		// 	});
-		// }
 
-		// function asyncError()
-		// {
-		// 	var call = "Async call (Throw Exception): " + Date();
-		// 	boundAsync.error().catch(function (e)
-		// 	{
-		// 		var end = "Error: " + e + "(" + Date() + ")";
-		// 		writeAsyncResult(call, end);
-		// 	});
-		// }
+        var paydetaildate = {
+            "ticketcode": "00124-180608173028-002",
+            "shopcode": "125806715",
+            "branchcode": "001",
+            "branchname": "总部_中仑零售",
+            "paycode": "60000",
+            "payname": "现金支付",
+            "payamount": 55,
+            "businesscode": "999999",
+            "countcardnums": "",
+            "paycredit": "",
+            "paytime": "2018-06-08 17:30:28",
+            "ordercode": ""
 
-		function MessageBox(argument) {
-			// body...
-			alert(argument);
-		}
+        }
+        // function asyncDivOk()
+        // {
+        // 	var call = "Async call (Divide 16 / 2): " + Date();
+        // 	boundAsync.div(16, 2).then(function (res)
+        // 	{
+        // 		var end = "Result: " + res + "(" + Date() + ")";
+        // 		writeAsyncResult(call, end);
+        // 	});
+        // }
 
-		function callbackFunc(argument){
-			alert('here is js call back demo function,call back success');
-			alert(argument);
-		}
+        // function asyncError()
+        // {
+        // 	var call = "Async call (Throw Exception): " + Date();
+        // 	boundAsync.error().catch(function (e)
+        // 	{
+        // 		var end = "Error: " + e + "(" + Date() + ")";
+        // 		writeAsyncResult(call, end);
+        // 	});
+        // }
 
-		function callbackFunc2(argument) {
-			// body...
-			alert(argument);
-		}
+        function MessageBox(argument) {
+            // body...
+            alert(argument);
+        }
 
-		function printInvokeJSMethod(argument) {
-			// body...
-			//alert('here is  c# invoke js method success!!!!');
+        function callbackFunc(argument) {
+            alert('here is js call back demo function,call back success');
+            alert(argument);
+        }
 
-			alert(argument);
-		}
+        function callbackFunc2(argument) {
+            // body...
+            alert(argument);
+        }
 
+        function printInvokeJSMethod(argument) {
+            // body...
+            //alert('here is  c# invoke js method success!!!!');
 
-		function invokeClassMethod(argument) {
-			// body...
-
-			//bound.myProperty;
-			bound.myMethod();
-			var state = bound.myMethod1(document.getElementById("inputStream").value); // use this to call the method.
-			alert(state);
-		}
-
-		function invokeClassMethod2(argument) {
-			
-			if(HostApp== null){
-				return;
-			}
-			var state = HostApp.nativeUnityMethod(document.getElementById("inputStream").value); // use this to call the method.
-			alert(state);
-		}
+            alert(argument);
+        }
 
 
-		
-		function login(argument) {
-			// body...
-			if(HostApp== null){
-				return;
-			}
+        function invokeClassMethod(argument) {
+            // body...
 
-			var rs = HostApp.login(JSON.stringify(loginJson))
+            //bound.myProperty;
+            bound.myMethod();
+            var state = bound.myMethod1(document.getElementById("inputStream").value); // use this to call the method.
+            alert(state);
+        }
+
+        function invokeClassMethod2(argument) {
+
+            if (HostApp == null) {
+                return;
+            }
+            var state = HostApp.nativeUnityMethod(document.getElementById("inputStream").value); // use this to call the method.
+            alert(state);
+        }
 
 
-		}
 
-		function loginCallBack(json) {
-			// body...
-			alert(json)
-		}
+        function login(argument) {
+            // body...
+            if (HostApp == null) {
+                return;
+            }
 
-		function testDBOrm(argument) {
-			// body...
+            var rs = HostApp.login(JSON.stringify(loginJson))
+
+
+        }
+
+        function loginCallBack(json) {
+            // body...
+            alert(json)
+        }
+
+        function testDBOrm(argument) {
+            // body...
             var obj = HostApp.testORM(JSON.stringify(testEFormJson));
-            alert(obj);
+            alert("数据发送成功");
         }
 
         function testGetPort() {
@@ -118,15 +134,20 @@
             HostApp.getLastUserName();
         }
 
-	</script>
+        function testPayDetailData() {
+            HostApp.testORM(JSON.stringify(paydetaildate));
+            alert("数据发送成功");
+        }
+
+    </script>
 </head>
 <body>
-	 
-	<!-- <button onclick="invokeClassMethod()">测试调用c#方法</button> -->
 
-	<button onclick="invokeClassMethod2()">测试调用c#方法(兼容android调用方式）</button>
+    <!-- <button onclick="invokeClassMethod()">测试调用c#方法</button> -->
 
-	<button onclick="login(loginJson)">debug login method 模拟</button>
+    <button onclick="invokeClassMethod2()">测试调用c#方法(兼容android调用方式）</button>
+
+    <button onclick="login(loginJson)">debug login method 模拟</button>
 
     <button onclick="testDBOrm(testEFormJson)">test database orm</button>
 
@@ -136,20 +157,22 @@
 
     <button onclick="debugall()">debugall</button>
 
-	<input type="text"  id="inputStream"  name="inputStream" value="JS call c# method with return success!!">
-		<script type="text/javascript">
-			//MessageBox('hello world');
+    <button onclick="testPayDetailData()">PayDataTest</button>
 
-			// asyncDivOk();
+    <input type="text" id="inputStream" name="inputStream" value="JS call c# method with return success!!">
+    <script type="text/javascript">
+                    //MessageBox('hello world');
 
-			// asyncError();
-			//bound.myProperty; // use this syntax to access the property
-			//var state = bound.myMethod1('JS call c# method with return success!!'); // use this to call the method.
-			//alert(state);
-			
-			// bound.testCallback(callbackFunc); //Pass a function in to use as a callback
-			// bound.testCallback2(callbackFunc2)
-			
-		</script>
+                    // asyncDivOk();
+
+                    // asyncError();
+                    //bound.myProperty; // use this syntax to access the property
+                    //var state = bound.myMethod1('JS call c# method with return success!!'); // use this to call the method.
+                    //alert(state);
+
+                    // bound.testCallback(callbackFunc); //Pass a function in to use as a callback
+                    // bound.testCallback2(callbackFunc2)
+
+    </script>
 </body>
 </html>
