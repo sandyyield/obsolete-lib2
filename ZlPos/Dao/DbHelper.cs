@@ -85,6 +85,10 @@ namespace ZlPos.Dao
                         //生成数据库配置文件
                         CreateConfig();
                         break;
+                    case 3:
+                        UpgradingSchema.UpgradingVersion3();
+                        CreateConfig();
+                        break;
 
                 }
             }

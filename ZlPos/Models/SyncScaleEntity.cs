@@ -8,7 +8,7 @@ namespace ZlPos.Models
 {
     public class SyncScaleEntity
     {
-        public SyncScaleStatus status { get; set; }
+        public string status { get; set; }
         public int point { get; set; }
 
     }

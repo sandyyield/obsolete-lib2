@@ -34,5 +34,15 @@ namespace ZlPos.Utils
             return ContextCache.getGprint();
         }
 
+        public static void InsertBarcodeScale(string obj)
+        {
+            ContextCache.setBarcodeStyle(obj);
+        }
+
+        public static string GetBarcodeScale()
+        {
+            return ContextCache.getBarcodeStyle();
+        }
+
     }
 }

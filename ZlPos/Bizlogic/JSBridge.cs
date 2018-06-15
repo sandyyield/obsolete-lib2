@@ -27,6 +27,8 @@ using ZlPos.Core;
 using ZlPos.Forms;
 using System.Windows.Forms;
 using System.Text;
+using System.Net.Sockets;
+using System.Net;
 
 namespace ZlPos.Bizlogic
 {
@@ -137,6 +139,11 @@ namespace ZlPos.Bizlogic
             return RegHelper.GetKey2();
         }
         #endregion
+
+        public string GetDeviceModel()
+        {
+            return "";
+        }
 
         #region GetVersionInfo
         /// <summary>
@@ -2398,6 +2405,9 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+
+
+
         #region SaveBarcodeScale
         /// <summary>
         /// 保存条码信息
@@ -2409,8 +2419,7 @@ namespace ZlPos.Bizlogic
             {
                 BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
                 List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
-                //这里有一条逻辑没有看懂 TODO...等确认了再翻译
-                ///...SpUtil.putString(mWebView.getContext(), SPCode.barcodeStyle, barcodeScaleConfigEntity.getBarcodeStyle());
+                CacheManager.InsertBarcodeScale(barcodeScaleConfigEntity.barcodeStyle);
                 DbManager dbManager = DBUtils.Instance.DbManager;
                 if (scaleList != null && scaleList.Count > 0)
                 {
@@ -2445,14 +2454,15 @@ namespace ZlPos.Bizlogic
                 using (var db = SugarDao.GetInstance())
                 {
                     barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
+                    barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
                 }
             }
             catch (Exception e)
             {
                 logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
             }
-            //TOFIX
-            string barcodeStyle = "";//SpUtil.getString(mWebView.getContext(), SPCode.barcodeStyle, "");  ---???
+
+            string barcodeStyle = CacheManager.GetBarcodeScale();
             barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
             if (barcodeScaleEntityList == null)
             {
@@ -2462,8 +2472,346 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        /// <summary>
+        /// 同步条码称方法
+        /// </summary>
+        /// <param name="ss"> @ ip:同步到秤的ip地址 @ pluMessageEntityList: @ clear:是否全量同步          1:全量</param>
+        public void SyncCommoditytoBarcodeScale(string ss)
+        {
+            logger.Info("syncCommoditytoBarcodeScale(" + ss + ")");
+            SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
+            IPAddress ip = IPAddress.Parse(syncScaleVM.ip);
+            List<PluMessageEntity> pluMessageEntities = syncScaleVM.pluMessageEntityList;
+            int clear = syncScaleVM.clean;
 
 
+            Action<string, int> sendMessage = (syncScaleStatus, point) =>
+             {
+                 SyncScaleEntity syncScaleEntity = new SyncScaleEntity();
+                 syncScaleEntity.status = syncScaleStatus;
+                 syncScaleEntity.point = point;
+                 Task.Factory.StartNew(() =>
+                 {
+                     browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
+                 });
+             };
+
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback((state) =>
+            {
+                Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                bool isConnect = false;
+                try
+                {
+                    sendMessage(SyncScaleStatus.SOCKET_OPENING, 0);
+
+                    socket.Connect(new IPEndPoint(ip, 4001));
+                    logger.Info("尝试打开socket...");
+                    if (socket.Connected)
+                    {
+                        logger.Info("socket is connect...");
+                        sendMessage(SyncScaleStatus.SOCKET_OPENED, 0);
+                        isConnect = true;
+                        logger.Info("socket打开成功...");
+                    }
+                    else
+                    {
+                        int i = 0;
+                        while (!isConnect && i < 10)
+                        {
+                            i++;
+                            socket.Connect(new IPEndPoint(ip, 4001));
+                            Thread.Sleep(100);
+                            if (socket.Connected)
+                            {
+                                logger.Info("sockt is connected");
+                                isConnect = true;
+                                sendMessage(SyncScaleStatus.SOCKET_OPENED, 0);
+                                logger.Info("socket 打开成功");
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Info("SyncCommoditytoBarcodeScale异常>>" + e.Message + e.StackTrace);
+                }
+                if (isConnect)
+                {
+                    if (clear == 1)
+                    {
+                        sendMessage(SyncScaleStatus.PLU_CLEANING, 0);
+                        sendMessage_btye(StringConvert.convertStringToBytesForTMC("!0IA"), socket);
+                        sendMessage_btye(StringConvert.convertStringToBytesForTMC("!0HA"), socket);
+                        logger.Info("正在清除历史数据");
+                        Thread.Sleep(20000);
+                    }
+                    sendMessage(SyncScaleStatus.PLU_CLEANED, 0);
+                    sendMessage(SyncScaleStatus.PLU_SYNCING, 0);
+                    logger.Info("开始同步");
+                    string barcodeStyle = CacheManager.GetBarcodeScale();
+                    string style = "!0O01050301" + barcodeStyle + "000100000100010001000000000000000001";
+                    sendMessage_btye(StringConvert.convertStringToBytesForTMC(style), socket);
+                    string branchName = "!0Z01A" + StringConvert.getWordCode(_LoginUserManager.UserEntity.branchname) + "0000B";
+                    sendMessage_btye(StringConvert.convertStringToBytesForTMC(branchName), socket);
+                    for (int i = 0; i < pluMessageEntities.Count; i++)
+                    {
+                        string shopInfo = CommodityToPLU(pluMessageEntities[i]);
+                        if (!string.IsNullOrEmpty(shopInfo))
+                        {
+                            sendMessage_btye(StringConvert.convertStringToBytesForTMC(shopInfo), socket);
+                            sendMessage(SyncScaleStatus.PLU_SYNCING, i + 1);
+                        }
+                        logger.Info("正在同步第" + (i + 1) + "条商品数据");
+                        Thread.Sleep(500);
+                    }
+                    try
+                    {
+                        socket.Shutdown(SocketShutdown.Both);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Info("socket shutdown err>>" + e.Message + e.StackTrace);
+                    }
+                    sendMessage(SyncScaleStatus.PLU_SYNCED, 0);
+                    logger.Info("同步完成");
+                }
+            }), new object[] { });
+            return;
+        }
+
+        public string GetWeightCommodity()
+        {
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            List<CommodityEntity> commodityEntityList = null;
+            List<BarCodeEntity> barCodeEntityList = null;
+            List<CommodityPriceEntity> commodityPriceEntityList = null;
+            List<PluMessageEntity> pluMessageEntityList = null;
+            try
+            {
+                string shopcode = _LoginUserManager.UserEntity.shopcode;
+                string branchcode = _LoginUserManager.UserEntity.branchcode;
+                using (var db = SugarDao.GetInstance())
+                {
+                    commodityEntityList = db.Queryable<CommodityEntity>().Where(i => i.shopcode == shopcode
+                                                                            && i.commoditystatus == "0"
+                                                                            && i.del == "0"
+                                                                            && (i.pricing == "1" || i.pricing == "2")).ToList();
+                    pluMessageEntityList = db.Queryable<PluMessageEntity>().Where(i => i.shopCode == shopcode).ToList();
+                    barCodeEntityList = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == shopcode).ToList();
+                    commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == shopcode
+                                                                                && i.branchcode == branchcode).ToList();
+
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info("db err>>" + e.Message + e.StackTrace);
+            }
+
+            if (commodityEntityList != null)
+            {
+                for (int i = 0; i < commodityEntityList.Count; i++)
+                {
+                    CommodityEntity commodityEntity = commodityEntityList[i];
+                    //从plu编号表获取上次保存的信息
+                    if (pluMessageEntityList != null && pluMessageEntityList.Count > 0)
+                    {
+                        foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
+                        {
+                            if (commodityEntity.commoditycode.Equals(pluMessageEntity.commoditycode))
+                            {
+                                commodityEntity.plu = pluMessageEntity.plu;
+                                //                            commodityEntity.setValidtime(pluMessageEntity.getIndate());
+                                commodityEntity.tare = pluMessageEntity.tare;
+                                pluMessageEntityList.Remove(pluMessageEntity);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        commodityEntity.plu = "" + (i + 1);
+                    }
+                    //从条码表获取商品对应的条码
+                    if (barCodeEntityList != null)
+                    {
+                        for (int a = 0; a < barCodeEntityList.Count; a++)
+                        {
+                            if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
+                            {
+                                String barcodes = barCodeEntityList[a].barcodes;
+                                if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
+                                {
+                                    barcodes = barcodes.Split(',')[0];
+                                }
+                                if (string.IsNullOrEmpty(barcodes))
+                                {
+                                    barcodes = "";
+                                }
+                                commodityEntity.barcode = barcodes;//用商品条码
+                                barCodeEntityList.RemoveAt(a);
+                                break;
+                            }
+                        }
+                    }
+                    if (commodityEntity.barcode == null)
+                    {
+                        commodityEntity.barcode = "";
+                    }
+                    //从调价表获取商品单价
+                    if (commodityPriceEntityList != null)
+                    {
+                        for (int a = 0; a < commodityPriceEntityList.Count; a++)
+                        {
+                            if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
+                            {
+                                commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
+                                commodityPriceEntityList.RemoveAt(a);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return JsonConvert.SerializeObject(commodityEntityList);
+        }
+
+        public void SaveWeightCommodity(string str)
+        {
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            List<PluMessageEntity> pluMessageEntityList = JsonConvert.DeserializeObject<List<PluMessageEntity>>(str);
+            try
+            {
+                if (pluMessageEntityList != null)
+                {
+                    foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
+                    {
+                        pluMessageEntity.shopCode = _LoginUserManager.UserEntity.shopcode;
+                        pluMessageEntity.uid = pluMessageEntity.shopCode + "_" + pluMessageEntity.commoditycode;
+                        dbManager.SaveOrUpdate(pluMessageEntity);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info("saveWeightCommodity err>>" + e.Message + e.StackTrace);
+            }
+        }
+
+
+        /// <summary>
+        /// 将单条商品信息转换成条码秤PLU码
+        /// </summary>
+        /// <param name="pluMessageEntity"></param>
+        /// <returns></returns>
+        private string CommodityToPLU(PluMessageEntity pluMessageEntity)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder("!0W");
+                if (Int32.Parse(pluMessageEntity.plu) > 4000 || Int32.Parse(pluMessageEntity.plu) < 0)
+                {
+                    return "";
+                }
+                sb.Append(formatCode(pluMessageEntity.plu, 4));//PLU编码
+                sb.Append("A");
+                sb.Append(formatCode(pluMessageEntity.barcode, 6));//条码
+                sb.Append("B");
+                sb.Append(formatCode((int)(float.Parse(pluMessageEntity.price) * 100) + "", 5));//单价
+                sb.Append("C");
+                sb.Append(pluMessageEntity.type);//0-称重状态 1-计件
+                sb.Append("D");
+                sb.Append(formatCode(pluMessageEntity.indate, 3));//有效期
+                sb.Append("E");
+                sb.Append("22");//店名
+                sb.Append("F");
+                if (Int32.Parse(pluMessageEntity.tare) > 15000 || Int32.Parse(pluMessageEntity.tare) < 0)
+                {
+                    return "";
+                }
+                sb.Append(formatCode(pluMessageEntity.tare, 5));//皮重
+                sb.Append("G");
+                sb.Append("0");//特殊信息
+                sb.Append("H");
+                sb.Append(wordCheck(pluMessageEntity.commodityName));//商品名称
+                sb.Append("00I");
+                sb.Append("00000000");//配料
+                sb.Append("00J");
+                return sb.ToString();
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// 校验商品长度，并转换成区位码
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private string wordCheck(string commodityName)
+        {
+            if (commodityName.Length > 9)
+            {
+                commodityName = commodityName.Substring(0, 9);
+            }
+            return StringConvert.getWordCode(commodityName);
+        }
+
+
+        /// <summary>
+        /// 补零操作
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        private string formatCode(string code, int count)
+        {
+            if (code == null)
+            {//为空处理
+                code = "";
+            }
+            StringBuilder result = new StringBuilder(code);
+            if (count > code.Length)
+            {
+                for (int i = 0; i < count - code.Length; i++)
+                {
+                    result.Insert(0, "0");
+                }
+            }
+            else
+            {
+                result.Remove(0, code.Length - count);
+            }
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// 定义下发数据的方法
+        /// </summary>
+        /// <param name="buf"></param>
+        /// <param name="socket"></param>
+        private void sendMessage_btye(byte[] buf, Socket socket)
+        {
+            try
+            {
+                logger.Info("send:" + Encoding.Default.GetString(buf));
+                socket.Send(buf);
+
+                //读取服务器返回的消息
+                byte[] revBuff = new byte[1024];
+                socket.Receive(revBuff);
+                string mess = Encoding.Default.GetString(revBuff);
+                logger.Info(mess);
+
+            }
+            catch (Exception e)
+            {
+                logger.Info("sendMessage_btye error:" + e.Message + e.StackTrace);
+            }
+        }
 
 
         /// <summary>

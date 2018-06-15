@@ -228,6 +228,7 @@
     <Compile Include="Utils\serialPort.cs" />
     <Compile Include="Utils\SerialPortPrinterSetter.cs" />
     <Compile Include="Utils\SPCode.cs" />
+    <Compile Include="Utils\StringConvert.cs" />
     <Compile Include="Utils\StringUtils.cs" />
     <Compile Include="Utils\USBGPrinterSetter.cs" />
     <Compile Include="Utils\USBPrinterSetter.cs" />

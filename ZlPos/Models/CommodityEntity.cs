@@ -105,5 +105,20 @@ namespace ZlPos.Models
         //add 2018年6月7日
         [SugarColumn(IsNullable = true)]
         public string validtime { get; set; }
+
+
+
+        // add: 2018/6/12  条码秤需要字段,不入库
+        [SugarColumn(IsIgnore = true)]
+        public string plu { get; set; }
+
+        private string tare1 = "0";
+        [SugarColumn(IsIgnore = true)]
+        public string tare { get => tare1; set => tare1 = value; }//皮重
+
+
+        [SugarColumn(IsIgnore = true)]
+        public string barcode { get; set; }
+        
     }
 }

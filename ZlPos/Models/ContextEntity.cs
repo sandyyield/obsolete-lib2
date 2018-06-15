@@ -30,5 +30,9 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public string gprint { get; set; }
+
+        //add 2018年6月14日
+        [SugarColumn(IsNullable = true)]
+        public string barcodeStyle { get; set; }
     }
 }

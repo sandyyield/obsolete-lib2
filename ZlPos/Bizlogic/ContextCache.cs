@@ -191,5 +191,41 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region BarcodeStyle cache
+        public static string getBarcodeStyle()
+        {
+            using (var db = SugarDao.GetInstance())
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.barcodeStyle;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setBarcodeStyle(string v)
+        {
+            using (var db = SugarDao.GetInstance())
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.barcodeStyle = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion 
+
     }
 }

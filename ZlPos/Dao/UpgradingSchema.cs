@@ -23,9 +23,6 @@ namespace ZlPos.Dao
                     //获取旧表数据
                     var oldDt = db.Ado.GetDataTable("select * from CommodityEntity");
 
-                    var dt = from r in oldDt.AsEnumerable()
-                             select r;
-
                     //新表继承老数据
                     DataTable newDt = oldDt;
                     //添加新字段
@@ -47,6 +44,39 @@ namespace ZlPos.Dao
             catch(Exception e)
             {
                 logger.Info("UpgradingVersion2 exception>>" + e.Message + e.StackTrace);
+            }
+        }
+
+        public static void UpgradingVersion3()
+        {
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    //获取旧表数据
+                    var oldDt = db.Ado.GetDataTable("select * from ContextEntity");
+
+                    //新表继承老数据
+                    DataTable newDt = oldDt;
+                    //添加新字段
+                    newDt.Columns.Add("barcodeStyle", Type.GetType("System.String"));
+
+                    //老数据备份
+                    db.DbMaintenance.BackupTable("ContextEntity", "ContextEntity" + DateTime.Now);
+                    //删除老表
+                    db.DbMaintenance.DropTable("ContextEntity");
+
+                    //创建新表
+                    db.CodeFirst.InitTables(Type.GetType("ZlPos.Models.ContextEntity"));
+                    var ls = ConvertUtils.ToList<CommodityEntity>(newDt).ToArray();
+                    db.Insertable(ls).Where(true, true).ExecuteCommand();
+
+
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info("UpgradingVersion3 exception>>" + e.Message + e.StackTrace);
             }
         }
     }
