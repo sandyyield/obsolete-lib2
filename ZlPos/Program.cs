@@ -36,7 +36,7 @@ namespace ZlPos
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             logger = LogManager.GetLogger("Logger");
 
-            #region "数据库相关"
+            #region "数据库兼容"
             //初始化
             DbHelper.Instance.Init();
 

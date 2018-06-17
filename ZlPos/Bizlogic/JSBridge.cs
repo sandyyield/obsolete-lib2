@@ -142,7 +142,7 @@ namespace ZlPos.Bizlogic
 
         public string GetDeviceModel()
         {
-            return "";
+            return "WINDOWS";
         }
 
         #region GetVersionInfo
@@ -2576,6 +2576,10 @@ namespace ZlPos.Bizlogic
                     sendMessage(SyncScaleStatus.PLU_SYNCED, 0);
                     logger.Info("同步完成");
                 }
+                else
+                {
+                    sendMessage(SyncScaleStatus.SOCKET_NO_OPEN, 0);
+                }
             }), new object[] { });
             return;
         }
@@ -2718,7 +2722,7 @@ namespace ZlPos.Bizlogic
                 sb.Append("A");
                 sb.Append(formatCode(pluMessageEntity.barcode, 6));//条码
                 sb.Append("B");
-                sb.Append(formatCode((int)(float.Parse(pluMessageEntity.price) * 100) + "", 5));//单价
+                sb.Append(formatCode(Convert.ToInt32(float.Parse(pluMessageEntity.price) * 100) + "", 5));//单价
                 sb.Append("C");
                 sb.Append(pluMessageEntity.type);//0-称重状态 1-计件
                 sb.Append("D");
