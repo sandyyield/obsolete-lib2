@@ -1307,7 +1307,8 @@ namespace ZlPos.Bizlogic
                     using (var db = SugarDao.GetInstance())
                     {
                         BarCodeEntity barCodeEntity = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                            && i.barcodes.Contains(barcode)).First();
+                                                                                            //&& i.barcodes.Contains(barcode)).First();
+                                                                                            && i.barcodes == barcode).First();//模糊查询改为精确查询
                         if (barCodeEntity != null)
                         {
                             commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
