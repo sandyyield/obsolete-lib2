@@ -30,7 +30,7 @@ namespace ZlPos.Utils
                         {
                             s += "030" + code;
                         }
-                        else
+                        else if(code < 100)
                         {
                             s += "03" + code;
                         }

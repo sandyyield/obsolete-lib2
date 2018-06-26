@@ -124,5 +124,9 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public string memberprice { get; set; }
+
+        //add 2018年6月26日
+        [SugarColumn(IsNullable = true)]
+        public string commission { get; set; }
     }
 }

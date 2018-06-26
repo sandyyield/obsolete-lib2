@@ -87,6 +87,8 @@ namespace ZlPos.Utils
             {
                 if (Enable)
                 {
+                    m_SerialPort.PortName = port;
+                    m_SerialPort.BaudRate = rate;
                     m_SerialPort.Open();
                     return true;
                 }
