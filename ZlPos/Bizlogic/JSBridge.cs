@@ -469,6 +469,16 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region Logout
+        /// <summary>
+        /// 登出清缓存接口
+        /// </summary>
+        public void Logout()
+        {
+            CommodityCacheManager.Instance.cleanCache();
+        }
+        #endregion
+
         #region SaveOrUpdateCommodityInfo
         /// <summary>
         /// 保存或更新商品信息
