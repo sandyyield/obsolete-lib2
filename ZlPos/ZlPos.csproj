@@ -132,6 +132,7 @@
     <Compile Include="Enums\PrinterType.cs" />
     <Compile Include="Manager\CommodityCacheManager.cs" />
     <Compile Include="Manager\CustomerShowManager.cs" />
+    <Compile Include="Models\BarCodeEntity2.cs" />
     <Compile Include="Models\BarcodeScaleConfigEntity.cs" />
     <Compile Include="Models\BarcodeScaleEntity.cs" />
     <Compile Include="Models\PluMessageEntity.cs" />

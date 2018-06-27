@@ -1,0 +1,29 @@
+﻿using SqlSugar;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+/// <summary>
+/// 条码表，用来对应条码和商品的关系，一个商品可能对应多个条码
+/// </summary>
+namespace ZlPos.Models
+{
+    public class BarCodeEntity2
+    {
+        [SugarColumn(IsNullable = false, IsPrimaryKey = true)]
+        public string id { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string shopcode { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string barcode { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string commoditycode { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string del { get; set; }
+    }
+}

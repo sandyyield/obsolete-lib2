@@ -498,7 +498,7 @@ namespace ZlPos.Bizlogic
                         List<CashierEntity> users = commodityInfoVM.users;
                         List<SupplierEntity> suppliers = commodityInfoVM.suppliers;
                         // add: 2018/2/27
-                        List<BarCodeEntity> barCodes = commodityInfoVM.barcodes;
+                        List<BarCodeEntity2> barCodes = commodityInfoVM.barcodes;
                         List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
 
                         #region 已采用bulksave 方式提高存库效率
@@ -546,13 +546,14 @@ namespace ZlPos.Bizlogic
                         //保存条码表信息
                         if (barCodes != null)
                         {
-                            foreach (BarCodeEntity barCodeEntity in barCodes)
-                            {
-                                //由shopcode+commoditycode做联合主键,防止跨商户商品数据的commoditycode相同
-                                barCodeEntity.uid = shopcode + "_" + barCodeEntity.commoditycode;
-                                barCodeEntity.shopcode = shopcode;
-                                dbManager.SaveOrUpdate(barCodeEntity);
-                            }
+                            //foreach (BarCodeEntity2 barCodeEntity in barCodes)
+                            //{
+                            //    //由shopcode+commoditycode做联合主键,防止跨商户商品数据的commoditycode相同
+                            //    //barCodeEntity.uid = shopcode + "_" + barCodeEntity.commoditycode;
+                            //    //barCodeEntity.shopcode = shopcode;
+                            //    dbManager.SaveOrUpdate(barCodeEntity);
+                            //}
+                            dbManager.BulkSaveOrUpdate(barCodes);
                         }
                         //保存调价表信息
                         if (commodityPriceEntityList != null)
@@ -619,7 +620,7 @@ namespace ZlPos.Bizlogic
                     List<CashierEntity> cashierEntities = null;
                     List<SupplierEntity> supplierEntities = null;
                     List<CommodityInfoVM> commodityInfoVMList = null;
-                    List<BarCodeEntity> barCodes = null;
+                    List<BarCodeEntity2> barCodes = null;
                     List<CommodityPriceEntity> commodityPriceList = null;
 
                     using (var db = SugarDao.GetInstance())
@@ -636,7 +637,8 @@ namespace ZlPos.Bizlogic
                                                                             && it.del == "0").OrderBy(it => it.categorycode).ToList();
 
                         // add: 2018/2/27
-                        barCodes = db.Queryable<BarCodeEntity>().Where(it => it.shopcode == userEntity.shopcode).ToList();
+                        barCodes = db.Queryable<BarCodeEntity2>().Where(it => it.shopcode == userEntity.shopcode
+                                                                        && it.del == "0").ToList();
 
                         //固定精确到shopcode + branchcode
                         assistantsEntities = db.Queryable<AssistantsEntity>().Where(it => it.shopcode == userEntity.shopcode
@@ -699,7 +701,7 @@ namespace ZlPos.Bizlogic
                         // add: 2018/2/27
                         if (barCodes == null)
                         {
-                            barCodes = new List<BarCodeEntity>();
+                            barCodes = new List<BarCodeEntity2>();
                         }
                         if (commodityPriceList == null)
                         {
@@ -1306,9 +1308,10 @@ namespace ZlPos.Bizlogic
                 {
                     using (var db = SugarDao.GetInstance())
                     {
-                        BarCodeEntity barCodeEntity = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == userEntity.shopcode
+                        BarCodeEntity2 barCodeEntity = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
                                                                                             //&& i.barcodes.Contains(barcode)).First();
-                                                                                            && i.barcodes == barcode).First();//模糊查询改为精确查询
+                                                                                            && i.barcode == barcode
+                                                                                            && i.barcode == "0").First();//模糊查询改为精确查询
                         if (barCodeEntity != null)
                         {
                             commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
@@ -2589,7 +2592,7 @@ namespace ZlPos.Bizlogic
         {
             DbManager dbManager = DBUtils.Instance.DbManager;
             List<CommodityEntity> commodityEntityList = null;
-            List<BarCodeEntity> barCodeEntityList = null;
+            List<BarCodeEntity2> barCodeEntityList = null;
             List<CommodityPriceEntity> commodityPriceEntityList = null;
             List<PluMessageEntity> pluMessageEntityList = null;
             try
@@ -2603,7 +2606,8 @@ namespace ZlPos.Bizlogic
                                                                             && i.del == "0"
                                                                             && (i.pricing == "1" || i.pricing == "2")).ToList();
                     pluMessageEntityList = db.Queryable<PluMessageEntity>().Where(i => i.shopCode == shopcode).ToList();
-                    barCodeEntityList = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == shopcode).ToList();
+                    barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == shopcode
+                                                                            && i.del == "0").ToList();
                     commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == shopcode
                                                                                 && i.branchcode == branchcode).ToList();
 
@@ -2645,7 +2649,7 @@ namespace ZlPos.Bizlogic
                         {
                             if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
                             {
-                                String barcodes = barCodeEntityList[a].barcodes;
+                                string barcodes = barCodeEntityList[a].barcode;
                                 if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
                                 {
                                     barcodes = barcodes.Split(',')[0];

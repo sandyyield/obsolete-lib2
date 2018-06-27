@@ -19,7 +19,7 @@ namespace ZlPos.Manager
         private Dictionary<String, List<CommodityEntity>> commodityMap;//存放各个分类以及分类对应的商品全量
 
         // add: 2018/2/27
-        private List<BarCodeEntity> barCodes;
+        private List<BarCodeEntity2> barCodes;
         private List<CommodityPriceEntity> commodityPriceEntityList;
 
         private CommodityCacheManager()
@@ -54,7 +54,7 @@ namespace ZlPos.Manager
         public List<CashierEntity> Users { get => users; set => users = value; }
         public List<SupplierEntity> Suppliers { get => suppliers; set => suppliers = value; }
         public Dictionary<string, List<CommodityEntity>> CommodityMap { get => commodityMap; set => commodityMap = value; }
-        public List<BarCodeEntity> BarCodes { get => barCodes; set => barCodes = value; }
+        public List<BarCodeEntity2> BarCodes { get => barCodes; set => barCodes = value; }
         public List<CommodityPriceEntity> CommodityPriceEntityList { get => commodityPriceEntityList; set => commodityPriceEntityList = value; }
 
         /// <summary>

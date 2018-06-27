@@ -84,20 +84,20 @@ namespace ZlPos.Dao
                     case 2:
                         //UpgradingSchema.UpgradingVersion2();
                         UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "validtime" });
-                        //生成数据库配置文件
-                        CreateConfig();
                         break;
                     case 3:
                         //UpgradingSchema.UpgradingVersion3();
                         UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "barcodeStyle" });
-                        CreateConfig();
                         break;
                     case 4:
                         UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "commission" });
-                        CreateConfig();
                         break;
-
+                    case 5:
+                        UpgradingSchema.UpgradingBarCodeEntity2();
+                        break;
                 }
+                //生成数据库配置文件
+                CreateConfig();
             }
         }
 

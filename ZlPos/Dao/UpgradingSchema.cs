@@ -15,6 +15,11 @@ namespace ZlPos.Dao
         private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
 
+        /// <summary>
+        /// 统一数据表添加字段接口
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="newColumns"></param>
         public static void UpgradingVersion<T>(string[] newColumns)
             where T : class, new()
         {
@@ -52,6 +57,34 @@ namespace ZlPos.Dao
                 logger.Info("UpgradingVersion exception>>>table:" + tableName + ">>" + e.Message + e.StackTrace);
             }
         }
+
+        /// <summary>
+        /// 采用新的barcode表
+        /// </summary>
+        internal static void UpgradingBarCodeEntity2()
+        {
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    //判断表是否存在
+                    if (db.DbMaintenance.IsAnyTable("BarCodeEntity"))
+                    {
+                        //删除老表
+                        db.DbMaintenance.DropTable("BarCodeEntity");
+                        //再删除lastrequesttime
+                        db.DbMaintenance.DropTable("CommodityInfoVM");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info("UpgradingBarCodeEntity2 exception>>" + e.Message + e.StackTrace);
+            }
+        }
+
+
+
 
         public static void UpgradingVersion2()
         {
@@ -118,6 +151,8 @@ namespace ZlPos.Dao
                 logger.Info("UpgradingVersion3 exception>>" + e.Message + e.StackTrace);
             }
         }
+
+        
 
         internal static void UpgradingVersion4()
         {

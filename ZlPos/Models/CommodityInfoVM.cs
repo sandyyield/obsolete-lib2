@@ -41,7 +41,7 @@ namespace ZlPos.Models
 
         // add: 2018/2/27
         [SugarColumn(IsNullable = true, IsIgnore = true)]
-        public List<BarCodeEntity> barcodes { get; set; }
+        public List<BarCodeEntity2> barcodes { get; set; }
         [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<CommodityPriceEntity> commoditypricelist { get; set; }
 
