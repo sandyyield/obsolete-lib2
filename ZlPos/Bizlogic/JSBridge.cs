@@ -1311,7 +1311,7 @@ namespace ZlPos.Bizlogic
                         BarCodeEntity2 barCodeEntity = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
                                                                                             //&& i.barcodes.Contains(barcode)).First();
                                                                                             && i.barcode == barcode
-                                                                                            && i.barcode == "0").First();//模糊查询改为精确查询
+                                                                                            && i.del == "0").First();//模糊查询改为精确查询
                         if (barCodeEntity != null)
                         {
                             commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
