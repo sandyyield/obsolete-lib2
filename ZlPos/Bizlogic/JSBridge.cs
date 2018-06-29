@@ -2598,124 +2598,136 @@ namespace ZlPos.Bizlogic
             return;
         }
 
-        public string GetWeightCommodity()
+        public void GetWeightCommodity()
         {
-            DbManager dbManager = DBUtils.Instance.DbManager;
-            List<CommodityEntity> commodityEntityList = null;
-            List<BarCodeEntity2> barCodeEntityList = null;
-            List<CommodityPriceEntity> commodityPriceEntityList = null;
-            List<PluMessageEntity> pluMessageEntityList = null;
-            try
+            Task.Factory.StartNew(() =>
             {
-                string shopcode = _LoginUserManager.UserEntity.shopcode;
-                string branchcode = _LoginUserManager.UserEntity.branchcode;
-                using (var db = SugarDao.GetInstance())
+                //ResponseEntity responseEntity = new ResponseEntity();
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                List<CommodityEntity> commodityEntityList = null;
+                List<BarCodeEntity2> barCodeEntityList = null;
+                List<CommodityPriceEntity> commodityPriceEntityList = null;
+                List<PluMessageEntity> pluMessageEntityList = null;
+                try
                 {
-                    commodityEntityList = db.Queryable<CommodityEntity>().Where(i => i.shopcode == shopcode
-                                                                            && i.commoditystatus == "0"
-                                                                            && i.del == "0"
-                                                                            && (i.pricing == "1" || i.pricing == "2")).ToList();
-                    pluMessageEntityList = db.Queryable<PluMessageEntity>().Where(i => i.shopCode == shopcode).ToList();
-                    barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == shopcode
-                                                                            && i.del == "0").ToList();
-                    commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == shopcode
-                                                                                && i.branchcode == branchcode).ToList();
+                    string shopcode = _LoginUserManager.UserEntity.shopcode;
+                    string branchcode = _LoginUserManager.UserEntity.branchcode;
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        commodityEntityList = db.Queryable<CommodityEntity>().Where(i => i.shopcode == shopcode
+                                                                                && i.commoditystatus == "0"
+                                                                                && i.del == "0"
+                                                                                && (i.pricing == "1" || i.pricing == "2")).ToList();
+                        pluMessageEntityList = db.Queryable<PluMessageEntity>().Where(i => i.shopCode == shopcode).ToList();
+                        barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == shopcode
+                                                                                && i.del == "0").ToList();
+                        commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == shopcode
+                                                                                    && i.branchcode == branchcode).ToList();
 
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Info("db err>>" + e.Message + e.StackTrace);
-            }
-
-            if (commodityEntityList != null)
-            {
-                for (int i = 0; i < commodityEntityList.Count; i++)
-                {
-                    CommodityEntity commodityEntity = commodityEntityList[i];
-                    //从plu编号表获取上次保存的信息
-                    if (pluMessageEntityList != null && pluMessageEntityList.Count > 0)
-                    {
-                        foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
-                        {
-                            if (commodityEntity.commoditycode.Equals(pluMessageEntity.commoditycode))
-                            {
-                                commodityEntity.plu = pluMessageEntity.plu;
-                                //                            commodityEntity.setValidtime(pluMessageEntity.getIndate());
-                                commodityEntity.tare = pluMessageEntity.tare;
-                                pluMessageEntityList.Remove(pluMessageEntity);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        commodityEntity.plu = "" + (i + 1);
-                    }
-                    //从条码表获取商品对应的条码
-                    if (barCodeEntityList != null)
-                    {
-                        for (int a = 0; a < barCodeEntityList.Count; a++)
-                        {
-                            if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
-                            {
-                                string barcodes = barCodeEntityList[a].barcode;
-                                if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
-                                {
-                                    barcodes = barcodes.Split(',')[0];
-                                }
-                                if (string.IsNullOrEmpty(barcodes))
-                                {
-                                    barcodes = "";
-                                }
-                                commodityEntity.barcode = barcodes;//用商品条码
-                                barCodeEntityList.RemoveAt(a);
-                                break;
-                            }
-                        }
-                    }
-                    if (commodityEntity.barcode == null)
-                    {
-                        commodityEntity.barcode = "";
-                    }
-                    //从调价表获取商品单价
-                    if (commodityPriceEntityList != null)
-                    {
-                        for (int a = 0; a < commodityPriceEntityList.Count; a++)
-                        {
-                            if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
-                            {
-                                commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
-                                commodityPriceEntityList.RemoveAt(a);
-                                break;
-                            }
-                        }
                     }
                 }
-            }
-            return JsonConvert.SerializeObject(commodityEntityList);
+                catch (Exception e)
+                {
+                    logger.Info("db err>>" + e.Message + e.StackTrace);
+                }
+
+                if (commodityEntityList != null)
+                {
+                    for (int i = 0; i < commodityEntityList.Count; i++)
+                    {
+                        CommodityEntity commodityEntity = commodityEntityList[i];
+                        //从plu编号表获取上次保存的信息
+                        if (pluMessageEntityList != null && pluMessageEntityList.Count > 0)
+                        {
+                            foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
+                            {
+                                if (commodityEntity.commoditycode.Equals(pluMessageEntity.commoditycode))
+                                {
+                                    commodityEntity.plu = pluMessageEntity.plu;
+                                    //                            commodityEntity.setValidtime(pluMessageEntity.getIndate());
+                                    commodityEntity.tare = pluMessageEntity.tare;
+                                    pluMessageEntityList.Remove(pluMessageEntity);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            commodityEntity.plu = "" + (i + 1);
+                        }
+                        //从条码表获取商品对应的条码
+                        if (barCodeEntityList != null)
+                        {
+                            for (int a = 0; a < barCodeEntityList.Count; a++)
+                            {
+                                if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
+                                {
+                                    string barcodes = barCodeEntityList[a].barcode;
+                                    if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
+                                    {
+                                        barcodes = barcodes.Split(',')[0];
+                                    }
+                                    if (string.IsNullOrEmpty(barcodes))
+                                    {
+                                        barcodes = "";
+                                    }
+                                    commodityEntity.barcode = barcodes;//用商品条码
+                                                                       //barCodeEntityList.RemoveAt(a);
+                                    break;
+                                }
+                            }
+                        }
+                        if (commodityEntity.barcode == null)
+                        {
+                            commodityEntity.barcode = "";
+                        }
+                        //从调价表获取商品单价
+                        if (commodityPriceEntityList != null)
+                        {
+                            for (int a = 0; a < commodityPriceEntityList.Count; a++)
+                            {
+                                if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
+                                {
+                                    commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
+                                    //commodityPriceEntityList.RemoveAt(a);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                //responseEntity.data = commodityEntityList;
+                //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
+                browser.ExecuteScriptAsync("getWeightCommodityCallBack('"+ JsonConvert.SerializeObject(commodityEntityList) + "')");
+            });
+            return;
+            //return JsonConvert.SerializeObject(commodityEntityList);
         }
 
         public void SaveWeightCommodity(string str)
         {
-            DbManager dbManager = DBUtils.Instance.DbManager;
-            List<PluMessageEntity> pluMessageEntityList = JsonConvert.DeserializeObject<List<PluMessageEntity>>(str);
-            try
+            Task.Factory.StartNew(() =>
             {
-                if (pluMessageEntityList != null)
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                List<PluMessageEntity> pluMessageEntityList = JsonConvert.DeserializeObject<List<PluMessageEntity>>(str);
+                try
                 {
-                    foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
+                    if (pluMessageEntityList != null)
                     {
-                        pluMessageEntity.shopCode = _LoginUserManager.UserEntity.shopcode;
-                        pluMessageEntity.uid = pluMessageEntity.shopCode + "_" + pluMessageEntity.commoditycode;
-                        dbManager.SaveOrUpdate(pluMessageEntity);
+                        foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
+                        {
+                            pluMessageEntity.shopCode = _LoginUserManager.UserEntity.shopcode;
+                            pluMessageEntity.uid = pluMessageEntity.shopCode + "_" + pluMessageEntity.commoditycode;
+                            dbManager.SaveOrUpdate(pluMessageEntity);
+                        }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Info("saveWeightCommodity err>>" + e.Message + e.StackTrace);
-            }
+                catch (Exception e)
+                {
+                    logger.Info("saveWeightCommodity err>>" + e.Message + e.StackTrace);
+                }
+                browser.ExecuteScriptAsync("saveWeightCommodityCallBack()");
+            });
         }
 
 
