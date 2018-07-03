@@ -11,7 +11,9 @@ namespace ZlPos.Dao
         void SaveOrUpdate<T>(T entity) where T : class, new();
         void SaveAndInsert<T>(T entity) where T : class, new();
         void BulkSaveOrUpdate<T>(List<T> list) where T : class, new();
+        void BulkSaveOrUpdate<T>(T[] array) where T : class, new();
         void Delete<T>(T payDetailEntity) where T : class, new();
-        void SaveOrUpdateCommodityEntities(CommodityEntity[] commodityEntity);
+        //void SaveOrUpdateCommodityEntities(CommodityEntity[] commodityEntity);
+        //void BulkSaveOrUpdateBarCodes(BarCodeEntity2[] barCodeEntity2);
     }
 }

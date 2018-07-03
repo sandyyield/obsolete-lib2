@@ -485,122 +485,110 @@ namespace ZlPos.Bizlogic
         /// </summary>
         public void SaveOrUpdateCommodityInfo(string json)
         {
-            CommodityCacheManager.Instance.cleanCache();
-            ResponseEntity responseEntity = new ResponseEntity();
-            if (_LoginUserManager.Login)
-            {
-                string shopcode = _LoginUserManager.UserEntity.shopcode;
-                string branchcode = _LoginUserManager.UserEntity.branchcode;
-                try
-                {
-                    DbManager dbManager = DBUtils.Instance.DbManager;
-                    CommodityInfoVM commodityInfoVM = JsonConvert.DeserializeObject<CommodityInfoVM>(json);
-                    if (commodityInfoVM != null)
-                    {
-                        commodityInfoVM.shopcode = shopcode;
-                        commodityInfoVM.branchcode = branchcode;
-
-                        List<CategoryEntity> categoryEntities = commodityInfoVM.categorys;
-                        List<CommodityEntity> commoditys = commodityInfoVM.commoditys;
-                        List<MemberEntity> memberEntities = commodityInfoVM.memberlevels;
-                        List<PayTypeEntity> paytypes = commodityInfoVM.paytypes;
-                        List<AssistantsEntity> assistants = commodityInfoVM.assistants;
-                        List<CashierEntity> users = commodityInfoVM.users;
-                        List<SupplierEntity> suppliers = commodityInfoVM.suppliers;
-                        // add: 2018/2/27
-                        List<BarCodeEntity2> barCodes = commodityInfoVM.barcodes;
-                        List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
-
-                        #region 已采用bulksave 方式提高存库效率
-                        //保存商品分类信息
-                        if (categoryEntities != null)
-                        {
-                            dbManager.BulkSaveOrUpdate(categoryEntities);
-                        }
-                        //保存商品信息
-                        if (commoditys != null)
-                        {
-                            //这里是数据的大头
-                            //dbManager.BulkSaveOrUpdate(commoditys);
-
-                            //后台数据主键设置不统一  还要兼容android数据库不能自定义字段  只能写死的方式更新提升速度
-                            dbManager.SaveOrUpdateCommodityEntities(commoditys.ToArray());
-
-                        }
-                        //保存会员等级信息
-                        if (memberEntities != null)
-                        {
-                            dbManager.BulkSaveOrUpdate(memberEntities);
-                        }
-                        //保存付款方式信息
-                        if (paytypes != null)
-                        {
-                            dbManager.BulkSaveOrUpdate(paytypes);
-                        }
-                        //保存收银员信息
-                        if (assistants != null)
-                        {
-                            dbManager.BulkSaveOrUpdate(assistants);
-                        }
-                        //保存收银员信息
-                        if (users != null)
-                        {
-                            dbManager.BulkSaveOrUpdate(users);
-                        }
-                        //保存供应商信息
-                        if (suppliers != null)
-                        {
-                            dbManager.BulkSaveOrUpdate(suppliers);
-                        }
-                        // add: 2018/2/27
-                        //保存条码表信息
-                        if (barCodes != null)
-                        {
-                            //foreach (BarCodeEntity2 barCodeEntity in barCodes)
-                            //{
-                            //    //由shopcode+commoditycode做联合主键,防止跨商户商品数据的commoditycode相同
-                            //    //barCodeEntity.uid = shopcode + "_" + barCodeEntity.commoditycode;
-                            //    //barCodeEntity.shopcode = shopcode;
-                            //    dbManager.SaveOrUpdate(barCodeEntity);
-                            //}
-                            dbManager.BulkSaveOrUpdate(barCodes);
-                        }
-                        //保存调价表信息
-                        if (commodityPriceEntityList != null)
-                        {
-                            dbManager.BulkSaveOrUpdate(commodityPriceEntityList);
-                        }
-                        #endregion
-
-                        dbManager.SaveOrUpdate(commodityInfoVM);
-                        logger.Info("保存和更新商品信息接口：信息保存成功");
-                        responseEntity.code = ResponseCode.SUCCESS;
-
-                        //callback
-                        //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOrUpdateCommodityInfoCallBack", responseEntity });
-                        //减少线程开销
-                        Task.Factory.StartNew(() =>
-                        {
-                            mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
-                        });
-                        return;
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.Info("保存和更新商品信息接口：" + e.StackTrace);
-                    responseEntity.code = ResponseCode.Failed;
-                }
-            }
-            else
-            {
-                logger.Info("保存和更新商品信息接口：用户未登录");
-                responseEntity.code = ResponseCode.Failed;
-            }
-            logger.Info("数据保存成功");
             Task.Factory.StartNew(() =>
             {
+                CommodityCacheManager.Instance.cleanCache();
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (_LoginUserManager.Login)
+                {
+                    string shopcode = _LoginUserManager.UserEntity.shopcode;
+                    string branchcode = _LoginUserManager.UserEntity.branchcode;
+                    try
+                    {
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        CommodityInfoVM commodityInfoVM = JsonConvert.DeserializeObject<CommodityInfoVM>(json);
+                        if (commodityInfoVM != null)
+                        {
+                            commodityInfoVM.shopcode = shopcode;
+                            commodityInfoVM.branchcode = branchcode;
+
+                            List<CategoryEntity> categoryEntities = commodityInfoVM.categorys;
+                            List<CommodityEntity> commoditys = commodityInfoVM.commoditys;
+                            List<MemberEntity> memberEntities = commodityInfoVM.memberlevels;
+                            List<PayTypeEntity> paytypes = commodityInfoVM.paytypes;
+                            List<AssistantsEntity> assistants = commodityInfoVM.assistants;
+                            List<CashierEntity> users = commodityInfoVM.users;
+                            List<SupplierEntity> suppliers = commodityInfoVM.suppliers;
+                            // add: 2018/2/27
+                            List<BarCodeEntity2> barCodes = commodityInfoVM.barcodes;
+                            List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
+
+                            #region 已采用bulksave 方式提高存库效率
+                            //保存商品分类信息
+                            if (categoryEntities != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(categoryEntities);
+                            }
+                            //保存商品信息
+                            if (commoditys != null)
+                            {
+                                //这里是数据的大头
+                                dbManager.BulkSaveOrUpdate(commoditys.ToArray());
+
+                                //后台数据主键设置不统一  还要兼容android数据库不能自定义字段  只能写死的方式更新提升速度
+                                //dbManager.SaveOrUpdateCommodityEntities(commoditys.ToArray());
+
+                            }
+                            //保存会员等级信息
+                            if (memberEntities != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(memberEntities);
+                            }
+                            //保存付款方式信息
+                            if (paytypes != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(paytypes);
+                            }
+                            //保存收银员信息
+                            if (assistants != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(assistants);
+                            }
+                            //保存收银员信息
+                            if (users != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(users);
+                            }
+                            //保存供应商信息
+                            if (suppliers != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(suppliers);
+                            }
+                            // add: 2018/2/27
+                            //保存条码表信息
+                            if (barCodes != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(barCodes.ToArray());
+                            }
+                            //保存调价表信息
+                            if (commodityPriceEntityList != null)
+                            {
+                                dbManager.BulkSaveOrUpdate(commodityPriceEntityList.ToArray());
+                            }
+                            #endregion
+
+                            dbManager.SaveOrUpdate(commodityInfoVM);
+                            logger.Info("保存和更新商品信息接口：信息保存成功");
+                            responseEntity.code = ResponseCode.SUCCESS;
+
+                            mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
+                            return;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Info("保存和更新商品信息接口：" + e.StackTrace);
+                        responseEntity.code = ResponseCode.Failed;
+                    }
+                }
+                else
+                {
+                    logger.Info("保存和更新商品信息接口：用户未登录");
+                    responseEntity.code = ResponseCode.Failed;
+                }
+                logger.Info("数据保存成功");
                 mWebViewHandle.Invoke("saveOrUpdateCommodityInfoCallBack", responseEntity);
+
             });
             return; /*JsonConvert.SerializeObject(responseEntity);*/
 
@@ -1032,7 +1020,7 @@ namespace ZlPos.Bizlogic
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public string GetSelectTimeSaleBill(string start, string end)
+        public string GetSelectTimeSaleBill(string start, string end, int pageindex, int pagesize)
         {
             string result = "";
             if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
@@ -1083,7 +1071,37 @@ namespace ZlPos.Bizlogic
                                 billEntities[i].commoditys = billCommodityEntities;
                                 billEntities[i].paydetails = payDetailEntities;
                             }
-                            result = JsonConvert.SerializeObject(billEntities);
+                            //add 2018年7月3日 分页数据返回
+                            List<BillEntity> selectBillList = null;
+                            if (billEntities != null && billEntities.Count > 0 && pageindex != -1)
+                            {
+                                if (billEntities.Count > (pageindex * pagesize + pagesize))
+                                {
+                                    selectBillList = billEntities.GetRange(pageindex * pagesize, pagesize);
+                                }
+                                else
+                                {
+                                    if (billEntities.Count - pageindex * pagesize >= 0)
+                                    {
+                                        if (billEntities.Count <= (pageindex * pagesize + pageindex * pagesize + pagesize))
+                                        {
+                                            selectBillList = billEntities.GetRange(pageindex * pagesize, billEntities.Count - pageindex * pagesize);
+                                        }
+
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                selectBillList = billEntities;
+                            }
+                            if (selectBillList == null)
+                            {
+                                selectBillList = new List<BillEntity>();
+                            }
+                            return JsonConvert.SerializeObject(selectBillList);
+
+                            //result = JsonConvert.SerializeObject(billEntities);
                         }
                     }
                 }
@@ -2698,7 +2716,7 @@ namespace ZlPos.Bizlogic
                 }
                 //responseEntity.data = commodityEntityList;
                 //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
-                browser.ExecuteScriptAsync("getWeightCommodityCallBack('"+ JsonConvert.SerializeObject(commodityEntityList) + "')");
+                browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
             });
             return;
             //return JsonConvert.SerializeObject(commodityEntityList);
