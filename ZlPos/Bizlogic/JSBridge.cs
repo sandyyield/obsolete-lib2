@@ -67,6 +67,8 @@ namespace ZlPos.Bizlogic
         //操作系统版本
         private string OSVer = "";
 
+        private DataProcessor _DataProcessor = DataProcessor.Instance;
+
         /// <summary>
         /// 委托方式托管回调
         /// </summary>
@@ -1007,20 +1009,20 @@ namespace ZlPos.Bizlogic
             {
                 logger.Error(e.Message + e.StackTrace);
             }
-            //有问题直接返回null
             return "";
         }
         #endregion
 
-        //时间相关的操作方法先放一放  等确认调用参数结构
-        #region GetSelectTimeSaleBill
+        #region GetSelectTimeSaleBillByPagination
         /// <summary>
-        /// 指定时间区间查询
+        /// 分页查询销售订单
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
+        /// <param name="pageindex"></param>
+        /// <param name="pagesize"></param>
         /// <returns></returns>
-        public string GetSelectTimeSaleBill(string start, string end, int pageindex, int pagesize)
+        public string GetSelectTimeSaleBillByPagination(string start, string end, int pageindex, int pagesize)
         {
             string result = "";
             if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
@@ -1071,37 +1073,82 @@ namespace ZlPos.Bizlogic
                                 billEntities[i].commoditys = billCommodityEntities;
                                 billEntities[i].paydetails = payDetailEntities;
                             }
-                            //add 2018年7月3日 分页数据返回
-                            List<BillEntity> selectBillList = null;
-                            if (billEntities != null && billEntities.Count > 0 && pageindex != -1)
+                            return JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info(e.Message + e.StackTrace);
+            }
+
+            return result;
+        }
+        #endregion
+
+
+        //时间相关的操作方法先放一放  等确认调用参数结构
+        #region GetSelectTimeSaleBill
+        /// <summary>
+        /// 指定时间区间查询
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public string GetSelectTimeSaleBill(string start, string end)
+        {
+            string result = "";
+            if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
+            {
+                return result;
+            }
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+            dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+            UserEntity userEntity = _LoginUserManager.UserEntity;
+            string shopcode = userEntity.shopcode;
+            string branchCode = userEntity.branchcode;
+            try
+            {
+                DateTime startDate = Convert.ToDateTime(start, dtFormat);
+                DateTime endDate = Convert.ToDateTime(end, dtFormat);
+                long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
+                long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                if (startDate != null && endDate != null)
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        string id = _LoginUserManager.UserEntity.userid;
+                        List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                                                                                        && i.cashierid == id
+                                                                                        && i.insertTime <= endDateTime
+                                                                                        && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
+                                                                                        && i.shopcode == shopcode
+                                                                                        && i.branchcode == branchCode).ToList();
+                        if (billEntities != null)
+                        {
+                            for (int i = 0; i < billEntities.Count; i++)
                             {
-                                if (billEntities.Count > (pageindex * pagesize + pagesize))
+                                List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                if (billCommodityEntities == null)
                                 {
-                                    selectBillList = billEntities.GetRange(pageindex * pagesize, pagesize);
+                                    billCommodityEntities = new List<BillCommodityEntity>();
                                 }
                                 else
                                 {
-                                    if (billEntities.Count - pageindex * pagesize >= 0)
-                                    {
-                                        if (billEntities.Count <= (pageindex * pagesize + pageindex * pagesize + pagesize))
-                                        {
-                                            selectBillList = billEntities.GetRange(pageindex * pagesize, billEntities.Count - pageindex * pagesize);
-                                        }
 
-                                    }
                                 }
+                                if (payDetailEntities == null)
+                                {
+                                    payDetailEntities = new List<PayDetailEntity>();
+                                }
+                                billEntities[i].commoditys = billCommodityEntities;
+                                billEntities[i].paydetails = payDetailEntities;
                             }
-                            else
-                            {
-                                selectBillList = billEntities;
-                            }
-                            if (selectBillList == null)
-                            {
-                                selectBillList = new List<BillEntity>();
-                            }
-                            return JsonConvert.SerializeObject(selectBillList);
-
-                            //result = JsonConvert.SerializeObject(billEntities);
+                            return JsonConvert.SerializeObject(billEntities);
+                            //return _DataProcessor.PaginationData(billEntities, pageindex, pagesize);
                         }
                     }
                 }
@@ -1279,6 +1326,98 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region GetCommodityList
+        /// <summary>
+        /// 根据相应条件获取商品信息
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <param name="categorycode"></param>
+        /// <param name="pageindex"></param>
+        /// <param name="pagesize"></param>
+        public void GetCommodityList(string keyword, string categorycode, int pageindex, int pagesize)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            Task.Factory.StartNew(() =>
+            {
+                List<CommodityEntity> commodityEntities = null;
+                List<BarCodeEntity2> barCodeEntityList = null;
+                List<CommodityPriceEntity> commodityPriceEntityList = null;
+                if (_LoginUserManager.Login)
+                {
+                    UserEntity userEntity = _LoginUserManager.UserEntity;
+                    try
+                    {
+                        using (var db = SugarDao.GetInstance())
+                        {
+                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                && i.commoditystatus == "0"
+                                                                                && i.del == "0"
+                                                                                && (string.IsNullOrEmpty(categorycode) || i.categorycode == categorycode)
+                                                                                && (i.commodityname.Contains(keyword) || i.commoditycode.Contains(keyword) || i.mnemonic.Contains(keyword))
+                                                                                ).ToList();
+                            barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                && i.del == "0").ToList();
+                            commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                    && i.branchcode == userEntity.branchcode).ToList();
+                        }
+
+                        for (int i = 0; i < commodityEntities.Count; i++)
+                        {
+                            CommodityEntity commodityEntity = commodityEntities[i];
+                            //从条码表获取商品对应的条码
+                            if (barCodeEntityList != null)
+                            {
+                                for (int a = 0; a < barCodeEntityList.Count; a++)
+                                {
+                                    if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
+                                    {
+                                        string barcodes = barCodeEntityList[a].barcode;
+                                        if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
+                                        {
+                                            barcodes = barcodes.Split(',')[0];
+                                        }
+                                        if (string.IsNullOrEmpty(barcodes))
+                                        {
+                                            barcodes = "";
+                                        }
+                                        commodityEntity.barcode = barcodes;//用商品条码
+                                        break;
+                                    }
+                                }
+                            }
+                            if (commodityPriceEntityList != null)
+                            {
+                                for (int a = 0; a < commodityPriceEntityList.Count; a++)
+                                {
+                                    if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
+                                    {
+                                        commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "获取商品列表出错";
+                        mWebViewHandle.Invoke("getCommodityListCallBack", responseEntity);
+                        logger.Info("GetCommodityList error:" + e.Message + e.StackTrace);
+                    }
+                }
+                CommodityAndCountEntity commodityAndCountEntity = new CommodityAndCountEntity();
+                commodityAndCountEntity.count = commodityEntities.Count;
+                commodityAndCountEntity.commodityEntities = _DataProcessor.PaginationData(commodityEntities, pageindex, pagesize) as List<CommodityEntity>;
+                responseEntity.code = ResponseCode.SUCCESS;
+                responseEntity.data = commodityAndCountEntity;
+                mWebViewHandle.Invoke("getCommodityListCallBack", responseEntity);
+            });
+
+
+        }
+        #endregion
+
 
         #region GetCommodityById
         /// <summary>
@@ -1450,34 +1589,35 @@ namespace ZlPos.Bizlogic
                     }
                 }
             }
-            List<CommodityEntity> selectCommodityList = null;
-            if (commodityEntities != null && commodityEntities.Count > 0 && pageindex != -1)
-            {
-                if (commodityEntities.Count > (pageindex * pagesize + pagesize))
-                {
-                    selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, pagesize);
-                }
-                else
-                {
-                    if (commodityEntities.Count - pageindex * pagesize >= 0)
-                    {
-                        if (commodityEntities.Count <= (pageindex * pagesize + pageindex * pagesize + pagesize))
-                        {
-                            selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, commodityEntities.Count - pageindex * pagesize);
-                        }
+            return JsonConvert.SerializeObject(_DataProcessor.PaginationData(commodityEntities, pageindex, pagesize));
+            //List<CommodityEntity> selectCommodityList = null;
+            //if (commodityEntities != null && commodityEntities.Count > 0 && pageindex != -1)
+            //{
+            //    if (commodityEntities.Count > (pageindex * pagesize + pagesize))
+            //    {
+            //        selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, pagesize);
+            //    }
+            //    else
+            //    {
+            //        if (commodityEntities.Count - pageindex * pagesize >= 0)
+            //        {
+            //            if (commodityEntities.Count <= (pageindex * pagesize + pageindex * pagesize + pagesize))
+            //            {
+            //                selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, commodityEntities.Count - pageindex * pagesize);
+            //            }
 
-                    }
-                }
-            }
-            else
-            {
-                selectCommodityList = commodityEntities;
-            }
-            if (selectCommodityList == null)
-            {
-                selectCommodityList = new List<CommodityEntity>();
-            }
-            return JsonConvert.SerializeObject(selectCommodityList);
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    selectCommodityList = commodityEntities;
+            //}
+            //if (selectCommodityList == null)
+            //{
+            //    selectCommodityList = new List<CommodityEntity>();
+            //}
+            //return JsonConvert.SerializeObject(selectCommodityList);
 
         }
         #endregion

@@ -109,6 +109,7 @@
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
     <Compile Include="Bizlogic\InternetHelper.cs" />
     <Compile Include="Bizlogic\RegHelper.cs" />
+    <Compile Include="Core\DataProcessor.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Core\MenuHandler.cs" />
     <Compile Include="Dao\DbHelper.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Models\BarCodeEntity2.cs" />
     <Compile Include="Models\BarcodeScaleConfigEntity.cs" />
     <Compile Include="Models\BarcodeScaleEntity.cs" />
+    <Compile Include="Models\CommodityAndCountEntity.cs" />
     <Compile Include="Models\PluMessageEntity.cs" />
     <Compile Include="Models\SyncScaleEntity.cs" />
     <Compile Include="Models\SyncScaleVM.cs" />
