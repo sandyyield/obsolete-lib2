@@ -19,6 +19,7 @@ using ZlPos.Utils;
 using ZlPos.Models;
 using ZlPos.Bean;
 using ZlPos.Config;
+using ZlPos.Forms;
 
 namespace ZlPos.Core
 {
@@ -31,6 +32,8 @@ namespace ZlPos.Core
 
         public ChromiumWebBrowser browser;
 
+        public PosForm _parentForm;
+
         private JSBridge jsBridge = JSBridge.Instance;
 
         private bool canExecuteJavaScriptAsync = false;
@@ -39,7 +42,7 @@ namespace ZlPos.Core
         //internal JSBridge HostApp { get => hostApp; set => hostApp = value; }
         internal JSBridge JsBridge { get => jsBridge; set => jsBridge = value; }
 
-        public ChromiumBrowserControl(object boundObject = null)
+        public ChromiumBrowserControl(PosForm parentForm,object boundObject = null)
         {
             //Text = "zlpos";
 
@@ -53,6 +56,8 @@ namespace ZlPos.Core
             };
             browser.MenuHandler = new MenuHandler();
             Controls.Add(browser);
+
+            _parentForm = parentForm;
 
             BrowserLoading();
 
@@ -68,6 +73,9 @@ namespace ZlPos.Core
 
             //host注入当前webbrowser
             JsBridge.Browser = browser;
+
+            //传入主窗体句柄
+            JsBridge.frmMain = _parentForm;
 
             //browser.RegisterJsObject("HostAppAsync", HostApp);//new BoundObject(browser)); //Standard object rego
             //browser.RegisterJsObject("HostApp", HostApp);//new BoundObject(browser), false); //Use the default binder to serialize values into complex objects
@@ -150,6 +158,7 @@ namespace ZlPos.Core
         {
             if (e.IsBrowserInitialized)
             {
+                //_parentForm.HideSelf();
                 //canExecuteJavaScriptAsync = true;
 #if DEBUG
                 ////调试器

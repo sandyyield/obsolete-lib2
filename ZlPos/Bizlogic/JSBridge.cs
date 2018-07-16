@@ -50,6 +50,9 @@ namespace ZlPos.Bizlogic
 
         static JSBridge instance = null;
 
+        //主窗体的指针
+        public PosForm frmMain;
+
         public delegate void JsCallbackHandle(object state);
 
         //网络检查开关
@@ -1051,7 +1054,9 @@ namespace ZlPos.Bizlogic
                                                                                         && i.insertTime <= endDateTime
                                                                                         && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
                                                                                         && i.shopcode == shopcode
-                                                                                        && i.branchcode == branchCode).ToList();
+                                                                                        && i.branchcode == branchCode)
+                                                                                        .OrderBy(j => j.insertTime,OrderByType.Desc)
+                                                                                        .ToList();
                         if (billEntities != null)
                         {
                             for (int i = 0; i < billEntities.Count; i++)
@@ -2536,6 +2541,7 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 string scale = CacheManager.GetScale(SPCode.scale) as string;
+                ResponseEntity responseEntity = new ResponseEntity();
                 if (!string.IsNullOrEmpty(scale))
                 {
                     try
@@ -2546,19 +2552,36 @@ namespace ZlPos.Bizlogic
                             WeightUtil.Instance.Open(scaleConfigEntity.port, scaleConfigEntity.brand);
                             WeightUtil.Instance.Listener = (number) =>
                             {
-                                browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
+                                //browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
+                                if(!string.IsNullOrEmpty(number))
+                                {
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "电子秤设置错误，请重新设置";
+                                }
+                                else
+                                {
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.data = number;
+                                }
+                                mWebViewHandle.Invoke("getWeightCallBack", responseEntity);
                             };
 
                         }
                         else
                         {
-                            browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "未设置电子秤";
+                            mWebViewHandle.Invoke("getWeightCallBack", responseEntity);
+                            //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
                         }
                     }
                     catch (Exception e)
                     {
                         logger.Error(e.Message + e.StackTrace);
-                        browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                        //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = e.Message + e.StackTrace;
+                        mWebViewHandle.Invoke("getWeightCallBack", responseEntity);
                     }
                 }
             });
@@ -3002,6 +3025,11 @@ namespace ZlPos.Bizlogic
             }
         }
 
+
+        public void OnDesktop()
+        {
+            frmMain.WindowState = FormWindowState.Minimized;
+        }
 
         /// <summary>
         /// 获取数据库缓存数据大小

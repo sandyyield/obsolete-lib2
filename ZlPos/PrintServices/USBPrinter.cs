@@ -129,5 +129,16 @@ namespace ZlPos.PrintServices
             string sendUnicode = Encoding.Unicode.GetString(strByte);
             PrintBridge.WriteUsb(hDevice, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendCount);
         }
+
+        public void printQRCode()
+        {
+            int sendCount = 0;
+            string str = "1D5A021B5A034C0605000201010D0A";
+            byte[] strByte = HexUtils.HexStringToByte(str);
+            string sendUnicode = Encoding.Unicode.GetString(strByte);
+            PrintBridge.WriteUsb(hDevice, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendCount);
+
+            //PrintString("hellow,world");
+        }
     }
 }

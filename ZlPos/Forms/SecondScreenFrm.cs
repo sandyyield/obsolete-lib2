@@ -21,6 +21,7 @@ namespace ZlPos.Forms
             chromiumWebBrowser.Dock = DockStyle.Fill;
             Controls.Add(chromiumWebBrowser);
             InitializeComponent();
+            this.ShowInTaskbar = false;
         }
 
         private void SecondScreenFrm_Load(object sender, EventArgs e)

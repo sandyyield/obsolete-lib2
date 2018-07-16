@@ -39,7 +39,7 @@ namespace ZlPos.Forms
 
             Text = version.ToString() + "_" + fileVersion.ToString(); 
 
-            chromiumBrowser = new ChromiumBrowserControl()
+            chromiumBrowser = new ChromiumBrowserControl(this)
             {
                 Dock = DockStyle.Fill,
             };
@@ -152,6 +152,37 @@ namespace ZlPos.Forms
             //Cef.Shutdown();
             //Application.Exit();
             //this.Dispose();
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (this.Visible == false || WindowState == FormWindowState.Minimized)
+            {
+                this.Visible = true;
+                this.WindowState = FormWindowState.Maximized;
+                this.Activate();
+            }
+            else if (this.Visible == true)
+            {
+                //this.Visible = false;
+                this.WindowState = FormWindowState.Minimized;
+            }
+        }
+
+        private void PosForm_Shown(object sender, EventArgs e)
+        {
+            //this.Hide();
+
+            //return;
+        }
+
+        public void HideSelf()
+        {
+            if (this.InvokeRequired)
+            {
+                Action action = () => { this.Hide(); };
+                this.Invoke(action);
+            }
         }
     }
 }
