@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using ZlPos.Bizlogic;
 using ZlPos.Core;
@@ -28,6 +29,8 @@ namespace ZlPos.Forms
 
         public PosForm()
         {
+            //如果存在进程 则激活
+            ThreadPool.RegisterWaitForSingleObject(Program.ProgramStarted, OnProgramStarted, null, -1, false);
 
             //hostApp = new HostApp();
 
@@ -37,7 +40,7 @@ namespace ZlPos.Forms
 
             var fileVersion = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).FileVersion);
 
-            Text = version.ToString() + "_" + fileVersion.ToString(); 
+            Text = version.ToString() + "_" + fileVersion.ToString();
 
             chromiumBrowser = new ChromiumBrowserControl(this)
             {
@@ -71,6 +74,8 @@ namespace ZlPos.Forms
             //button.Text = "PING JS ";
             //button.Click += Button_Click;
         }
+
+        
 
         //private void PosForm_KeyDown(object sender, KeyEventArgs e)
         //{
@@ -158,7 +163,10 @@ namespace ZlPos.Forms
         {
             if (this.Visible == false || WindowState == FormWindowState.Minimized)
             {
-                this.Visible = true;
+                if (!this.Visible)
+                {
+                    this.Visible = true;
+                }
                 this.WindowState = FormWindowState.Maximized;
                 this.Activate();
             }
@@ -180,9 +188,46 @@ namespace ZlPos.Forms
         {
             if (this.InvokeRequired)
             {
-                Action action = () => { this.Hide(); };
+                Action action = () =>
+                {
+                    this.WindowState = FormWindowState.Minimized;
+                };
                 this.Invoke(action);
             }
         }
+
+        /// <summary>
+        /// 当受到第二个进程的通知时，显示窗体
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="timedOut"></param>
+        private void OnProgramStarted(object state, bool timedOut)
+        {
+            ShowMine();
+        }
+
+        public void ShowMine()
+        {
+            if (this.InvokeRequired)
+            {
+                while (!this.IsHandleCreated)
+                {
+                    if (this.Disposing || this.IsDisposed)
+                    {
+                        return;
+                    }
+                }
+                Action action = () =>
+                {
+                    this.notifyIcon1.ShowBalloonTip(2000, "DetectionTool2", "程序已经运行", ToolTipIcon.Info);
+                    this.Show();
+
+                    //注意：一定要在窗体显示后，再对属性进行设置  
+                    this.WindowState = FormWindowState.Maximized;
+                };
+                this.Invoke(action);
+            }
+        }
+
     }
 }

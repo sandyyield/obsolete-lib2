@@ -3,8 +3,10 @@ using log4net;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ namespace ZlPos
 
         public static Mutex mutex { get; set; }
 
+        public static EventWaitHandle ProgramStarted;
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -44,13 +47,31 @@ namespace ZlPos
             #endregion
 
             #region " 不允许多个实例运行 "
-            mutex = new System.Threading.Mutex(true, "aabbccdd");
-            if (!mutex.WaitOne(0, false))
+            //mutex = new System.Threading.Mutex(true, "aabbccdd");
+            //if (!mutex.WaitOne(0, false))
+            //{
+            //    MessageBox.Show("程序已经在运行！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //    Application.Exit();
+            //    return;
+            //}
+
+            // 尝试创建一个命名事件  
+            bool createNew;
+            ProgramStarted = new EventWaitHandle(false, EventResetMode.AutoReset, "MyStartEvent", out createNew);
+
+            // 如果该命名事件已经存在(存在有前一个运行实例)，则发事件通知并退出  
+            if (!createNew)
             {
-                MessageBox.Show("程序已经在运行！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Application.Exit();
+                ProgramStarted.Set();
                 return;
             }
+
+            //Process instance = RunningInstance();
+            //if(instance != null)
+            //{
+            //    HandleRunningInstance(instance);
+            //    return;
+            //}
             #endregion
 
             #region "升级"
@@ -117,6 +138,36 @@ namespace ZlPos
             logger.Info("Start run " + AppContext.Instance.AppName + " services");
             Application.Run(new PosForm());
 
+        }
+
+        [DllImport("User32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+        [DllImport("User32.dll")]
+        private static extern bool ShowWindowAsync(IntPtr hWnd, int cmdShow);
+        private static void HandleRunningInstance(Process instance)
+        {
+            // 确保窗口没有被最小化或最大化 
+            ShowWindowAsync(instance.MainWindowHandle, 4);
+            // 设置真实例程为foreground  window  
+            SetForegroundWindow(instance.MainWindowHandle);// 放到最前端 
+        }
+
+        private static Process RunningInstance()
+        {
+            Process current = Process.GetCurrentProcess();
+            Process[] processes = Process.GetProcessesByName(current.ProcessName);
+            foreach (Process process in processes)
+            {
+                if (process.Id != current.Id)
+                {
+                    // 确保例程从EXE文件运行 
+                    if (Assembly.GetExecutingAssembly().Location.Replace("/", "\\") == current.MainModule.FileName)
+                    {
+                        return process;
+                    }
+                }
+            }
+            return null;
         }
 
         private static void InitLog4netCfg(Level level)

@@ -3028,7 +3028,7 @@ namespace ZlPos.Bizlogic
 
         public void OnDesktop()
         {
-            frmMain.WindowState = FormWindowState.Minimized;
+            frmMain.HideSelf();
         }
 
         /// <summary>

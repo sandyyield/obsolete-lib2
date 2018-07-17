@@ -108,8 +108,9 @@ namespace ZlPos.Models
 
 
 
-        // add: 2018/6/12  条码秤需要字段,不入库
-        [SugarColumn(IsIgnore = true)]
+        // add: 2018/6/12  条码秤需要字段,不入库 
+        //2018年7月17日 改为需要入库
+        [SugarColumn(IsNullable = true)]
         public string plu { get; set; }
 
         private string tare1 = "0";

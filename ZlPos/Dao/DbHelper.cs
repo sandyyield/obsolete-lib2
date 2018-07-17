@@ -95,6 +95,9 @@ namespace ZlPos.Dao
                     case 5:
                         UpgradingSchema.UpgradingBarCodeEntity2();
                         break;
+                    case 6:
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "plu" });
+                        break;
                 }
                 //生成数据库配置文件
                 CreateConfig();
