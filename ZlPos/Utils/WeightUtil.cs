@@ -36,8 +36,13 @@ namespace ZlPos.Utils
         }
 
         string sBuffer = "";
+        string sscache = "";
         internal void Open(string port, string brand)
         {
+            logger.Info("open weight port =>>" + port + "---" + brand);
+            //缓存置空
+            sBuffer = "";
+            sscache = "";
             if (mSerialPort == null)
             {
                 try
@@ -48,13 +53,15 @@ namespace ZlPos.Utils
                     mSerialPort.PortName = SerialPort.GetPortNames()[0];
                     mSerialPort.BaudRate = 9600;
                     //}
-
+                    logger.Info("open serialport");
                     mSerialPort.Open();
+                    logger.Info("switch brand =>" + brand);
                     switch (brand)
                     {
-                        case "ACS-A":
+                        case "ACS_A":
                             Task.Factory.StartNew(() =>
                             {
+                                logger.Info("case ACS_A");
                                 int size;
                                 byte[] buffer = new byte[64];
                                 while (mSerialPort.IsOpen)
@@ -62,6 +69,7 @@ namespace ZlPos.Utils
                                     Thread.Sleep(40);
                                     //size = mSerialPort.Read(buffer, 0, 1);
                                     string s = mSerialPort.ReadLine();
+                                    logger.Info("s(SerialPort.ReadLine ) =>" + s);
                                     if (!sBuffer.Equals(s))
                                     {
                                         sBuffer = s;
@@ -73,50 +81,15 @@ namespace ZlPos.Utils
                         case "EH100":
                             Task.Factory.StartNew(() =>
                             {
-                                int size;
-                                byte[] buffer = new byte[64];
-                                while (mSerialPort.IsOpen)
-                                {
-                                    Thread.Sleep(200);
-                                    //size = mSerialPort.Read(buffer, 0, 1);
-                                    mSerialPort.Read(buffer, 0, 64);
-                                    string s = Encoding.Default.GetString(buffer);
-                                    if (!sBuffer.Equals(s))
-                                    {
-                                        sBuffer = s;
-                                        if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
-                                        {
-                                            //2018年6月8日 多显示一位负数
-                                            string ss = s.Substring(3, 6);
-                                            try
-                                            {
-                                                Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
-                                            }
-                                            catch(Exception e)
-                                            {
-                                                logger.Info(e.Message + e.StackTrace);
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                            break;
-                        case "Aclas"://顶尖电子秤
-                            Task.Factory.StartNew(() =>
-                            {
+                                logger.Info("EH100");
                                 int size;
                                 byte[] buffer = new byte[64];
                                 while (mSerialPort.IsOpen)
                                 {
                                     Thread.Sleep(50);
                                     //size = mSerialPort.Read(buffer, 0, 1);
-                                    try
-                                    {
-                                        mSerialPort.Read(buffer, 0, 64);
-                                    }catch(Exception e)
-                                    {
+                                    mSerialPort.Read(buffer, 0, 64);
 
-                                    }
                                     string s = Encoding.Default.GetString(buffer);
                                     if (!sBuffer.Equals(s))
                                     {
@@ -126,21 +99,63 @@ namespace ZlPos.Utils
                                         {
                                             //2018年6月8日 多显示一位负数
                                             string ss = s.Substring(3, 6);
-                                            try
+                                            if (!ss.Equals(sscache))
                                             {
-                                                Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                logger.Info(e.Message + e.StackTrace);
+                                                sscache = ss;
+                                                try
+                                                {
+                                                    logger.Info("invoke ss =>>" + ss);
+                                                    Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    logger.Info(e.Message + e.StackTrace);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             });
                             break;
-                            break;
+                        case "Aclas"://顶尖电子秤
+                            Task.Factory.StartNew(() =>
+                            {
+                                logger.Info("Aclas");
+                                int size;
+                                byte[] buffer = new byte[64];
+                                while (mSerialPort.IsOpen)
+                                {
+                                    Thread.Sleep(50);
+                                    //size = mSerialPort.Read(buffer, 0, 1);
+                                    mSerialPort.Read(buffer, 0, 64);
 
+                                    string s = Encoding.Default.GetString(buffer);
+                                    if (!sBuffer.Equals(s))
+                                    {
+                                        Thread.Sleep(200);
+                                        sBuffer = s;
+                                        if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
+                                        {
+                                            //2018年6月8日 多显示一位负数
+                                            string ss = s.Substring(3, 6);
+                                            if (!ss.Equals(sscache))
+                                            {
+                                                sscache = ss;
+                                                try
+                                                {
+                                                    logger.Info("invoke ss =>>" + ss);
+                                                    Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    logger.Info(e.Message + e.StackTrace);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            break;
                     }
 
                 }
@@ -148,6 +163,10 @@ namespace ZlPos.Utils
                 {
                     logger.Info(e.Message + e.StackTrace);
                 }
+            }
+            else
+            {
+                logger.Info("mSerialPort = null");
             }
         }
 

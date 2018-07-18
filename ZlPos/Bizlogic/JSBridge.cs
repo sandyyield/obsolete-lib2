@@ -1055,7 +1055,7 @@ namespace ZlPos.Bizlogic
                                                                                         && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
                                                                                         && i.shopcode == shopcode
                                                                                         && i.branchcode == branchCode)
-                                                                                        .OrderBy(j => j.insertTime,OrderByType.Desc)
+                                                                                        .OrderBy(i => i.insertTime,OrderByType.Desc)
                                                                                         .ToList();
                         if (billEntities != null)
                         {
@@ -2512,6 +2512,7 @@ namespace ZlPos.Bizlogic
                 ScaleConfigEntity scaleConfigEntity = JsonConvert.DeserializeObject<ScaleConfigEntity>(json);
                 if (!string.IsNullOrEmpty(scaleConfigEntity.port))
                 {
+                    logger.Info(json);
                     WeightUtil.Instance.Open(scaleConfigEntity.port, scaleConfigEntity.brand);
                     WeightUtil.Instance.Close();
                     responseEntity.code = ResponseCode.SUCCESS;
@@ -2553,7 +2554,8 @@ namespace ZlPos.Bizlogic
                             WeightUtil.Instance.Listener = (number) =>
                             {
                                 //browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
-                                if(!string.IsNullOrEmpty(number))
+                                logger.Info("getweigth callback invoke : number =>> " + number);
+                                if(string.IsNullOrEmpty(number))
                                 {
                                     responseEntity.code = ResponseCode.Failed;
                                     responseEntity.msg = "电子秤设置错误，请重新设置";
