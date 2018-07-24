@@ -128,7 +128,8 @@ namespace ZlPos.Utils
                                     Thread.Sleep(50);
                                     //size = mSerialPort.Read(buffer, 0, 1);
                                     mSerialPort.Read(buffer, 0, 64);
-
+                                    logger.Info("buffer is reading...=> " + buffer);
+                                    
                                     string s = Encoding.Default.GetString(buffer);
                                     if (!sBuffer.Equals(s))
                                     {
