@@ -147,6 +147,7 @@
     <Compile Include="Models\BarcodeScaleEntity.cs" />
     <Compile Include="Models\CommodityAndCountEntity.cs" />
     <Compile Include="Models\PluMessageEntity.cs" />
+    <Compile Include="Models\PrintCommodityEntity.cs" />
     <Compile Include="Models\SyncScaleEntity.cs" />
     <Compile Include="Models\SyncScaleVM.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
@@ -304,18 +305,10 @@
     <Content Include="References\Newtonsoft.Json.dll" />
     <Content Include="References\Oracle.ManagedDataAccess.dll" />
     <Content Include="References\System.Data.SQLite.dll" />
-    <Reference Include="MySql.Data, Version=6.2.1.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\MySql.Data.dll</HintPath>
-    </Reference>
     <!-- <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\Newtonsoft.Json.dll</HintPath>
     </Reference> -->
-    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>References\Oracle.ManagedDataAccess.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -336,6 +329,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <!-- add by sVen 2018年7月30日 -->
+    <Content Include="Library\libUsbContorl.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -138,7 +138,7 @@ namespace ZlPos.Utils
                                         if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
                                         {
                                             //2018年6月8日 多显示一位负数
-                                            string ss = s.Substring(3, 6);
+                                            string ss = s.Substring(3, 7);
                                             if (!ss.Equals(sscache))
                                             {
                                                 sscache = ss;

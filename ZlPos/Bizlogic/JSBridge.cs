@@ -965,54 +965,62 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetAllSaleBill(string state)
+        public void GetAllSaleBill(string state,string target)
         {
-            DbManager dbManager = DBUtils.Instance.DbManager;
-            UserEntity userEntity = _LoginUserManager.UserEntity;
-            string shopcode = userEntity.shopcode;
-            string branchcode = userEntity.branchcode;
-
-            try
+            Task.Factory.StartNew(() =>
             {
-                using (var db = SugarDao.GetInstance())
-                {
-                    List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(it => it.ticketstatue == state
-                                                                                && it.shopcode == shopcode
-                                                                                && it.branchcode == branchcode).ToList();
-                    if (billEntities != null)
-                    {
-                        logger.Info("获取对应状态的单据信息billEntities: " + billEntities.ToString());
-                        for (int i = 0; i < billEntities.Count; i++)
-                        {
-                            List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
-                            List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
-                            List<DisCountDetailEntity> disCountDetailEntities = db.Queryable<DisCountDetailEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
+                string allBill = "[]";
 
-                            if (billCommodityEntities == null)
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                string shopcode = userEntity.shopcode;
+                string branchcode = userEntity.branchcode;
+
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(it => it.ticketstatue == state
+                                                                                    && it.shopcode == shopcode
+                                                                                    && it.branchcode == branchcode).ToList();
+                        if (billEntities != null)
+                        {
+                            logger.Info("获取对应状态的单据信息billEntities: " + billEntities.ToString());
+                            for (int i = 0; i < billEntities.Count; i++)
                             {
-                                billCommodityEntities = new List<BillCommodityEntity>();
+                                List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
+                                List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
+                                List<DisCountDetailEntity> disCountDetailEntities = db.Queryable<DisCountDetailEntity>().Where(it => it.ticketcode == billEntities[i].ticketcode).ToList();
+
+                                if (billCommodityEntities == null)
+                                {
+                                    billCommodityEntities = new List<BillCommodityEntity>();
+                                }
+                                if (disCountDetailEntities == null)
+                                {
+                                    disCountDetailEntities = new List<DisCountDetailEntity>();
+                                }
+                                if (payDetailEntities == null)
+                                {
+                                    payDetailEntities = new List<PayDetailEntity>();
+                                }
+                                billEntities[i].commoditys = billCommodityEntities;
+                                billEntities[i].paydetails = payDetailEntities;
+                                billEntities[i].discountdetails = disCountDetailEntities;
                             }
-                            if (disCountDetailEntities == null)
-                            {
-                                disCountDetailEntities = new List<DisCountDetailEntity>();
-                            }
-                            if (payDetailEntities == null)
-                            {
-                                payDetailEntities = new List<PayDetailEntity>();
-                            }
-                            billEntities[i].commoditys = billCommodityEntities;
-                            billEntities[i].paydetails = payDetailEntities;
-                            billEntities[i].discountdetails = disCountDetailEntities;
+                            allBill = JsonConvert.SerializeObject(billEntities);
+                            //return JsonConvert.SerializeObject(billEntities);
+                            //browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target +  "','" + allBill + "')");
                         }
-                        return JsonConvert.SerializeObject(billEntities);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message + e.StackTrace);
-            }
-            return "";
+                catch (Exception e)
+                {
+                    logger.Error(e.Message + e.StackTrace);
+                }
+                browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
+                //return "";
+            });
         }
         #endregion
 
@@ -1025,70 +1033,76 @@ namespace ZlPos.Bizlogic
         /// <param name="pageindex"></param>
         /// <param name="pagesize"></param>
         /// <returns></returns>
-        public string GetSelectTimeSaleBillByPagination(string start, string end, int pageindex, int pagesize)
+        public void GetSelectTimeSaleBillByPagination(string start, string end, int pageindex, int pagesize)
         {
-            string result = "";
-            if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
+            Task.Factory.StartNew(() =>
             {
-                return result;
-            }
-            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
-            dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
-            UserEntity userEntity = _LoginUserManager.UserEntity;
-            string shopcode = userEntity.shopcode;
-            string branchCode = userEntity.branchcode;
-            try
-            {
-                DateTime startDate = Convert.ToDateTime(start, dtFormat);
-                DateTime endDate = Convert.ToDateTime(end, dtFormat);
-                long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
-                long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
-                DbManager dbManager = DBUtils.Instance.DbManager;
-                if (startDate != null && endDate != null)
+                string result = "[]";
+                if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
                 {
-                    using (var db = SugarDao.GetInstance())
+                    browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "')");
+                    return;
+                }
+                DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+                dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                string shopcode = userEntity.shopcode;
+                string branchCode = userEntity.branchcode;
+                try
+                {
+                    DateTime startDate = Convert.ToDateTime(start, dtFormat);
+                    DateTime endDate = Convert.ToDateTime(end, dtFormat);
+                    long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
+                    long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
+                    DbManager dbManager = DBUtils.Instance.DbManager;
+                    if (startDate != null && endDate != null)
                     {
-                        string id = _LoginUserManager.UserEntity.userid;
-                        List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
-                                                                                        && i.cashierid == id
-                                                                                        && i.insertTime <= endDateTime
-                                                                                        && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
-                                                                                        && i.shopcode == shopcode
-                                                                                        && i.branchcode == branchCode)
-                                                                                        .OrderBy(i => i.insertTime,OrderByType.Desc)
-                                                                                        .ToList();
-                        if (billEntities != null)
+                        using (var db = SugarDao.GetInstance())
                         {
-                            for (int i = 0; i < billEntities.Count; i++)
+                            string id = _LoginUserManager.UserEntity.userid;
+                            List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                                                                                            && i.cashierid == id
+                                                                                            && i.insertTime <= endDateTime
+                                                                                            && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
+                                                                                            && i.shopcode == shopcode
+                                                                                            && i.branchcode == branchCode)
+                                                                                            .OrderBy(i => i.insertTime, OrderByType.Desc)
+                                                                                            .ToList();
+                            if (billEntities != null)
                             {
-                                List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                if (billCommodityEntities == null)
-                                {
-                                    billCommodityEntities = new List<BillCommodityEntity>();
-                                }
-                                else
-                                {
+                                //for (int i = 0; i < billEntities.Count; i++)
+                                //{
+                                //    List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                //    List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                //    if (billCommodityEntities == null)
+                                //    {
+                                //        billCommodityEntities = new List<BillCommodityEntity>();
+                                //    }
+                                //    else
+                                //    {
 
-                                }
-                                if (payDetailEntities == null)
-                                {
-                                    payDetailEntities = new List<PayDetailEntity>();
-                                }
-                                billEntities[i].commoditys = billCommodityEntities;
-                                billEntities[i].paydetails = payDetailEntities;
+                                //    }
+                                //    if (payDetailEntities == null)
+                                //    {
+                                //        payDetailEntities = new List<PayDetailEntity>();
+                                //    }
+                                //    billEntities[i].commoditys = billCommodityEntities;
+                                //    billEntities[i].paydetails = payDetailEntities;
+                                //}
+                                //return JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
+                                browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize)) + "')");
                             }
-                            return JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
                         }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Info(e.Message + e.StackTrace);
-            }
+                catch (Exception e)
+                {
+                    logger.Info(e.Message + e.StackTrace);
+                    browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "','" + pageindex + "','" + pagesize + "')");
+                }
+            });
 
-            return result;
+            //return result;
         }
         #endregion
 
@@ -1101,69 +1115,74 @@ namespace ZlPos.Bizlogic
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public string GetSelectTimeSaleBill(string start, string end)
+        public void GetSelectTimeSaleBill(string start, string end)
         {
             string result = "";
-            if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
+            Task.Factory.StartNew(() =>
             {
-                return result;
-            }
-            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
-            dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
-            UserEntity userEntity = _LoginUserManager.UserEntity;
-            string shopcode = userEntity.shopcode;
-            string branchCode = userEntity.branchcode;
-            try
-            {
-                DateTime startDate = Convert.ToDateTime(start, dtFormat);
-                DateTime endDate = Convert.ToDateTime(end, dtFormat);
-                long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
-                long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
-                DbManager dbManager = DBUtils.Instance.DbManager;
-                if (startDate != null && endDate != null)
-                {
-                    using (var db = SugarDao.GetInstance())
-                    {
-                        string id = _LoginUserManager.UserEntity.userid;
-                        List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
-                                                                                        && i.cashierid == id
-                                                                                        && i.insertTime <= endDateTime
-                                                                                        && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
-                                                                                        && i.shopcode == shopcode
-                                                                                        && i.branchcode == branchCode).ToList();
-                        if (billEntities != null)
-                        {
-                            for (int i = 0; i < billEntities.Count; i++)
-                            {
-                                List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                if (billCommodityEntities == null)
-                                {
-                                    billCommodityEntities = new List<BillCommodityEntity>();
-                                }
-                                else
-                                {
 
-                                }
-                                if (payDetailEntities == null)
+                if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
+                {
+                    browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
+                    return;
+                }
+                DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+                dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                string shopcode = userEntity.shopcode;
+                string branchCode = userEntity.branchcode;
+                try
+                {
+                    DateTime startDate = Convert.ToDateTime(start, dtFormat);
+                    DateTime endDate = Convert.ToDateTime(end, dtFormat);
+                    long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
+                    long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
+                    DbManager dbManager = DBUtils.Instance.DbManager;
+                    if (startDate != null && endDate != null)
+                    {
+                        using (var db = SugarDao.GetInstance())
+                        {
+                            string id = _LoginUserManager.UserEntity.userid;
+                            List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                                                                                            && i.cashierid == id
+                                                                                            && i.insertTime <= endDateTime
+                                                                                            && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
+                                                                                            && i.shopcode == shopcode
+                                                                                            && i.branchcode == branchCode).ToList();
+                            if (billEntities != null)
+                            {
+                                for (int i = 0; i < billEntities.Count; i++)
                                 {
-                                    payDetailEntities = new List<PayDetailEntity>();
+                                    //List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                    List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                    //if (billCommodityEntities == null)
+                                    //{
+                                    //    billCommodityEntities = new List<BillCommodityEntity>();
+                                    //}
+                                    //else
+                                    //{
+
+                                    //}
+                                    if (payDetailEntities == null)
+                                    {
+                                        payDetailEntities = new List<PayDetailEntity>();
+                                    }
+                                    //billEntities[i].commoditys = billCommodityEntities;
+                                    billEntities[i].paydetails = payDetailEntities;
                                 }
-                                billEntities[i].commoditys = billCommodityEntities;
-                                billEntities[i].paydetails = payDetailEntities;
+                                result = JsonConvert.SerializeObject(billEntities);
+                                //return _DataProcessor.PaginationData(billEntities, pageindex, pagesize);
                             }
-                            return JsonConvert.SerializeObject(billEntities);
-                            //return _DataProcessor.PaginationData(billEntities, pageindex, pagesize);
                         }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Info(e.Message + e.StackTrace);
-            }
+                catch (Exception e)
+                {
+                    logger.Info(e.Message + e.StackTrace);
+                }
 
-            return result;
+                browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
+            });
         }
         #endregion
 
@@ -1800,6 +1819,8 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+
+
         #region GetGPrinter
         /// <summary>
         /// 获取标签打印机
@@ -1816,7 +1837,7 @@ namespace ZlPos.Bizlogic
         /// 设置佳博打印机
         /// </summary>
         /// <param name="json"></param>
-        public void SetGprinter(string json)
+        public void SetGPrinter(string json)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             Task.Factory.StartNew(() =>
@@ -1832,6 +1853,8 @@ namespace ZlPos.Bizlogic
                                                     //保存缓存
                                                     if (result.code == ResponseCode.SUCCESS)
                                                     {
+                                                        //添加缓存
+
                                                         CacheManager.InsertGprint(json);
                                                         if (GPrinterManager.Instance.Init)
                                                         {
@@ -1846,6 +1869,10 @@ namespace ZlPos.Bizlogic
                                                                     break;
                                                             }
                                                         }
+                                                    }
+                                                    else
+                                                    {
+                                                        mWebViewHandle.Invoke("setGPrinterCallBack", result);
                                                     }
                                                 });
                 }
@@ -1866,9 +1893,9 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 ResponseEntity responseEntity = new ResponseEntity();
-                responseEntity.code = ResponseCode.Failed;
+                USBGPrinterSetter usbGPrinterSetter = new USBGPrinterSetter();
                 //ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
-                mWebViewHandle.Invoke("getGPrintUsbDevicesCallBack", responseEntity);
+                browser.ExecuteScriptAsync("getGPrintUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetGPrinter() + "')");
             });
             return;
 
@@ -2037,17 +2064,50 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        #region PrintLabel (null mehtod)
+        #region PrintLabel
         /// <summary>
-        /// 标签打印
+        /// 打印标签
         /// </summary>
         /// <param name="json"></param>
         public void PrintLabel(string json)
         {
-            //TODO...
-            return;
+            if (GPrinterManager.Instance.Init)
+            {
+                GPrinterUtils.Instance.printLabel(json);
+            }
         }
         #endregion
+
+        ///// <summary>
+        ///// 打印条码标签
+        ///// </summary>
+        //public void PrintBarcodeLabel(string s)
+        //{
+        //    Task.Factory.StartNew(() =>
+        //    {
+        //        ResponseEntity responseEntity = new ResponseEntity();
+        //        try
+        //        {
+        //            if (GPrinterManager.Instance.Init)
+        //            {
+        //                GPrinterUtils.Instance.PrintBarcodeLable(s);
+        //                responseEntity.code = ResponseCode.SUCCESS;
+        //            }
+        //            else
+        //            {
+        //                responseEntity.code = ResponseCode.Failed;
+        //                responseEntity.msg = "请设置打印机";
+        //            }
+        //        }
+        //        catch(Exception e)
+        //        {
+        //            logger.Info("PrintBarcodeLabel err>>" + e.Message + e.StackTrace);
+        //            responseEntity.code = ResponseCode.SUCCESS;
+        //            responseEntity.msg = e.Message;
+        //        }
+        //        mWebViewHandle?.Invoke(")
+        //    });
+        //}
 
         #region Print
         /// <summary>
@@ -2555,7 +2615,7 @@ namespace ZlPos.Bizlogic
                             {
                                 //browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
                                 logger.Info("getweigth callback invoke : number =>> " + number);
-                                if(string.IsNullOrEmpty(number))
+                                if (string.IsNullOrEmpty(number))
                                 {
                                     responseEntity.code = ResponseCode.Failed;
                                     responseEntity.msg = "电子秤设置错误，请重新设置";
@@ -2601,9 +2661,6 @@ namespace ZlPos.Bizlogic
             WeightUtil.Instance.Close();
         }
         #endregion
-
-
-
 
         #region SaveBarcodeScale
         /// <summary>
@@ -2669,6 +2726,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region SyncCommoditytoBarcodeScale
         /// <summary>
         /// 同步条码称方法
         /// </summary>
@@ -2780,7 +2838,12 @@ namespace ZlPos.Bizlogic
             }), new object[] { });
             return;
         }
+        #endregion
 
+        #region
+        /// <summary>
+        /// 获取条码称重量
+        /// </summary>
         public void GetWeightCommodity()
         {
             Task.Factory.StartNew(() =>
@@ -2886,7 +2949,13 @@ namespace ZlPos.Bizlogic
             return;
             //return JsonConvert.SerializeObject(commodityEntityList);
         }
+        #endregion
 
+        #region SaveWeightCommodity
+        /// <summary>
+        /// 保存商品重量
+        /// </summary>
+        /// <param name="str"></param>
         public void SaveWeightCommodity(string str)
         {
             Task.Factory.StartNew(() =>
@@ -2912,8 +2981,9 @@ namespace ZlPos.Bizlogic
                 browser.ExecuteScriptAsync("saveWeightCommodityCallBack()");
             });
         }
+        #endregion
 
-
+        #region Method of BarcodeScale
         /// <summary>
         /// 将单条商品信息转换成条码秤PLU码
         /// </summary>
@@ -3026,12 +3096,112 @@ namespace ZlPos.Bizlogic
                 logger.Info("sendMessage_btye error:" + e.Message + e.StackTrace);
             }
         }
+        #endregion
 
-
+        #region OnDesktop
+        /// <summary>
+        /// 返回桌面
+        /// </summary>
         public void OnDesktop()
         {
             frmMain.HideSelf();
         }
+        #endregion
+
+        #region PrintCommodityLabel
+        /// <summary>
+        /// 打印商品标签
+        /// </summary>
+        /// <param name="json"></param>
+        public void PrintCommodityLabel(string json)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (!string.IsNullOrEmpty(json))
+                {
+                    GPrinterUtils.Instance.PrintCommodotyLabel(json);
+                    responseEntity.code = ResponseCode.SUCCESS;
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "打印失败";
+                }
+                mWebViewHandle.Invoke("printCommodityLabelCallBack", responseEntity);
+            });
+        }
+        #endregion
+
+        #region
+        /// <summary>
+        /// 打印条码标签
+        /// </summary>
+        /// <param name="json"></param>
+        public void PrintBarcodeLabel(string json)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                try
+                {
+                    //CacheManager.GetGprint() as string
+                    if (CacheManager.GetGprint() as string != null)
+                    {
+                        List<string> usblist = GPrinterUtils.Instance.FindUSBPrinter();
+                        if (usblist == null)
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "未发现可用USB设备";
+
+                        }
+                        else
+                        {
+                            GPrinterManager.Instance.usbDeviceArrayList = usblist;
+                            GPrinterManager.Instance.Init = true;
+                            GPrinterManager.Instance.PrinterTypeEnum = "usb";
+                            //每次都先设置完再打印
+                            if (GPrinterUtils.Instance.Connect_Printer())
+                            {
+                                if (GPrinterManager.Instance.Init)
+                                {
+                                    GPrinterUtils.Instance.PrintBarcodeLable(json);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                }
+                                else
+                                {
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "请设置标签打印机";
+                                }
+                            }
+                            else
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "连接标签打印机失败";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "请设置标签打印机";
+                    }
+
+
+
+
+                }
+                catch (Exception e)
+                {
+                    logger.Info("PrintBarcodeLabel >> " + e.Message + e.StackTrace);
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = e.Message;
+                }
+
+                mWebViewHandle.Invoke("printBarcodeLabelCallBack", responseEntity);
+            });
+        }
+        #endregion
 
         /// <summary>
         /// 获取数据库缓存数据大小
