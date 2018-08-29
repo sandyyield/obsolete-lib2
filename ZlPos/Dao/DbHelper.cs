@@ -106,6 +106,9 @@ namespace ZlPos.Dao
                         UpgradingSchema.UpgradingVersion<ShopConfigEntity>(new string[] { "industryname", "industryid", "softwaretype", "expirestime", "contactaddress", "isbranchpay", "isrecharge", "payway", "expirestimestr" });
                         UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "updatetime", "createuser", "storagetype", "stylecode", "ordernum", "createtime", "dishid" });
                         break;
+                    case 8:
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "barcodes" });
+                        break;
                 }
                 //生成数据库配置文件
                 CreateConfig();

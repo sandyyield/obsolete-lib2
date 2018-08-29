@@ -128,5 +128,9 @@ namespace ZlPos.Models
         //add 2018年6月26日
         [SugarColumn(IsNullable = true)]
         public string commission { get; set; }
+
+        //add 2018年8月29日
+        [SugarColumn(IsNullable = true)]
+        public string barcodes { get; set; }
     }
 }
