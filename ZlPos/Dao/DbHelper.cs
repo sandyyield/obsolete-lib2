@@ -98,6 +98,14 @@ namespace ZlPos.Dao
                     case 6:
                         UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "plu" });
                         break;
+                    case 7:
+                        UpgradingSchema.UpgradingVersion<CategoryEntity>(new string[] { "createtime", "createuser", "updatetime", "updateuser" });
+                        UpgradingSchema.UpgradingVersion<CashierEntity>(new string[] { "createtime", "updatetime" });
+                        UpgradingSchema.UpgradingVersion<SupplierEntity>(new string[] { "commissionrate", "areaname", "areacode", "createtime", "flag", "required" });
+                        UpgradingSchema.UpgradingVersion<PayTypeEntity>(new string[] { "createtime" });
+                        UpgradingSchema.UpgradingVersion<ShopConfigEntity>(new string[] { "industryname", "industryid", "softwaretype", "expirestime", "contactaddress", "isbranchpay", "isrecharge", "payway", "expirestimestr" });
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "updatetime", "createuser", "storagetype", "stylecode", "ordernum", "createtime", "dishid" });
+                        break;
                 }
                 //生成数据库配置文件
                 CreateConfig();

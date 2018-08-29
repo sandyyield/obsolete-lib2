@@ -38,5 +38,22 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public string businessmodelname { get; set; }
 
+        //add 2018年8月27日
+        [SugarColumn(IsNullable = true)]
+        public string commissionrate { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string areaname { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string areacode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string createtime { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string flag { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string required { get; set; }
+
+
+
+
     }
 }

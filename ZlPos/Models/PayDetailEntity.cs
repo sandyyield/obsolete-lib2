@@ -19,7 +19,7 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public String shopcode { get; set; }
         [SugarColumn(IsNullable = true)]
-        public String payamount { get; set; }
+        public string payamount { get; set; }
         [SugarColumn(IsNullable = true)]
         public String paycardcode { get; set; }
         //2017/12/16新增
@@ -39,5 +39,9 @@ namespace ZlPos.Models
         // add: 2018/2/27
         [SugarColumn(IsNullable = true)]
         public String ordercode { get; set; }
+
+        // add 2018年8月27日
+        [SugarColumn(IsNullable = true)]
+        public string createtime { get; set; }
     }
 }

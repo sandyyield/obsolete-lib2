@@ -150,6 +150,7 @@
     <Compile Include="Models\PrintCommodityEntity.cs" />
     <Compile Include="Models\SyncScaleEntity.cs" />
     <Compile Include="Models\SyncScaleVM.cs" />
+    <Compile Include="Models\TotalBillVM.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\LoadPOSDll.cs" />
     <Compile Include="PrintServices\LPTPrinter.cs" />

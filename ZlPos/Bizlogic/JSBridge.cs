@@ -29,6 +29,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.Net.Sockets;
 using System.Net;
+using System.Linq;
 
 namespace ZlPos.Bizlogic
 {
@@ -965,7 +966,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public void GetAllSaleBill(string state,string target)
+        public void GetAllSaleBill(string state, string target)
         {
             Task.Factory.StartNew(() =>
             {
@@ -1090,7 +1091,8 @@ namespace ZlPos.Bizlogic
                                 //    billEntities[i].paydetails = payDetailEntities;
                                 //}
                                 //return JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
-                                browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize)) + "')");
+                                result = JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
+                                //browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize)) + "')");
                             }
                         }
                     }
@@ -1098,8 +1100,8 @@ namespace ZlPos.Bizlogic
                 catch (Exception e)
                 {
                     logger.Info(e.Message + e.StackTrace);
-                    browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "','" + pageindex + "','" + pagesize + "')");
                 }
+                browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "','" + pageindex + "','" + pagesize + "')");
             });
 
             //return result;
@@ -1140,47 +1142,84 @@ namespace ZlPos.Bizlogic
                     DbManager dbManager = DBUtils.Instance.DbManager;
                     if (startDate != null && endDate != null)
                     {
+                        TotalBillVM totalBillVM = new TotalBillVM();
+                        List<TotalBillVM.PayTypeEntity> paytypes = new List<TotalBillVM.PayTypeEntity>();
                         using (var db = SugarDao.GetInstance())
                         {
-                            string id = _LoginUserManager.UserEntity.userid;
-                            List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
-                                                                                            && i.cashierid == id
-                                                                                            && i.insertTime <= endDateTime
-                                                                                            && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
-                                                                                            && i.shopcode == shopcode
-                                                                                            && i.branchcode == branchCode).ToList();
-                            if (billEntities != null)
-                            {
-                                for (int i = 0; i < billEntities.Count; i++)
-                                {
-                                    //List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                    List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                    //if (billCommodityEntities == null)
-                                    //{
-                                    //    billCommodityEntities = new List<BillCommodityEntity>();
-                                    //}
-                                    //else
-                                    //{
 
-                                    //}
-                                    if (payDetailEntities == null)
-                                    {
-                                        payDetailEntities = new List<PayDetailEntity>();
-                                    }
-                                    //billEntities[i].commoditys = billCommodityEntities;
-                                    billEntities[i].paydetails = payDetailEntities;
-                                }
-                                result = JsonConvert.SerializeObject(billEntities);
-                                //return _DataProcessor.PaginationData(billEntities, pageindex, pagesize);
+                            string id = _LoginUserManager.UserEntity.userid;
+                            //List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                            //                                                                && i.cashierid == id
+                            //                                                                && i.insertTime <= endDateTime
+                            //                                                                && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
+                            //                                                                && i.shopcode == shopcode
+                            //                                                                && i.branchcode == branchCode).ToList();
+                            //if (billEntities != null)
+                            //{
+                            //    for (int i = 0; i < billEntities.Count; i++)
+                            //    {
+                            //        //List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                            //        List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                            //        //if (billCommodityEntities == null)
+                            //        //{
+                            //        //    billCommodityEntities = new List<BillCommodityEntity>();
+                            //        //}
+                            //        //else
+                            //        //{
+
+                            //        //}
+                            //        if (payDetailEntities == null)
+                            //        {
+                            //            payDetailEntities = new List<PayDetailEntity>();
+                            //        }
+                            //        //billEntities[i].commoditys = billCommodityEntities;
+                            //        billEntities[i].paydetails = payDetailEntities;
+                            //    }
+                            //    result = JsonConvert.SerializeObject(billEntities);
+                            //    //return _DataProcessor.PaginationData(billEntities, pageindex, pagesize);
+                            //}
+
+                            var totalDM = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                                                                            && i.cashierid == id
+                                                                            && i.insertTime <= endDateTime
+                                                                            && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
+                                                                            && i.shopcode == shopcode
+                                                                            && i.branchcode == branchCode)
+                                                                            .Select(i => new { totalpay = SqlFunc.AggregateSum(i.paytotal), count = SqlFunc.AggregateCount(i.ticketcode) })
+                                                                            .ToList();
+                            totalBillVM.totalpay = Math.Round(Convert.ToDouble(totalDM[0].totalpay), 2) + "";
+
+                            totalBillVM.totalnum = Convert.ToInt32(totalDM[0].count);
+
+
+                            try
+                            {
+                                var list = db.Queryable<BillEntity, PayDetailEntity>((be, pde) => new object[] { JoinType.Inner, be.ticketcode == pde.ticketcode })
+                                                                                    .Where((be, pde) => be.insertTime >= startDateTime
+                                                                                    && be.cashierid == id
+                                                                                    && be.insertTime <= endDateTime
+                                                                                    && (be.ticketstatue == "cached" || be.ticketstatue == "updated")
+                                                                                    && be.shopcode == shopcode
+                                                                                    && be.branchcode == branchCode)
+                                                                                    .GroupBy((be, pde) => pde.payname)
+                                                                                    .Select((be, pde) => new { pde.payname, payamount = SqlFunc.AggregateSum(pde.payamount), totalnumtcout = SqlFunc.AggregateCount(pde.id) })
+                                                                                    .ToList();
+
+                                list.ForEach(i => paytypes.Add(new TotalBillVM.PayTypeEntity { payname = i.payname, totalpay = i.payamount, totalnum = i.totalnumtcout.ToString() }));
+                                totalBillVM.paytypes = paytypes;
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.Info("统计支付方式异常");
                             }
                         }
+                        result = JsonConvert.SerializeObject(totalBillVM);
                     }
                 }
                 catch (Exception e)
                 {
                     logger.Info(e.Message + e.StackTrace);
                 }
-
                 browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
             });
         }
@@ -1694,7 +1733,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetCommodityByKeyword(string keyword)
+        public string GetCommodityByKeyword(string keyword, int pageindex, int pagesize)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
@@ -1710,7 +1749,9 @@ namespace ZlPos.Bizlogic
                                                                             && i.commoditystatus == "0"
                                                                             && i.del == "0"
                                                                             && (i.commodityname.Contains("keyword")
-                                                                                || i.mnemonic.Contains("keyword"))).ToList();
+                                                                                || i.mnemonic.Contains("keyword")))
+                                                                            .ToPageList(pageindex, pagesize);
+                        //.ToList();
                     }
                 }
                 catch (Exception e)
@@ -1722,10 +1763,10 @@ namespace ZlPos.Bizlogic
             {
                 commodityEntities = new List<CommodityEntity>();
             }
-            if (commodityEntities.Count > 50)
-            {
-                commodityEntities = commodityEntities.GetRange(0, 50);
-            }
+            //if (commodityEntities.Count > 50)
+            //{
+            //    commodityEntities = commodityEntities.GetRange(0, 50);
+            //}
 
             return JsonConvert.SerializeObject(commodityEntities);
         }

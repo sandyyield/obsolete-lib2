@@ -50,5 +50,37 @@ namespace ZlPos.Models
         public string rechargepwd { get; set; }
 
 
+        //add 2018年8月27日
+        [SugarColumn(IsNullable = true)]
+        public string industryname { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string industryid { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string softwaretype { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string expirestime { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string contactaddress { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string isbranchpay { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string isrecharge { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string payway { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string expirestimestr { get; set; }
+
+
+
+        
+
+            
+        
+        
+            
+            
+            
+            
+
     }
 }

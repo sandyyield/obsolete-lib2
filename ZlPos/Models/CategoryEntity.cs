@@ -30,5 +30,16 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public String branchcode { get; set; }
 
+        //ADD 2018年8月27日
+        [SugarColumn(IsNullable = true)]
+        public string createtime { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string createuser { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string updatetime { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string updateuser { get; set; }
+
+
     }
 }

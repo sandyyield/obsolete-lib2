@@ -26,5 +26,11 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public String del { get; set; }
+
+        //add 2018年8月27日
+        [SugarColumn(IsNullable = true)]
+        public string createtime { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string updatetime { get; set; }
     }
 }

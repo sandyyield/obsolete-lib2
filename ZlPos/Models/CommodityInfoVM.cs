@@ -23,6 +23,7 @@ namespace ZlPos.Models
         public List<MemberEntity> memberlevels { get; set; }
         [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<PayTypeEntity> paytypes { get; set; }
+        //此节点已弃用1
         [SugarColumn(IsNullable = true, IsIgnore = true)]
         public List<AssistantsEntity> assistants { get; set; }
         [SugarColumn(IsNullable = true,IsIgnore = true)]

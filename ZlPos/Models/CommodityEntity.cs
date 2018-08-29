@@ -120,6 +120,23 @@ namespace ZlPos.Models
 
         [SugarColumn(IsIgnore = true)]
         public string barcode { get; set; }
-        
+
+
+        //add 2018年8月27日
+        [SugarColumn(IsIgnore = true)]
+        public string updatetime { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string createuser { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string storagetype { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string stylecode { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string ordernum { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string createtime { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string dishid { get; set; }
+
     }
 }
