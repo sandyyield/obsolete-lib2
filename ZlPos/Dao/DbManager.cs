@@ -13,6 +13,7 @@ namespace ZlPos.Dao
         void BulkSaveOrUpdate<T>(List<T> list) where T : class, new();
         void BulkSaveOrUpdate<T>(T[] array) where T : class, new();
         void Delete<T>(T payDetailEntity) where T : class, new();
+        bool IsTableExist<T>(T table) where T:class,new();
         //void SaveOrUpdateCommodityEntities(CommodityEntity[] commodityEntity);
         //void BulkSaveOrUpdateBarCodes(BarCodeEntity2[] barCodeEntity2);
     }

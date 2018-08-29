@@ -193,28 +193,6 @@ namespace ZlPos.Dao
             {
                 try
                 {
-                    //这部分代码移到BulkSaveOrUpdate
-                    ////判断一下是否为list集合
-                    //if (entity.GetType().IsGenericType)
-                    //{
-                    //    Type[] tps = entity.GetType().GetGenericArguments();
-                    //    if(!(tps.Length > 0))
-                    //    {
-                    //        throw new Exception("saveOrUpdate list数据types出错");
-                    //    }
-                    //    if (!db.DbMaintenance.IsAnyTable(tps[0].Name))
-                    //    {
-                    //        //db.CodeFirst.InitTables(entity.GetType().Name);
-                    //        db.CodeFirst.InitTables(tps[0]);
-
-                    //    }
-                    //    //TODO...这里还没有完成
-                    //    Type tpp = entity.GetType().GetGenericTypeDefinition();
-                    //    //var tlist = entity is tpp;
-                    //    var s9 = db.Insertable(entity).Where(true, true).ExecuteCommand();
-                    //}
-                    //else
-                    //{
                     //db.Ado.BeginTran();
                     if (!db.DbMaintenance.IsAnyTable(entity.GetType().Name, false))
                     {
@@ -236,7 +214,7 @@ namespace ZlPos.Dao
                 }
                 catch (Exception e)
                 {
-                    db.Ado.RollbackTran();
+                    //db.Ado.RollbackTran();
                     throw e;
                 }
             }
@@ -569,6 +547,29 @@ namespace ZlPos.Dao
             catch (Exception e)
             {
                 logger.Error("BulkSaveOrUpdateCommodityPriceEntityList:" + e.Message + e.StackTrace);
+            }
+        }
+
+        public bool IsTableExist<T>(T table) where T : class, new()
+        {
+            try
+            {
+                using (var db = SugarDao.GetInstance())
+                {
+                    //db.Ado.BeginTran();
+                    if (!db.DbMaintenance.IsAnyTable(table.GetType().Name, false))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }

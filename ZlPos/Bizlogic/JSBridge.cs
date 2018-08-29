@@ -469,7 +469,7 @@ namespace ZlPos.Bizlogic
             }
             catch (Exception e)
             {
-                logger.Info("保存或更新用户信息接口：保存数据库操作异常");
+                logger.Info("保存或更新用户信息接口：保存数据库操作异常: " + e.Message + e.StackTrace);
                 //throw;
             }
         }
@@ -1365,6 +1365,11 @@ namespace ZlPos.Bizlogic
             {
                 try
                 {
+                    if (!db.DbMaintenance.IsAnyTable("BillEntity", false))
+                    {
+                        logger.Info("数据库暂时没有单据");
+                        return 0;
+                    }
                     DateTime startDate = Convert.ToDateTime(start, dtFormat);
                     DateTime endDate = Convert.ToDateTime(end, dtFormat);
                     long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
@@ -1748,10 +1753,11 @@ namespace ZlPos.Bizlogic
                         commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                             && i.commoditystatus == "0"
                                                                             && i.del == "0"
-                                                                            && (i.commodityname.Contains("keyword")
-                                                                                || i.mnemonic.Contains("keyword")))
+                                                                            && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword)))
+                                                                            //&& (i.commodityname.Contains("keyword")
+                                                                            //    || i.mnemonic.Contains("keyword")))
+                                                                            //.ToList();
                                                                             .ToPageList(pageindex, pagesize);
-                        //.ToList();
                     }
                 }
                 catch (Exception e)
@@ -1787,12 +1793,15 @@ namespace ZlPos.Bizlogic
                 {
                     var paycodeModelList = db.Queryable<PayDetailEntity>().GroupBy(i => i.paycode).ToList();
                     List<string> payCodeList = new List<string>();
-                    foreach (var item in paycodeModelList)
+                    if (paycodeModelList != null)
                     {
-                        string paycode = item.paycode;
-                        payCodeList.Add(paycode);
-
+                        foreach (var item in paycodeModelList)
+                        {
+                            string paycode = item.paycode;
+                            payCodeList.Add(paycode);
+                        }
                     }
+
                     //    for (DbModel dbModel : paycodeModelList) {
                     //        String paycode = dbModel.getDataMap().get("paycode");
                     //payCodeList.add(paycode);
@@ -1815,6 +1824,14 @@ namespace ZlPos.Bizlogic
         }
 
         //public void SetSecondScreenWebView()
+
+        #region VersionUpdate
+        public void VersionUpdate()
+        {
+            //TODO...UPDATE
+        }
+
+        #endregion
 
 
         //IO 操作相关 ... 
