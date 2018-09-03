@@ -123,20 +123,24 @@ namespace ZlPos.Models
 
 
         //add 2018年8月27日
-        [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsNullable = true)]
         public string updatetime { get; set; }
-        [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsNullable = true)]
         public string createuser { get; set; }
-        [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsNullable = true)]
         public string storagetype { get; set; }
-        [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsNullable = true)]
         public string stylecode { get; set; }
-        [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsNullable = true)]
         public string ordernum { get; set; }
-        [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsNullable = true)]
         public string createtime { get; set; }
-        [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsNullable = true)]
         public string dishid { get; set; }
+
+        //add 2018年9月3日
+        [SugarColumn(IsNullable = true)]
+        public string updateuser { get; set; }
 
     }
 }

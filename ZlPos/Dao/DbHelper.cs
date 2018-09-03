@@ -109,6 +109,9 @@ namespace ZlPos.Dao
                     case 8:
                         UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "barcodes" });
                         break;
+                    case 9:
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "updateuser" });
+                        break;
                 }
                 //生成数据库配置文件
                 CreateConfig();

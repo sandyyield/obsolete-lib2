@@ -1486,6 +1486,42 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        //add 2018年9月3日
+        #region SaveCommodityList
+        public void SaveCommodityList(string target, string commodityListString)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            Task.Factory.StartNew(() =>
+            {
+                if (_LoginUserManager.Login)
+                {
+                    UserEntity userEntity = _LoginUserManager.UserEntity;
+                    try
+                    {
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        List<CommodityEntity> commodities = JsonConvert.DeserializeObject<List<CommodityEntity>>(commodityListString);
+                        if(commodities != null)
+                        {
+                            dbManager.BulkSaveOrUpdate(commodities);
+                        }
+                        logger.Info("保存和更新商品信息接口：信息保存成功");
+                        responseEntity.code = ResponseCode.SUCCESS;
+                    }
+                    catch(Exception e)
+                    {
+                        logger.Error("保存和更新商品信息接口：json解析异常or保存数据库操作异常");
+                        responseEntity.code = ResponseCode.Failed;
+                    }
+                }
+                else
+                {
+                    logger.Info("保存和更新商品信息接口：用户未登录");
+                    responseEntity.code = ResponseCode.Failed;
+                }
+                browser.ExecuteScriptAsync("saveCommodityListCallBack('" + target + "', '" + JsonConvert.SerializeObject(responseEntity) + "')");
+            });
+        }
+        #endregion
 
         #region GetCommodityById
         /// <summary>
@@ -1641,7 +1677,8 @@ namespace ZlPos.Bizlogic
                             commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                     && i.commoditystatus == "0"
                                                                                     && i.del == "0"
-                                                                                    && i.categorycode == categoryCode)
+                                                                                    && i.categorycode == categoryCode
+                                                                                    && i.commodityclassify != "3")
                                                                                     .OrderBy(i => i.categorycode, SqlSugar.OrderByType.Desc)
                                                                                     .ToList();
                         }
@@ -2611,7 +2648,14 @@ namespace ZlPos.Bizlogic
         public string GetScale()
         {
             string scale = CacheManager.GetScale(SPCode.scale) as string;
-            return scale;
+            if (string.IsNullOrEmpty(scale))
+            {
+                return "";
+            }
+            else
+            {
+                return scale;
+            }
         }
         #endregion
 
@@ -3251,7 +3295,7 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception e)
                 {
-                    logger.Info("PrintBarcodeLabel >> " + e.Message + e.StackTrace);
+                    logger.Error("PrintBarcodeLabel >> " + e.Message + e.StackTrace);
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = e.Message;
                 }
