@@ -1500,14 +1500,14 @@ namespace ZlPos.Bizlogic
                     {
                         DbManager dbManager = DBUtils.Instance.DbManager;
                         List<CommodityEntity> commodities = JsonConvert.DeserializeObject<List<CommodityEntity>>(commodityListString);
-                        if(commodities != null)
+                        if (commodities != null)
                         {
                             dbManager.BulkSaveOrUpdate(commodities);
                         }
                         logger.Info("保存和更新商品信息接口：信息保存成功");
                         responseEntity.code = ResponseCode.SUCCESS;
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         logger.Error("保存和更新商品信息接口：json解析异常or保存数据库操作异常");
                         responseEntity.code = ResponseCode.Failed;
@@ -1923,7 +1923,28 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetGPrinter()
         {
-            return CacheManager.GetGprint() as string;
+            return CacheManager.GetGprint() as string??"";
+        }
+        #endregion
+
+        //add 2018年9月3日 新增标价签设置
+        #region GetBJQPrinter
+        public string GetBJQPrinter()
+        {
+            return CacheManager.GetBJQprint() as string??"";
+        }
+        #endregion
+
+        #region SetBJQPrinter (这个接口由于windows上usb设备为广播形式所以不需要实现 直接返回ture就完事了)
+        public void SetBJQPrinter(string s)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            Task.Factory.StartNew(() =>
+            {
+                responseEntity.code = ResponseCode.SUCCESS;
+                responseEntity.msg = "windows不需要设置";
+                mWebViewHandle?.Invoke("setBJQPrinterCallBack", responseEntity);
+            });
         }
         #endregion
 
@@ -1995,6 +2016,21 @@ namespace ZlPos.Bizlogic
             return;
 
         }
+        #endregion
+
+        #region GetBJQUsbDevices
+        public void GetBJQUsbDevices()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                USBGPrinterSetter usbGPrinterSetter = new USBGPrinterSetter();
+                //ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
+                browser.ExecuteScriptAsync("getBJQUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetBJQPrinter() + "')");
+            });
+            return;
+        }
+
         #endregion
 
         #region print debug code

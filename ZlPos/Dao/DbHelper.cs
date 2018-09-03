@@ -111,6 +111,7 @@ namespace ZlPos.Dao
                         break;
                     case 9:
                         UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "updateuser" });
+                        UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "BJQprint" });
                         break;
                 }
                 //生成数据库配置文件

@@ -44,5 +44,14 @@ namespace ZlPos.Utils
             return ContextCache.getBarcodeStyle();
         }
 
+        public static string GetBJQprint()
+        {
+            return ContextCache.getBJQprint();
+        }
+
+        public static void InsertBJQprint(string s)
+        {
+            ContextCache.SetBJQprint(s);
+        }
     }
 }

@@ -43,6 +43,43 @@ namespace ZlPos.Bizlogic
                 DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
             }
         }
+
+        #endregion
+
+        #region BJQprint
+        public static string getBJQprint()
+        {
+            using (var db = SugarDao.GetInstance())
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.BJQprint;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void SetBJQprint(string v)
+        {
+            using (var db = SugarDao.GetInstance())
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.BJQprint = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
         #endregion
 
         #region Scale cache
