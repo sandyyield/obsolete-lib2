@@ -130,10 +130,12 @@ namespace ZlPos.PrintServices
             PrintBridge.WriteUsb(hDevice, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendCount);
         }
 
-        public void printQRCode()
+        public void printQRCode(string code)
         {
             int sendCount = 0;
-            string str = "1D5A021B5A034C0605000201010D0A";
+            string hex = StringUtils.StringToHex16String(code);//StringUtils.ConvertStringToHex(code);
+            string str = "1D5A021B5A034C06" + String.Format("{0:X}", hex.Length / 2) + "00" + hex;
+            //string str = "1D5A021B5A034C06" + "05000201010D0A" + "54C754C754C754C754C754C754C720202054C854C854C854C82031212121";
             byte[] strByte = HexUtils.HexStringToByte(str);
             string sendUnicode = Encoding.Unicode.GetString(strByte);
             PrintBridge.WriteUsb(hDevice, sendUnicode, Encoding.Unicode.GetByteCount(sendUnicode), ref sendCount);

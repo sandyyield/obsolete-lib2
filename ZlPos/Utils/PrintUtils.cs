@@ -24,7 +24,14 @@ namespace ZlPos.Utils
                 usbPrinter.initUSB();
                 for (int i = 0; i < printEntities.Count; i++)
                 {
-                    usbPrinter.PrintString(printEntities[i].content);
+                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                    {
+                        usbPrinter.PrintString(printEntities[i].content);
+                    }
+                    else
+                    {
+                        usbPrinter.printQRCode(printEntities[i].content);
+                    }
                 }
             }
             usbPrinter.PrintString("\n\n\n\n\n\n");
@@ -32,6 +39,17 @@ namespace ZlPos.Utils
         }
         #endregion
 
+        #region print QRCode usb
+        internal static void PrintQRCode(string code, USBPrinter usbPrinter)
+        {
+            if (string.IsNullOrEmpty(code) && usbPrinter == null)
+            {
+                return;
+            }
+            usbPrinter.initUSB();
+            usbPrinter.printQRCode(code);
+        }
+        #endregion
         #region printmodel bluetooth
         public static void printModel(string content, BluetoothPrinter bluetoothPrinter)
         {
@@ -71,12 +89,31 @@ namespace ZlPos.Utils
                 //portPrinter.initUSB();
                 for (int i = 0; i < printEntities.Count; i++)
                 {
-                    portPrinter.PrintString(printEntities[i].content);
+                    //portPrinter.PrintString(printEntities[i].content);
+                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                    {
+                        portPrinter.PrintString(printEntities[i].content);
+                    }
+                    else
+                    {
+                        portPrinter.PrintQRCode(printEntities[i].content);
+                    }
                 }
             }
             portPrinter.PrintString("\n\n\n\n\n\n");
             //portPrinter.Write(content);
         }
+        #endregion
+        internal static void PrintQRCode(string code, serialPort portPrinter)
+        {
+            if (string.IsNullOrEmpty(code) && portPrinter == null)
+            {
+                return;
+            }
+            portPrinter.PrintString(code);
+        }
+        #region print QRCode port
+
         #endregion
 
         #region printmodel lpt
@@ -489,6 +526,8 @@ namespace ZlPos.Utils
             }
             return stringBuffer.ToString();
         }
+
+
 
         #endregion
     }

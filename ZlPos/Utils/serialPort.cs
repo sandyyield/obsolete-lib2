@@ -54,6 +54,17 @@ namespace ZlPos.Utils
             }
         }
 
+        public void PrintQRCode(string txt)
+        {
+            if (m_SerialPort.IsOpen)
+            {
+                string hex = StringUtils.StringToHex16String(txt);
+                string str = "1D5A021B5A034C06" + String.Format("{0:X}", hex.Length / 2) + "00" + hex;
+                byte[] strByte = StringUtils.HexToByte(str);
+                m_SerialPort.Write(strByte, 0, strByte.Length);
+            }
+        }
+
         public void CustomerWrite(string s)
         {
             byte[] buffer = strToToHexByte(s as string);

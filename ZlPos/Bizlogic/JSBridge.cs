@@ -1025,6 +1025,103 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region GetAllSaleBillByParams
+        /// <summary>
+        /// 离线交易查询（JS存在bug 待处理 2018年9月5日）
+        /// </summary>
+        /// <param name="s"></param>
+        public void GetAllSaleBillByParams(string s)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                string result = "[]";
+                BillAndCountEntity billAndCountEntity = new BillAndCountEntity();
+                try
+                {
+                    QueryBillEntity queryBillEntity = JsonConvert.DeserializeObject<QueryBillEntity>(s);
+                    if (queryBillEntity != null)
+                    {
+                        string start = queryBillEntity.starttime;
+                        string end = queryBillEntity.endtime;
+                        if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
+                        {
+                            browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + result + "')");
+                            return;
+                        }
+                        DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+                        dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+                        UserEntity userEntity = _LoginUserManager.UserEntity;
+                        string shopcode = userEntity.shopcode;
+                        string branchCode = userEntity.branchcode;
+                        try
+                        {
+                            DateTime startDate = Convert.ToDateTime(start, dtFormat);
+                            DateTime endDate = Convert.ToDateTime(end, dtFormat);
+                            long startDateTime = DateUtils.ConvertDataTimeToLong(startDate);
+                            long endDateTime = DateUtils.ConvertDataTimeToLong(endDate);
+                            DbManager dbManager = DBUtils.Instance.DbManager;
+                            if (startDate != null && endDate != null)
+                            {
+                                var totalCount = 0;
+                                using (var db = SugarDao.GetInstance())
+                                {
+                                    List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                                                                                                    && i.cashierid == queryBillEntity.cashierid
+                                                                                                    && i.insertTime <= endDateTime
+                                                                                                    && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
+                                                                                                    && i.shopcode == shopcode
+                                                                                                    && i.branchcode == branchCode
+                                                                                                    && SqlFunc.Contains(i.ticketcode, queryBillEntity.ticketcode))
+                                                                                                    .ToPageList(queryBillEntity.pageindex, queryBillEntity.pagesize, ref totalCount);
+                                    if (billEntities != null)
+                                    {
+                                        logger.Info("获取对应状态的单据信息 billEntities:" + billEntities.ToString());
+                                        for (int i = 0; i < billEntities.Count; i++)
+                                        {
+                                            List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                            List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                            List<DisCountDetailEntity> disCountDetailEntities = db.Queryable<DisCountDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
+                                            if (billCommodityEntities == null)
+                                            {
+                                                billCommodityEntities = new List<BillCommodityEntity>();
+                                            }
+                                            if (payDetailEntities == null)
+                                            {
+                                                payDetailEntities = new List<PayDetailEntity>();
+                                            }
+                                            if (disCountDetailEntities == null)
+                                            {
+                                                disCountDetailEntities = new List<DisCountDetailEntity>();
+                                            }
+                                            billEntities[i].commoditys = billCommodityEntities;
+                                            billEntities[i].paydetails = payDetailEntities;
+                                            billEntities[i].discountdetails = disCountDetailEntities;
+                                        }
+                                        billAndCountEntity.count = totalCount;
+                                        billAndCountEntity.billEntityList = billEntities;
+                                        //result = JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Info("getAllSaleBillByParams : 数据库查询出错",e);
+                        }
+
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("getAllSaleBillByParams : json 解析异常", e);
+                }
+                string finalAllBills = JsonConvert.SerializeObject(billAndCountEntity);
+                browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + finalAllBills + "')");
+            });
+        }
+        #endregion
+
         #region GetSelectTimeSaleBillByPagination
         /// <summary>
         /// 分页查询销售订单
@@ -1923,7 +2020,7 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetGPrinter()
         {
-            return CacheManager.GetGprint() as string??"";
+            return CacheManager.GetGprint() as string ?? "";
         }
         #endregion
 
@@ -1931,7 +2028,7 @@ namespace ZlPos.Bizlogic
         #region GetBJQPrinter
         public string GetBJQPrinter()
         {
-            return CacheManager.GetBJQprint() as string??"";
+            return CacheManager.GetBJQprint() as string ?? "";
         }
         #endregion
 
@@ -2369,6 +2466,74 @@ namespace ZlPos.Bizlogic
                 mWebViewHandle.Invoke("print2CallBack", responseEntity);
             });
             return;
+        }
+        #endregion
+
+        #region PrintQRCode
+        public void PrintQRCode(string code)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            if (!string.IsNullOrEmpty(code))
+            {
+                try
+                {
+                    if (PrinterManager.Instance.Init)
+                    {
+                        switch (PrinterManager.Instance.PrinterTypeEnum)
+                        {
+                            case Enums.PrinterTypeEnum.usb:
+                                USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
+                                for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                {
+                                    PrintUtils.PrintQRCode(code, usbPrinter);
+                                }
+                                responseEntity.code = ResponseCode.SUCCESS;
+                                responseEntity.msg = "小票打印成功";
+                                break;
+                            case Enums.PrinterTypeEnum.bluetooth:
+                                //BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
+                                //for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                //{
+                                //    PrintUtils.printModel(content, bluetoothPrinter);
+                                //}
+                                //responseEntity.code = ResponseCode.SUCCESS;
+                                //responseEntity.msg = "小票打印成功";
+                                break;
+                            case Enums.PrinterTypeEnum.port:
+                                serialPort portPrinter = PrinterManager.Instance.PortPrinter;
+                                for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                {
+                                    PrintUtils.PrintQRCode(code, portPrinter);
+                                }
+                                responseEntity.code = ResponseCode.SUCCESS;
+                                responseEntity.msg = "小票打印成功";
+                                break;
+                            case PrinterTypeEnum.LPT:
+                                //LPTPrinter lptPrinter = PrinterManager.Instance.LptPrinter;
+                                //for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                //{
+                                //    PrintUtils.printModel(content, lptPrinter);
+                                //}
+                                //responseEntity.code = ResponseCode.SUCCESS;
+                                //responseEntity.msg = "小票打印成功";
+                                break;
+                            default:
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "非法打印机类型";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印机未设置，请设置打印机";
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("PrintQRCode err", e);
+                }
+            }
         }
         #endregion
 

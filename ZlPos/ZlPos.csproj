@@ -145,9 +145,11 @@
     <Compile Include="Models\BarCodeEntity2.cs" />
     <Compile Include="Models\BarcodeScaleConfigEntity.cs" />
     <Compile Include="Models\BarcodeScaleEntity.cs" />
+    <Compile Include="Models\BillAndCountEntity.cs" />
     <Compile Include="Models\CommodityAndCountEntity.cs" />
     <Compile Include="Models\PluMessageEntity.cs" />
     <Compile Include="Models\PrintCommodityEntity.cs" />
+    <Compile Include="Models\QueryBillEntity.cs" />
     <Compile Include="Models\SyncScaleEntity.cs" />
     <Compile Include="Models\SyncScaleVM.cs" />
     <Compile Include="Models\TotalBillVM.cs" />
