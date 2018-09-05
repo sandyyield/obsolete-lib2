@@ -248,47 +248,53 @@ namespace ZlPos.Utils
         /// <param name="v"></param>
         private void PrintOneLable(BillCommodityEntity billCommodityEntity, string v)
         {
-            byte[] enddata = { 0x0a };//换行
-
-            List<string> s = new List<string>();
-            s.Add("SIZE 60 mm,40 mm");
-            s.Add("GAP 2 0");//TODO...
-            s.Add("DIRECTION 1");
-            s.Add("REFERENCE 0,0");
-            s.Add("SET TEAR ON");
-            s.Add("CLS");
-
-            s.Add("TEXT 20,20,\"TSS24.BF2\",0,2,2,\"" + center(24, billCommodityEntity.branchname, 2) + "\"");
-
-            s.Add("TEXT 360,20,\"TSS24.BF2\",0,2,2,\"" + center(8, billCommodityEntity.ticketcode.Substring(billCommodityEntity.ticketcode.LastIndexOf("-") + 1),2) + "\"");
-
-            s.Add("TEXT 0,80,\"TSS24.BF2\",0,1,1,\"" + "`````````````````````````````````````````````````````````````````" + "\"");
-            s.Add("TEXT 20,110,\"TSS24.BF2\",0,1,1,\"" + billCommodityEntity.commodityname + "\"");
-
-            if ("1".Equals(billCommodityEntity.pricing))
-            {//称重商品
-                s.Add("TEXT 20,280,\"TSS24.BF2\",0,1,1,\"" + "￥" + billCommodityEntity.paysubtotal + "          " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
-                //tsc.addText(20, 280, FONTTYPE.SIMPLIFIED_CHINESE, ROTATION.ROTATION_0,
-                //        FONTMUL.MUL_1, FONTMUL.MUL_1, "￥" + billCommodityEntity.getPaysubtotal() + "          " + DateUtil.getTime(new Date()));
-            }
-            else
+            if (Connect_Printer())
             {
-                s.Add("TEXT 20,280,\"TSS24.BF2\",0,1,1,\"" + "￥" + billCommodityEntity.saleprice + "          " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
-                //tsc.addText(20, 280, FONTTYPE.SIMPLIFIED_CHINESE, ROTATION.ROTATION_0,
-                //        FONTMUL.MUL_1, FONTMUL.MUL_1, "￥" + billCommodityEntity.getSaleprice() + "          " + DateUtil.getTime(new Date()));
-            }
 
-            s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);//TOFIX...打印份数应当通过设置
-            s.Add("SOUND 2,100");
+                byte[] enddata = { 0x0a };//换行
 
-            foreach (var item in s)
-            {
-                if (!string.IsNullOrEmpty(item))
+                List<string> s = new List<string>();
+
+                s.Add("SIZE 60 mm,40 mm");
+                s.Add("GAP 2 0");//TODO...
+                s.Add("DIRECTION 0");
+                s.Add("REFERENCE 0,0");
+                s.Add("SET TEAR ON");
+                s.Add("CLS");
+
+                s.Add("TEXT 20,20,\"TSS24.BF2\",0,2,2,\"" + center(24, billCommodityEntity.branchname, 2) + "\"");
+
+                s.Add("TEXT 360,20,\"TSS24.BF2\",0,2,2,\"" + center(8, billCommodityEntity.ticketcode.Substring(billCommodityEntity.ticketcode.LastIndexOf("-") + 1), 2) + "\"");
+
+                s.Add("TEXT 0,80,\"TSS24.BF2\",0,1,1,\"" + "`````````````````````````````````````````````````````````````````" + "\"");
+                s.Add("TEXT 20,110,\"TSS24.BF2\",0,1,1,\"" + billCommodityEntity.commodityname + "\"");
+
+                if ("1".Equals(billCommodityEntity.pricing))
+                {//称重商品
+                    s.Add("TEXT 20,280,\"TSS24.BF2\",0,1,1,\"" + "￥" + billCommodityEntity.paysubtotal + "          " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
+                    //tsc.addText(20, 280, FONTTYPE.SIMPLIFIED_CHINESE, ROTATION.ROTATION_0,
+                    //        FONTMUL.MUL_1, FONTMUL.MUL_1, "￥" + billCommodityEntity.getPaysubtotal() + "          " + DateUtil.getTime(new Date()));
+                }
+                else
                 {
+                    s.Add("TEXT 20,280,\"TSS24.BF2\",0,1,1,\"" + "￥" + billCommodityEntity.saleprice + "          " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\"");
+                    //tsc.addText(20, 280, FONTTYPE.SIMPLIFIED_CHINESE, ROTATION.ROTATION_0,
+                    //        FONTMUL.MUL_1, FONTMUL.MUL_1, "￥" + billCommodityEntity.getSaleprice() + "          " + DateUtil.getTime(new Date()));
+                }
 
-                    byte[] strb = Encoding.Default.GetBytes(item);
-                    SendData_Printer(strb);
-                    SendData_Printer(enddata);
+                s.Add("PRINT 1");
+                //s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);//TOFIX...打印份数应当通过设置
+                s.Add("SOUND 2,100");
+
+                foreach (var item in s)
+                {
+                    if (!string.IsNullOrEmpty(item))
+                    {
+
+                        byte[] strb = Encoding.Default.GetBytes(item);
+                        SendData_Printer(strb);
+                        SendData_Printer(enddata);
+                    }
                 }
             }
         }
@@ -313,7 +319,7 @@ namespace ZlPos.Utils
             byte[] enddata = { 0x0a };//换行
 
             List<string> s = new List<string>();
-            s.Add("SIZE 50 mm,30 mm");
+            s.Add("SIZE 60 mm,40 mm");
             s.Add("GAP 2 0");//TODO...
             s.Add("DIRECTION 0");
             s.Add("REFERENCE 0,0");
