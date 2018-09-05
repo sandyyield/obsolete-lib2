@@ -1072,7 +1072,7 @@ namespace ZlPos.Bizlogic
                                                                                                     && i.shopcode == shopcode
                                                                                                     && i.branchcode == branchCode
                                                                                                     && SqlFunc.Contains(i.ticketcode, queryBillEntity.ticketcode))
-                                                                                                    .ToPageList(queryBillEntity.pageindex, queryBillEntity.pagesize, ref totalCount);
+                                                                                                    .ToPageList(queryBillEntity.pageindex + 1, queryBillEntity.pagesize, ref totalCount);
                                     if (billEntities != null)
                                     {
                                         logger.Info("获取对应状态的单据信息 billEntities:" + billEntities.ToString());
@@ -1884,14 +1884,18 @@ namespace ZlPos.Bizlogic
                 {
                     using (var db = SugarDao.GetInstance())
                     {
+                        var total = 0;
+                        //数据pageindex 从1开始 故++
                         commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                             && i.commoditystatus == "0"
                                                                             && i.del == "0"
-                                                                            && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword)))
+                                                                            && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
+                                                                            && i.commodityclassify != "3")
                                                                             //&& (i.commodityname.Contains("keyword")
                                                                             //    || i.mnemonic.Contains("keyword")))
                                                                             //.ToList();
-                                                                            .ToPageList(pageindex, pagesize);
+                                                                            .OrderBy(i => i.id)
+                                                                            .ToPageList(pageindex + 1, pagesize,ref total);
                     }
                 }
                 catch (Exception e)
