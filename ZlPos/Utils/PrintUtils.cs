@@ -30,7 +30,8 @@ namespace ZlPos.Utils
                     }
                     else
                     {
-                        usbPrinter.printQRCode(printEntities[i].content);
+                        //usb打印二维码可能会出现问题 所以直接不打印
+                        //usbPrinter.printQRCode(printEntities[i].content);
                     }
                 }
             }
@@ -67,7 +68,15 @@ namespace ZlPos.Utils
 
                 for (int i = 0; i < printEntities.Count; i++)
                 {
-                    bluetoothPrinter.PrintString(printEntities[i].content);
+                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                    {
+                        bluetoothPrinter.PrintString(printEntities[i].content);
+                    }
+                    else
+                    {
+                        //usb打印二维码可能会出现问题 所以直接不打印
+                        //usbPrinter.printQRCode(printEntities[i].content);
+                    }
                 }
             }
             bluetoothPrinter.PrintString("\n\n\n\n\n\n");
