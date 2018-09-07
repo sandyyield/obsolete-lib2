@@ -73,6 +73,9 @@ namespace ZlPos.Bizlogic
 
         private DataProcessor _DataProcessor = DataProcessor.Instance;
 
+
+        
+
         /// <summary>
         /// 委托方式托管回调
         /// </summary>
@@ -899,19 +902,31 @@ namespace ZlPos.Bizlogic
                 }
                 else
                 {
+                    int x = 0;
                     foreach (BillCommodityEntity billCommodityEntity in commoditys)
                     {
                         try
                         {
-                            billCommodityEntity.uid = billCommodityEntity
+                            if ("SKU00001".Equals(billCommodityEntity.commoditycode))
+                            {
+                                billCommodityEntity.uid = billCommodityEntity
+                                    .ticketcode
+                                    + "_"
+                                    + billCommodityEntity.id + "_" + x++;
+                            }
+                            else
+                            {
+
+                                billCommodityEntity.uid = billCommodityEntity
                                     .ticketcode
                                     + "_"
                                     + billCommodityEntity.id;
+                            }
                             dbManager.SaveOrUpdate(billCommodityEntity);
                         }
                         catch (Exception e)
                         {
-                            logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException");
+                            logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException",e);
                         }
                     }
                 }
@@ -1106,7 +1121,7 @@ namespace ZlPos.Bizlogic
                         }
                         catch (Exception e)
                         {
-                            logger.Info("getAllSaleBillByParams : 数据库查询出错",e);
+                            logger.Info("getAllSaleBillByParams : 数据库查询出错", e);
                         }
 
 
@@ -1895,7 +1910,7 @@ namespace ZlPos.Bizlogic
                                                                             //    || i.mnemonic.Contains("keyword")))
                                                                             //.ToList();
                                                                             .OrderBy(i => i.id)
-                                                                            .ToPageList(pageindex + 1, pagesize,ref total);
+                                                                            .ToPageList(pageindex + 1, pagesize, ref total);
                     }
                 }
                 catch (Exception e)
