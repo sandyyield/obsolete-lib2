@@ -277,6 +277,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="app.manifest" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="DataBase\dbinit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

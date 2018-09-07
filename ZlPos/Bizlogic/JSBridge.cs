@@ -74,7 +74,7 @@ namespace ZlPos.Bizlogic
         private DataProcessor _DataProcessor = DataProcessor.Instance;
 
 
-        
+
 
         /// <summary>
         /// 委托方式托管回调
@@ -926,7 +926,7 @@ namespace ZlPos.Bizlogic
                         }
                         catch (Exception e)
                         {
-                            logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException",e);
+                            logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException", e);
                         }
                     }
                 }
@@ -1317,7 +1317,10 @@ namespace ZlPos.Bizlogic
                                                                                     .Select((be, pde) => new { pde.payname, payamount = SqlFunc.AggregateSum(pde.payamount), totalnumtcout = SqlFunc.AggregateCount(pde.id) })
                                                                                     .ToList();
 
-                                list.ForEach(i => paytypes.Add(new TotalBillVM.PayTypeEntity { payname = i.payname, totalpay = i.payamount, totalnum = i.totalnumtcout.ToString() }));
+                                //list.ForEach(i => paytypes.Add(new TotalBillVM.PayTypeEntity { payname = i.payname, totalpay = i.payamount, totalnum = i.totalnumtcout.ToString() }));
+                                //2018年9月7日 防止高精度小数出现 进行四舍五入
+
+                                list.ForEach(i => paytypes.Add(new TotalBillVM.PayTypeEntity { payname = i.payname, totalpay = Math.Round(Convert.ToDouble(i.payamount), 2) + "", totalnum = i.totalnumtcout.ToString() }));
                                 totalBillVM.paytypes = paytypes;
                             }
                             catch (Exception ex)
