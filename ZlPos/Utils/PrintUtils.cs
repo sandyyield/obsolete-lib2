@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using ZlPos.Enums;
 using ZlPos.Models;
@@ -11,6 +13,8 @@ namespace ZlPos.Utils
 {
     public class PrintUtils
     {
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         #region print model usb
         public static void printModel(string content, USBPrinter usbPrinter)
         {
@@ -26,7 +30,9 @@ namespace ZlPos.Utils
                 {
                     if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
                     {
-                        usbPrinter.PrintString(printEntities[i].content);
+                        logger.Info("usb print:" + printEntities[i].content);
+                        //add 2018年9月10日 增加一个换行
+                        usbPrinter.PrintString(printEntities[i].content + "\n");
                     }
                     else
                     {
@@ -70,7 +76,9 @@ namespace ZlPos.Utils
                 {
                     if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
                     {
-                        bluetoothPrinter.PrintString(printEntities[i].content);
+                        logger.Info("bluetooth print:" + printEntities[i].content);
+                        //add 2018年9月10日 增加换行
+                        bluetoothPrinter.PrintString(printEntities[i].content + "\n");
                     }
                     else
                     {
@@ -101,7 +109,9 @@ namespace ZlPos.Utils
                     //portPrinter.PrintString(printEntities[i].content);
                     if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
                     {
-                        portPrinter.PrintString(printEntities[i].content);
+                        logger.Info("port print:" + printEntities[i].content);
+                        //add 2018年9月10日 增加换行
+                        portPrinter.PrintString(printEntities[i].content + "\n");
                     }
                     else
                     {
@@ -138,7 +148,11 @@ namespace ZlPos.Utils
                 //portPrinter.initUSB();
                 for (int i = 0; i < printEntities.Count; i++)
                 {
-                    lptPrinter.PrintString(printEntities[i].content);
+                    logger.Info("lpt print:" + printEntities[i].content);
+
+                    //add 2018年9月10日 增加换行
+                    lptPrinter.PrintString(printEntities[i].content + "\n");
+
                 }
             }
             lptPrinter.PrintString("\n\n\n\n\n\n");

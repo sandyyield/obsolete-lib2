@@ -113,6 +113,10 @@ namespace ZlPos.Dao
                         UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "updateuser" });
                         UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "BJQprint" });
                         break;
+                    case 10:
+                        UpgradingSchema.UpgradingVersion<PayDetailEntity>(new string[] { "createtime" });
+                        break;
+                    
                 }
                 //生成数据库配置文件
                 CreateConfig();

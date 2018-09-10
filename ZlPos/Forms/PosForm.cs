@@ -14,6 +14,7 @@ using System.Threading;
 using System.Windows.Forms;
 using ZlPos.Bizlogic;
 using ZlPos.Core;
+using ZlPos.Models;
 
 namespace ZlPos.Forms
 {
@@ -33,6 +34,27 @@ namespace ZlPos.Forms
             ThreadPool.RegisterWaitForSingleObject(Program.ProgramStarted, OnProgramStarted, null, -1, false);
 
             //hostApp = new HostApp();
+
+            ////2018年9月8日 执行一次性程序 执行把这三天的billentity ticketstatue 改为cached
+
+            ////判断一下文件是否存在
+            //string tempFilePath = Application.StartupPath + "\\temp0908.txt";
+            //if (!File.Exists(tempFilePath))
+            //{
+            //    //创建文件并执行
+            //    File.Create(tempFilePath).Close();
+            //    using (var db = Dao.SugarDao.GetInstance())
+            //    {
+            //        //update BillEntity set ticketstatue = 'cached' where ticketstatue = 'updated' and insertTime >= 1536189391000 and insertTime <= 1536422340000
+            //        var t10 = db.Updateable<BillEntity>().UpdateColumns(it => new BillEntity() { ticketstatue = "cached" }).Where(it => it.insertTime >= 1536189391000
+            //                                                                                                                 && it.insertTime <= 1536422340000
+            //                                                                                                                 && it.ticketstatue == "updated"
+            //                                                                                                                ).ExecuteCommand();
+            //    }
+
+            //}
+
+            //if()
 
             InitializeComponent();
 
@@ -75,7 +97,7 @@ namespace ZlPos.Forms
             //button.Click += Button_Click;
         }
 
-        
+
 
         //private void PosForm_KeyDown(object sender, KeyEventArgs e)
         //{

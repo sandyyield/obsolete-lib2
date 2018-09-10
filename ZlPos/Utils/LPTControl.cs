@@ -54,7 +54,7 @@ namespace ZlPos.Utils
             {
                 OVERLAPPED x = new OVERLAPPED();
                 int i = 0;
-                byte[] mybyte = System.Text.Encoding.Default.GetBytes(Mystring);
+                byte[] mybyte = StringUtils.CopyToBig(Encoding.Default.GetBytes(Mystring), new byte[] { 0x0a});
                 bool b = WriteFile(iHandle, mybyte, mybyte.Length, ref i, ref x);
                 return b;
             }

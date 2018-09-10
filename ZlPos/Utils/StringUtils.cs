@@ -38,6 +38,16 @@ namespace ZlPos.Utils
                 returnBytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
             return returnBytes;
         }
+
+        public static byte[] CopyToBig(byte[] bBig, byte[] bSmall)
+        {
+            List<byte> lTemp = new List<byte>();
+            lTemp.AddRange(bBig);
+            lTemp.AddRange(bSmall);
+            bBig = new byte[lTemp.Count];
+            lTemp.CopyTo(bBig);
+            return bBig;
+        }
         //public static string ConvertStringToHex(string strASCII, string separator = null)
         //{
         //    StringBuilder sbHex = new StringBuilder();
