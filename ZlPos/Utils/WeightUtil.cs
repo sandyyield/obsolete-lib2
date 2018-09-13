@@ -35,8 +35,8 @@ namespace ZlPos.Utils
             }
         }
 
-        string sBuffer = "";
-        string sscache = "";
+        public string sBuffer = "";
+        public string sscache = "";
         internal void Open(string port, string brand)
         {
             logger.Info("open weight port =>>" + port + "---" + brand);
