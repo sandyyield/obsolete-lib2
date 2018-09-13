@@ -2951,6 +2951,7 @@ namespace ZlPos.Bizlogic
                     try
                     {
                         ScaleConfigEntity scaleConfigEntity = JsonConvert.DeserializeObject<ScaleConfigEntity>(scale);
+                        logger.Info("GetWeight -> scale 缓存读出:" + scale);
                         if (!string.IsNullOrEmpty(scaleConfigEntity.port))
                         {
                             WeightUtil.Instance.Open(scaleConfigEntity.port, scaleConfigEntity.brand);

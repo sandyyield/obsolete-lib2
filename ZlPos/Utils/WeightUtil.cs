@@ -50,7 +50,7 @@ namespace ZlPos.Utils
                     //mSerialPort = new SerialPort(port, 9600);
                     //2018年5月25日 临时写法{
                     mSerialPort = new SerialPort();
-                    mSerialPort.PortName = SerialPort.GetPortNames()[0];
+                    mSerialPort.PortName = port;
                     mSerialPort.BaudRate = 9600;
                     //}
                     logger.Info("open serialport");
