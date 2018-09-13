@@ -142,20 +142,31 @@ namespace ZlPos.Utils
             {
                 return;
             }
+            content = content.Replace("\\r"," ");
+            content = content.Replace("\\n", "\n");
             List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
             if (printEntities != null && printEntities.Count > 0)
             {
+                StringBuilder sb = new StringBuilder();
+                logger.Info("xx传的JSON" + content);
                 //portPrinter.initUSB();
                 for (int i = 0; i < printEntities.Count; i++)
                 {
                     logger.Info("lpt print:" + printEntities[i].content);
 
-                    //add 2018年9月10日 增加换行
-                    lptPrinter.PrintString(printEntities[i].content + "\n");
-
+                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                    {
+                        //add 2018年9月10日 增加换行
+                        sb.Append(printEntities[i].content + "\n");
+                    }
+                    else
+                    {
+                        //并口没有二维码
+                        //portPrinter.PrintQRCode(printEntities[i].content);
+                    }
                 }
+                lptPrinter.PrintString(sb.ToString() + "\n\n\n\n\n\n\n");
             }
-            lptPrinter.PrintString("\n\n\n\n\n\n");
         }
         #endregion
 

@@ -35,7 +35,16 @@ namespace ZlPos.Utils
         private static extern bool WriteFile(int hFile, byte[] lpBuffer, int nNumberOfBytesToWrite, ref int lpNumberOfBytesWritten, ref OVERLAPPED lpOverlapped);
         [DllImport("kernel32.dll")]
         private static extern bool CloseHandle(int hObject);
+
+        //ADD 2018年9月12日 增加flush方法尝试一下
+        [DllImport("kernel32.dll")]
+        private static extern int FlushFileBuffers(int hFile);
+
+
         private int iHandle;
+
+        public int IHandle { get => iHandle; set => iHandle = value; }
+
         public bool Open()
         {
             iHandle = CreateFile(LptStr, 0x40000000, 0, 0, 3, 0, 0);
@@ -48,13 +57,22 @@ namespace ZlPos.Utils
                 return false;
             }
         }
-        public bool Write(String Mystring)
+
+        public void Flush()
+        {
+            if (iHandle != -1)
+            {
+                FlushFileBuffers(iHandle);
+            }
+        }
+
+        public bool Write(string Mystring)
         {
             if (iHandle != -1)
             {
                 OVERLAPPED x = new OVERLAPPED();
                 int i = 0;
-                byte[] mybyte = StringUtils.CopyToBig(Encoding.Default.GetBytes(Mystring), new byte[] { 0x0a});
+                byte[] mybyte = StringUtils.CopyToBig(Encoding.Default.GetBytes(Mystring), new byte[] { 0x0d, 0x0a });
                 bool b = WriteFile(iHandle, mybyte, mybyte.Length, ref i, ref x);
                 return b;
             }
@@ -81,7 +99,9 @@ namespace ZlPos.Utils
         }
         public bool Close()
         {
-            return CloseHandle(iHandle);
+            bool res = CloseHandle(iHandle);
+            iHandle = -1;
+            return res;
         }
     }
 }

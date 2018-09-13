@@ -36,7 +36,7 @@ namespace ZlPos.PrintServices
 
         public void Close()
         {
-            if(lptControl != null)
+            if (lptControl != null)
             {
                 lptControl.Close();
                 Enable = false;
@@ -47,7 +47,14 @@ namespace ZlPos.PrintServices
         {
             if (Enable)
             {
+                if (lptControl != null && lptControl.IHandle != -1)
+                {
+                    lptControl.Close();
+                }
+                lptControl.Open();
                 lptControl.Write(txt);
+                lptControl.Close();
+                //lptControl.Flush();
             }
         }
 
@@ -55,7 +62,13 @@ namespace ZlPos.PrintServices
         {
             if (Enable)
             {
+                if (lptControl != null && lptControl.IHandle != -1)
+                {
+                    lptControl.Close();
+                }
+                lptControl.Open();
                 lptControl.Write(str);
+                lptControl.Close();
             }
         }
 

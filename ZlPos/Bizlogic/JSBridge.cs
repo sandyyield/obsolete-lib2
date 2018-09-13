@@ -2735,28 +2735,45 @@ namespace ZlPos.Bizlogic
                 ResponseEntity responseEntity = new ResponseEntity();
                 if (!string.IsNullOrEmpty(json))
                 {
+                    logger.Info("SetCustomerShow:" + json);
                     CustomerShowConfigEntity customerShowConfigEntity = JsonConvert.DeserializeObject<CustomerShowConfigEntity>(json);
                     if (customerShowConfigEntity != null)
                     {
-                        serialPort serialport = new serialPort(customerShowConfigEntity.port, customerShowConfigEntity.intBaud);
-                        if (serialport.Open(customerShowConfigEntity.port, Int32.Parse(customerShowConfigEntity.intBaud)))
+                        try
                         {
-                            responseEntity.code = ResponseCode.SUCCESS;
-                            responseEntity.msg = "设置成功";
-                            CustomerShowManager.Instance.Init = true;
-                            CustomerShowManager.Instance.SerialPort = serialport;
-                            using (var db = SugarDao.GetInstance())
+                            serialPort serialport = new serialPort(customerShowConfigEntity.port, customerShowConfigEntity.intBaud);
+                            logger.Info("SetCustomerShow: port =" + customerShowConfigEntity.port + "baud:" + customerShowConfigEntity.intBaud);
+                            serialport.init();
+                            if (serialport.Open(customerShowConfigEntity.port, Int32.Parse(customerShowConfigEntity.intBaud)))
                             {
-                                DbManager dbManager = DBUtils.Instance.DbManager;
-                                db.DbMaintenance.DropTable(typeof(CustomerShowConfigEntity).Name);
-                                dbManager.SaveOrUpdate(customerShowConfigEntity);
-                            }
+                                serialport.Close();
+                                logger.Info("串口关闭" + serialport.port);
+                                responseEntity.code = ResponseCode.SUCCESS;
+                                responseEntity.msg = "设置成功";
+                                CustomerShowManager.Instance.Init = true;
+                                CustomerShowManager.Instance.SerialPort = serialport;
+                                using (var db = SugarDao.GetInstance())
+                                {
+                                    DbManager dbManager = DBUtils.Instance.DbManager;
+                                    if (db.DbMaintenance.IsAnyTable(typeof(CustomerShowConfigEntity).Name))
+                                    {
+                                        db.DbMaintenance.DropTable(typeof(CustomerShowConfigEntity).Name);
+                                    }
+                                    dbManager.SaveOrUpdate(customerShowConfigEntity);
+                                }
 
+                            }
+                            else
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "设置失败";
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
+                            logger.Info("SetCustomerShow 异常", ex);
                             responseEntity.code = ResponseCode.Failed;
-                            responseEntity.msg = "设置失败";
+                            responseEntity.msg = "异常";
                         }
                     }
                     else
@@ -2770,7 +2787,7 @@ namespace ZlPos.Bizlogic
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = "参数不能为空";
                 }
-
+                logger.Info("SetCustomerShow:" + JsonConvert.SerializeObject(responseEntity));
                 mWebViewHandle?.Invoke("setCustomerShowCallBack", responseEntity);
             });
 
@@ -2801,7 +2818,7 @@ namespace ZlPos.Bizlogic
                 {
                     customerShowConfigEntity = new CustomerShowConfigEntity();
                 }
-
+                logger.Info("GetCustomerShow:" + JsonConvert.SerializeObject(customerShowConfigEntity));
                 return JsonConvert.SerializeObject(customerShowConfigEntity);
             }
         }
@@ -2821,6 +2838,7 @@ namespace ZlPos.Bizlogic
                 serialPort serialport = CustomerShowManager.Instance.SerialPort;
                 if (CustomerShowManager.Instance.Init && serialport != null)
                 {
+                    logger.Info("CustomerShow: write into " + s);
                     serialport.CustomerWrite(s);
                     responseEntity.code = ResponseCode.SUCCESS;
                     responseEntity.msg = "成功";

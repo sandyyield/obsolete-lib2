@@ -1,13 +1,17 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace ZlPos.Utils
 {
     public class serialPort
     {
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public string brand { get; set; }
         public string port { get; set; }
         public string rate { get; set; }
@@ -67,8 +71,10 @@ namespace ZlPos.Utils
 
         public void CustomerWrite(string s)
         {
-            byte[] buffer = strToToHexByte(s as string);
+            m_SerialPort.Open();
+            byte[] buffer = StringUtils.HexToByte(s);//strToToHexByte(s as string);
             m_SerialPort.Write(buffer, 0, buffer.Length);
+            m_SerialPort.Close();
         }
 
         private static byte[] strToToHexByte(string hexString)
@@ -96,11 +102,13 @@ namespace ZlPos.Utils
         {
             try
             {
+                logger.Info("serialPort.cs -> Open -> Enable = " + Enable);
                 if (Enable)
                 {
                     m_SerialPort.PortName = port;
                     m_SerialPort.BaudRate = rate;
                     m_SerialPort.Open();
+                    logger.Info("串口打开成功");
                     return true;
                 }
             }
