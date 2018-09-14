@@ -76,8 +76,13 @@ namespace ZlPos.PrintServices
         {
             if (Enable)
             {
-
+                if (lptControl != null && lptControl.IHandle != -1)
+                {
+                    lptControl.Close();
+                }
+                lptControl.Open();
                 lptControl.Write(new byte[] { 0x1b, 0x70, 0x00, 0x10, 0x90 });
+                lptControl.Close();
             }
         }
     }
