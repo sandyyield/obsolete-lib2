@@ -25,7 +25,7 @@ namespace ZlPos.Bizlogic
             try
             {
                 Ping pingSender = new Ping();
-                PingReply reply = pingSender.Send("119.75.217.109");
+                PingReply reply = pingSender.Send("180.106.148.201");//Send("119.75.217.109");
                 if (reply.Status == IPStatus.Success)
                 {
                     return true;

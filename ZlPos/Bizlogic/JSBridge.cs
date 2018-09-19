@@ -3137,46 +3137,58 @@ namespace ZlPos.Bizlogic
                 }
                 if (isConnect)
                 {
-                    if (clear == 1)
-                    {
-                        sendMessage(SyncScaleStatus.PLU_CLEANING, 0);
-                        sendMessage_btye(StringConvert.convertStringToBytesForTMC("!0IA"), socket);
-                        sendMessage_btye(StringConvert.convertStringToBytesForTMC("!0HA"), socket);
-                        logger.Info("正在清除历史数据");
-                        Thread.Sleep(20000);
-                    }
-                    sendMessage(SyncScaleStatus.PLU_CLEANED, 0);
-                    sendMessage(SyncScaleStatus.PLU_SYNCING, 0);
-                    logger.Info("开始同步");
-                    string barcodeStyle = CacheManager.GetBarcodeScale();
-                    string style = "!0O01050301" + barcodeStyle + "000100000100010001000000000000000001";
-                    sendMessage_btye(StringConvert.convertStringToBytesForTMC(style), socket);
-                    string branchName = "!0Z01A" + StringConvert.getWordCode(_LoginUserManager.UserEntity.branchname) + "0000B";
-                    sendMessage_btye(StringConvert.convertStringToBytesForTMC(branchName), socket);
-                    for (int i = 0; i < pluMessageEntities.Count; i++)
-                    {
-                        string shopInfo = CommodityToPLU(pluMessageEntities[i]);
-                        if (!string.IsNullOrEmpty(shopInfo))
-                        {
-                            sendMessage_btye(StringConvert.convertStringToBytesForTMC(shopInfo), socket);
-                            sendMessage(SyncScaleStatus.PLU_SYNCING, i + 1);
-                        }
-                        logger.Info("正在同步第" + (i + 1) + "条商品数据");
-                        Thread.Sleep(500);
-                    }
                     try
                     {
-                        socket.Shutdown(SocketShutdown.Both);
+                        socket.SendTimeout = 5000;
+                        socket.ReceiveTimeout = 5000;
+                        if (clear == 1)
+                        {
+                            sendMessage(SyncScaleStatus.PLU_CLEANING, 0);
+                            sendMessage_btye(StringConvert.convertStringToBytesForTMC("!0IA"), socket);
+                            sendMessage_btye(StringConvert.convertStringToBytesForTMC("!0HA"), socket);
+                            logger.Info("正在清除历史数据");
+                            Thread.Sleep(20000);
+                        }
+                        sendMessage(SyncScaleStatus.PLU_CLEANED, 0);
+                        sendMessage(SyncScaleStatus.PLU_SYNCING, 0);
+                        logger.Info("开始同步");
+                        string barcodeStyle = CacheManager.GetBarcodeScale();
+                        string style = "!0O01050301" + barcodeStyle + "000100000100010001000000000000000001";
+                        sendMessage_btye(StringConvert.convertStringToBytesForTMC(style), socket);
+                        string branchName = "!0Z01A" + StringConvert.getWordCode(_LoginUserManager.UserEntity.branchname) + "0000B";
+                        sendMessage_btye(StringConvert.convertStringToBytesForTMC(branchName), socket);
+                        for (int i = 0; i < pluMessageEntities.Count; i++)
+                        {
+                            string shopInfo = CommodityToPLU(pluMessageEntities[i]);
+                            if (!string.IsNullOrEmpty(shopInfo))
+                            {
+                                sendMessage_btye(StringConvert.convertStringToBytesForTMC(shopInfo), socket);
+                                sendMessage(SyncScaleStatus.PLU_SYNCING, i + 1);
+                            }
+                            logger.Info("正在同步第" + (i + 1) + "条商品数据");
+                            Thread.Sleep(500);
+                        }
+                        try
+                        {
+                            //socket.Shutdown(SocketShutdown.Both);
+                            socket.Close();
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Info("socket close err>>" + e.Message + e.StackTrace);
+                        }
+                        sendMessage(SyncScaleStatus.PLU_SYNCED, 0);
+                        logger.Info("同步完成");
                     }
-                    catch (Exception e)
+                    catch(Exception ex)
                     {
-                        logger.Info("socket shutdown err>>" + e.Message + e.StackTrace);
+                        logger.Error("socket 超时异常", ex);
+                        sendMessage(SyncScaleStatus.SOCKET_ERR, 0);
                     }
-                    sendMessage(SyncScaleStatus.PLU_SYNCED, 0);
-                    logger.Info("同步完成");
                 }
                 else
                 {
+                    socket.Close();
                     sendMessage(SyncScaleStatus.SOCKET_NO_OPEN, 0);
                 }
             }), new object[] { });
@@ -3432,12 +3444,13 @@ namespace ZlPos.Bizlogic
                 byte[] revBuff = new byte[1024];
                 socket.Receive(revBuff);
                 string mess = Encoding.Default.GetString(revBuff);
-                logger.Info(mess);
+                logger.Info("rev:" + mess);
 
             }
             catch (Exception e)
             {
-                logger.Info("sendMessage_btye error:" + e.Message + e.StackTrace);
+                logger.Error("sendMessage_btye error:", e);
+                throw e;
             }
         }
         #endregion
