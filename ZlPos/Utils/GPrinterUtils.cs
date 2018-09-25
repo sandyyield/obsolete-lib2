@@ -95,7 +95,8 @@ namespace ZlPos.Utils
             {
                 s.Add("BARCODE 150,220,\"128M\",40,1,0,2,2,\"" + commodityEntity.barcode + "\"");
             }
-            s.Add(" PRINT " + number);
+            //s.Add(" PRINT " + number);
+            s.Add(" PRINT " + BJQPrinterManager.Instance.PrintNumber);
             s.Add("SOUND 2,100");
 
             foreach (var item in s)
@@ -109,6 +110,7 @@ namespace ZlPos.Utils
                 }
             }
         }
+
 
         private void SendBarcodeLabel(CommodityEntity commodityEntity, int number)
         {
@@ -132,7 +134,8 @@ namespace ZlPos.Utils
                 s.Add("BARCODE 30,160,\"128M\",40,1,0,2,2,\"" + commodityEntity.barcode + "\"");
             }
 
-            s.Add(" PRINT " + number);
+            //s.Add(" PRINT " + number);
+            s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);
             s.Add("SOUND 2,100");
 
             foreach (var item in s)
@@ -242,7 +245,7 @@ namespace ZlPos.Utils
         }
 
         /// <summary>
-        /// 
+        /// 标签打印 打印商品订单
         /// </summary>
         /// <param name="billCommodityEntity"></param>
         /// <param name="v"></param>
@@ -282,8 +285,8 @@ namespace ZlPos.Utils
                     //        FONTMUL.MUL_1, FONTMUL.MUL_1, "￥" + billCommodityEntity.getSaleprice() + "          " + DateUtil.getTime(new Date()));
                 }
 
-                s.Add("PRINT 1");
-                //s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);//TOFIX...打印份数应当通过设置
+                //s.Add("PRINT 1");
+                s.Add("PRINT " + GPrinterManager.Instance.PrintNumber);//TOFIX...打印份数应当通过设置
                 s.Add("SOUND 2,100");
 
                 foreach (var item in s)

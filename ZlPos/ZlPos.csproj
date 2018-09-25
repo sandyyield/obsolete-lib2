@@ -227,6 +227,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Img.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utils\BJQPrinterManager.cs" />
     <Compile Include="Utils\BluethoothPrinterSetter.cs" />
     <Compile Include="Utils\CacheManager.cs" />
     <Compile Include="Utils\LPTControl.cs" />

@@ -2060,6 +2060,7 @@ namespace ZlPos.Bizlogic
             ResponseEntity responseEntity = new ResponseEntity();
             Task.Factory.StartNew(() =>
             {
+                BJQPrinterManager.Instance.PrintNumber = int.Parse(JsonConvert.DeserializeObject<PrinterConfigEntity>(s).printernumber);
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.msg = "windows不需要设置";
                 mWebViewHandle?.Invoke("setBJQPrinterCallBack", responseEntity);
@@ -3492,7 +3493,7 @@ namespace ZlPos.Bizlogic
 
         #region
         /// <summary>
-        /// 打印条码标签
+        /// 打印条码标签 (非收银时候用 专门用来打的)
         /// </summary>
         /// <param name="json"></param>
         public void PrintBarcodeLabel(string json)
