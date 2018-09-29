@@ -1984,7 +1984,7 @@ namespace ZlPos.Bizlogic
         #region VersionUpdate
         public void VersionUpdate()
         {
-            //TODO...UPDATE
+            FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
         }
 
         #endregion
@@ -2027,7 +2027,8 @@ namespace ZlPos.Bizlogic
                 DeviceEntity deviceEntity = new DeviceEntity();
                 deviceEntity.devices = devices;
                 responseEntity.data = deviceEntity;
-                mWebViewHandle.Invoke("getUsbDevicesCallBack", responseEntity);
+                //mWebViewHandle.Invoke("getUsbDevicesCallBack", responseEntity);
+                browser.ExecuteScriptAsync("getUsbDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
             });
             return;
         }
@@ -2055,15 +2056,61 @@ namespace ZlPos.Bizlogic
         #endregion
 
         #region SetBJQPrinter (这个接口由于windows上usb设备为广播形式所以不需要实现 直接返回ture就完事了)
-        public void SetBJQPrinter(string s)
+        public void SetBJQPrinter(string json)
         {
+            //ResponseEntity responseEntity = new ResponseEntity();
+            //Task.Factory.StartNew(() =>
+            //{
+            //    BJQPrinterManager.Instance.PrintNumber = int.Parse(JsonConvert.DeserializeObject<PrinterConfigEntity>(s).printernumber);
+            //    responseEntity.code = ResponseCode.SUCCESS;
+            //    responseEntity.msg = "windows不需要设置";
+            //    mWebViewHandle?.Invoke("setBJQPrinterCallBack", responseEntity);
+            //});
+
             ResponseEntity responseEntity = new ResponseEntity();
             Task.Factory.StartNew(() =>
             {
-                BJQPrinterManager.Instance.PrintNumber = int.Parse(JsonConvert.DeserializeObject<PrinterConfigEntity>(s).printernumber);
-                responseEntity.code = ResponseCode.SUCCESS;
-                responseEntity.msg = "windows不需要设置";
-                mWebViewHandle?.Invoke("setBJQPrinterCallBack", responseEntity);
+                try
+                {
+                    PrinterConfigEntity printerConfigEntity = JsonConvert.DeserializeObject<PrinterConfigEntity>(json);
+                    BJQPrinterSetter printerSetter = new BJQPrinterSetter();
+                    printerSetter.setPrinter(printerConfigEntity,
+                                                p: (result) =>
+                                                {
+                                                    mWebViewHandle.Invoke("setBJQPrinterCallBack", result);
+                                                    //保存缓存
+                                                    if (result.code == ResponseCode.SUCCESS)
+                                                    {
+                                                        //添加缓存
+
+                                                        CacheManager.InsertBJQprint(json);
+                                                        if (BJQPrinterManager.Instance.Init)
+                                                        {
+                                                            switch (BJQPrinterManager.Instance.PrinterTypeEnum)
+                                                            {
+                                                                case "usb":
+                                                                    GPrinterUtils.Instance.printUSBTest();
+                                                                    break;
+                                                                case "port":
+                                                                    break;
+                                                                case "bluetooth":
+                                                                    break;
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        mWebViewHandle.Invoke("setGPrinterCallBack", result);
+                                                    }
+                                                });
+                }
+                catch (Exception e)
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "设置打印机异常";
+                    mWebViewHandle.Invoke("setGPrinterCallBack", responseEntity);
+                    logger.Error(e.Message + e.StackTrace);
+                }
             });
         }
         #endregion
@@ -2220,7 +2267,8 @@ namespace ZlPos.Bizlogic
                     deviceEntity.devices = deviceNames;
                     responseEntity.code = ResponseCode.SUCCESS;
                     responseEntity.data = deviceEntity;
-                    mWebViewHandle?.Invoke("getBluetoothDevicesCallBack", responseEntity);
+                    //mWebViewHandle?.Invoke("getBluetoothDevicesCallBack", responseEntity);
+                    browser.ExecuteScriptAsync("getBluetoothDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
                 }
                 catch (Exception e)
                 {
@@ -3181,7 +3229,7 @@ namespace ZlPos.Bizlogic
                         sendMessage(SyncScaleStatus.PLU_SYNCED, 0);
                         logger.Info("同步完成");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         logger.Error("socket 超时异常", ex);
                         sendMessage(SyncScaleStatus.SOCKET_ERR, 0);

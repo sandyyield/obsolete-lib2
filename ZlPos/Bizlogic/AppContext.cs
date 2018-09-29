@@ -30,12 +30,19 @@ namespace ZlPos.Bizlogic
         public string AppVersion { get => _AppVersion; set => _AppVersion = value; }
         public string AppName { get => _AppName; set => _AppName = value; }
         public int DatebaseVersion { get => _DatebaseVersion; set => _DatebaseVersion = value; }
+        public string UpdateUrl { get => _UpdateUrl; set => _UpdateUrl = value; }
+        public string XmlFile { get => _XmlFile; set => _XmlFile = value; }
 
         private string _AppName;
 
         private string _AppVersion;
 
         private int _DatebaseVersion;
+
+        private string _UpdateUrl;
+
+        private string _XmlFile;
+
 
         private void InitConfigParam()
         {
@@ -44,6 +51,14 @@ namespace ZlPos.Bizlogic
             AppVersion = ConfigurationManager.AppSettings["Version"];
 
             DatebaseVersion = Convert.ToInt32(ConfigurationManager.AppSettings["DatabaseVersion"]);
+
+            UpdateUrl = ConfigurationManager.AppSettings["WIN7UpdateUrl"];
+            if (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor == 1)
+            {
+                UpdateUrl = ConfigurationManager.AppSettings["XPUpdateUrl"];
+            }
+
+            XmlFile = ConfigurationManager.AppSettings["UpdateXmlFile"];
 
         }
     }

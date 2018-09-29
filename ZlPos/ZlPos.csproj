@@ -228,6 +228,7 @@
       <DependentUpon>Img.resx</DependentUpon>
     </Compile>
     <Compile Include="Utils\BJQPrinterManager.cs" />
+    <Compile Include="Utils\BJQPrinterSetter.cs" />
     <Compile Include="Utils\BluethoothPrinterSetter.cs" />
     <Compile Include="Utils\CacheManager.cs" />
     <Compile Include="Utils\LPTControl.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Utils\SPCode.cs" />
     <Compile Include="Utils\StringConvert.cs" />
     <Compile Include="Utils\StringUtils.cs" />
+    <Compile Include="Utils\USBBJQPrinterSetter.cs" />
     <Compile Include="Utils\USBGPrinterSetter.cs" />
     <Compile Include="Utils\USBPrinterSetter.cs" />
     <Compile Include="Utils\WeightUtil.cs" />
