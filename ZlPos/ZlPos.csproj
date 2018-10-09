@@ -63,6 +63,9 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net40\EntityFramework.dll</HintPath>
@@ -369,8 +372,12 @@
   <Import Project="..\packages\cef.redist.x86.3.2623.1396\build\cef.redist.x86.targets" Condition="Exists('..\packages\cef.redist.x86.3.2623.1396\build\cef.redist.x86.targets')" />
   <Import Project="..\packages\CefSharp.Common.49.0.0\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.49.0.0\build\CefSharp.Common.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy $(TargetDir)ZlPos.exe F:\NSIS\Resources
+copy $(TargetDir)ZlPos.exe.config F:\NSIS\Resources
+copy $(TargetDir)SimpleUpdater.dll F:\NSIS\Resources
+copy $(TargetDir)SimpleUpdater.xml F:\NSIS\Resources
+copy $(TargetDir)SqlSugar.dll F:\NSIS\Resources
+copy $(TargetDir)SqlSugar.dll.config F:\NSIS\Resources</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.108.0\build\net40\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.108.0\build\net40\System.Data.SQLite.Core.targets')" />
 </Project>

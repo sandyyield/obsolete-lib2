@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 // 方法是按如下所示使用“*”: :
 [assembly: AssemblyVersion("3.0.0.*")]
 //[assembly: AssemblyVersion("2.1.0.8")]
-[assembly: AssemblyFileVersion("3.0.0.29")]
+[assembly: AssemblyFileVersion("3.0.0.31")]
 
 //2018年9月29日 弃用这种方式 不灵活
 //--添加这行标记表示支持自动更新, 后面的网址为自动更新的根目录.
