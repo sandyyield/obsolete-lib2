@@ -52,16 +52,80 @@ namespace ZlPos.Utils
                     mSerialPort = new SerialPort();
                     mSerialPort.PortName = port;
                     mSerialPort.BaudRate = 9600;
+                    mSerialPort.DataBits = 8;
+                    mSerialPort.StopBits = StopBits.One;
+                    mSerialPort.Parity = Parity.None;
+
                     //}
-                    logger.Info("open serialport");
-                    mSerialPort.Open();
-                    logger.Info("switch brand =>" + brand);
+                    //2018年10月11日 把open还是放到case里面自己设置并判断吧
+                    //logger.Info("open serialport");
+                    //mSerialPort.Open();
+                    //logger.Info("switch brand =>" + brand);
+                    brand = "TOLEDO";
                     switch (brand)
                     {
+                        case "TOLEDO":
+                            Task.Factory.StartNew(() =>
+                            {
+                                //重新设置串口
+                                mSerialPort.DataBits = 7;
+                                mSerialPort.StopBits = StopBits.One;
+                                mSerialPort.Parity = Parity.Odd;
+                                logger.Info("case TOLEDO");
+                                mSerialPort.Open();
+                                logger.Info("serialport is open");
+                                byte[] buffer = new byte[64];
+                                while (mSerialPort.IsOpen)
+                                {
+                                    logger.Info("serialport already to read...");
+                                    Thread.Sleep(40);
+                                    mSerialPort.Read(buffer, 0, 64);
+                                    Thread.Sleep(100);
+                                    logger.Info("serialport is readed");
+
+                                    string s = Encoding.Default.GetString(buffer);
+
+                                    try
+                                    {
+                                        int startIndex = s.IndexOf(Convert.ToChar(02));
+                                        logger.Info("startindex = " + startIndex);
+                                        int endIndex = s.IndexOf(Convert.ToChar(03), startIndex);
+                                        //过滤掉脏数据
+                                        if (startIndex < endIndex && startIndex < 41 && endIndex < 65)
+                                        {
+                                            logger.Info("oneDateStr process...");
+                                            string oneDateStr = s.Substring(startIndex, 26);
+                                            string oneDate = oneDateStr.Substring(6, 5);
+                                            if (!oneDate.Equals(sscache))
+                                            {
+                                                Thread.Sleep(200);
+                                                sscache = oneDate;
+                                                try
+                                                {
+                                                    logger.Info("invoke ss =>>" + oneDate);
+                                                    Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(oneDate)) + "");
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    logger.Error("TOLEDO err", e);
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        logger.Error("TOLEDO ERR", ex);
+                                    }
+                                }
+
+                            });
+                            break;
                         case "ACS_A":
                             Task.Factory.StartNew(() =>
                             {
                                 logger.Info("case ACS_A");
+                                mSerialPort.Open();
                                 int size;
                                 byte[] buffer = new byte[64];
                                 while (mSerialPort.IsOpen)
@@ -82,37 +146,46 @@ namespace ZlPos.Utils
                             Task.Factory.StartNew(() =>
                             {
                                 logger.Info("EH100");
+                                mSerialPort.Open();
                                 int size;
                                 byte[] buffer = new byte[64];
                                 while (mSerialPort.IsOpen)
                                 {
-                                    Thread.Sleep(50);
-                                    //size = mSerialPort.Read(buffer, 0, 1);
-                                    mSerialPort.Read(buffer, 0, 64);
-
-                                    string s = Encoding.Default.GetString(buffer);
-                                    if (!sBuffer.Equals(s))
+                                    try
                                     {
-                                        Thread.Sleep(200);
-                                        sBuffer = s;
-                                        if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
+
+                                        Thread.Sleep(50);
+                                        //size = mSerialPort.Read(buffer, 0, 1);
+                                        mSerialPort.Read(buffer, 0, 64);
+
+                                        string s = Encoding.Default.GetString(buffer);
+                                        if (!sBuffer.Equals(s))
                                         {
-                                            //2018年6月8日 多显示一位负数
-                                            string ss = s.Substring(3, 6);
-                                            if (!ss.Equals(sscache))
+                                            Thread.Sleep(200);
+                                            sBuffer = s;
+                                            if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
                                             {
-                                                sscache = ss;
-                                                try
+                                                //2018年6月8日 多显示一位负数
+                                                string ss = s.Substring(3, 6);
+                                                if (!ss.Equals(sscache))
                                                 {
-                                                    logger.Info("invoke ss =>>" + ss);
-                                                    Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                    logger.Info(e.Message + e.StackTrace);
+                                                    sscache = ss;
+                                                    try
+                                                    {
+                                                        logger.Info("invoke ss =>>" + ss);
+                                                        Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        logger.Info(e.Message + e.StackTrace);
+                                                    }
                                                 }
                                             }
                                         }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        logger.Error("EH100", e);
                                     }
                                 }
                             });
@@ -121,6 +194,7 @@ namespace ZlPos.Utils
                             Task.Factory.StartNew(() =>
                             {
                                 logger.Info("Aclas");
+                                mSerialPort.Open();
                                 int size;
                                 byte[] buffer = new byte[64];
                                 while (mSerialPort.IsOpen)
@@ -129,30 +203,38 @@ namespace ZlPos.Utils
                                     //size = mSerialPort.Read(buffer, 0, 1);
                                     mSerialPort.Read(buffer, 0, 64);
                                     logger.Info("buffer is reading...=> " + buffer);
-                                    
-                                    string s = Encoding.Default.GetString(buffer);
-                                    if (!sBuffer.Equals(s))
+
+                                    try
                                     {
-                                        Thread.Sleep(200);
-                                        sBuffer = s;
-                                        if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
+
+                                        string s = Encoding.Default.GetString(buffer);
+                                        if (!sBuffer.Equals(s))
                                         {
-                                            //2018年6月8日 多显示一位负数
-                                            string ss = s.Substring(3, 7);
-                                            if (!ss.Equals(sscache))
+                                            Thread.Sleep(200);
+                                            sBuffer = s;
+                                            if (s.IndexOf(Convert.ToChar(01)) == 0 && s.IndexOf(Convert.ToChar(02)) == 1)
                                             {
-                                                sscache = ss;
-                                                try
+                                                //2018年6月8日 多显示一位负数
+                                                string ss = s.Substring(3, 7);
+                                                if (!ss.Equals(sscache))
                                                 {
-                                                    logger.Info("invoke ss =>>" + ss);
-                                                    Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                    logger.Info(e.Message + e.StackTrace);
+                                                    sscache = ss;
+                                                    try
+                                                    {
+                                                        logger.Info("invoke ss =>>" + ss);
+                                                        Listener?.Invoke(Convert.ToInt32(Convert.ToDouble(ss) * 1000) + "");
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        logger.Info(e.Message + e.StackTrace);
+                                                    }
                                                 }
                                             }
                                         }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        logger.Error("Aclas", e);
                                     }
                                 }
                             });
