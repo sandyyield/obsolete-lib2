@@ -61,7 +61,7 @@ namespace ZlPos.Utils
                     //logger.Info("open serialport");
                     //mSerialPort.Open();
                     //logger.Info("switch brand =>" + brand);
-                    brand = "TOLEDO";
+                    //brand = "TOLEDO";
                     switch (brand)
                     {
                         case "TOLEDO":
@@ -75,6 +75,7 @@ namespace ZlPos.Utils
                                 mSerialPort.Open();
                                 logger.Info("serialport is open");
                                 byte[] buffer = new byte[64];
+                                mSerialPort.DiscardInBuffer();
                                 while (mSerialPort.IsOpen)
                                 {
                                     logger.Info("serialport already to read...");
@@ -85,6 +86,7 @@ namespace ZlPos.Utils
 
                                     string s = Encoding.Default.GetString(buffer);
 
+                                    logger.Info("serialport read buffer is =>" + s);
                                     try
                                     {
                                         int startIndex = s.IndexOf(Convert.ToChar(02));
