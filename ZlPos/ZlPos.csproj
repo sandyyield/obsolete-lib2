@@ -234,6 +234,8 @@
     <Compile Include="Utils\BJQPrinterSetter.cs" />
     <Compile Include="Utils\BluethoothPrinterSetter.cs" />
     <Compile Include="Utils\CacheManager.cs" />
+    <Compile Include="Utils\DrivePrinter.cs" />
+    <Compile Include="Utils\DrivePrinterSetter.cs" />
     <Compile Include="Utils\LPTControl.cs" />
     <Compile Include="Utils\LPTPrinterSetter.cs" />
     <Compile Include="Utils\ModelComperar.cs" />

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using ZlPos.Enums;
 using ZlPos.Models;
 using ZlPos.PrintServices;
@@ -142,7 +143,7 @@ namespace ZlPos.Utils
             {
                 return;
             }
-            content = content.Replace("\\r"," ");
+            content = content.Replace("\\r", " ");
             content = content.Replace("\\n", "\n");
             List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
             if (printEntities != null && printEntities.Count > 0)
@@ -167,6 +168,128 @@ namespace ZlPos.Utils
                 }
                 lptPrinter.PrintString(sb.ToString() + "\n\n\n\n\n\n\n");
             }
+        }
+        #endregion
+
+        #region printModel drive
+        internal static void printModel(string content, DrivePrinter drivePrinter)
+        {
+            if (string.IsNullOrEmpty(content) && drivePrinter == null)
+            {
+                return;
+            }
+            //content = content.Replace("\\r", " ");
+            //content = content.Replace("\\n", "\n");
+            List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
+            if (printEntities != null && printEntities.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                //portPrinter.initUSB();
+                for ( int i = 0; i < printEntities.Count; i++)
+                {
+                    logger.Info("lpt print:" + printEntities[i].content);
+                    //判断如果是头尾 16个(32个英文)中文字符换行
+                    if (!string.IsNullOrEmpty(printEntities[i].needAutoNewLine) && printEntities[i].needAutoNewLine == "1")
+                    {
+                        string cont = printEntities[i].content.Replace("\\n", "");
+                        sb.Append(ProcessNewlineString(cont) + Environment.NewLine);
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                        {
+                            //add 2018年9月10日 增加换行
+                            string cont = printEntities[i].content.Replace("\\n", "");
+                            sb.Append(cont + Environment.NewLine);
+                        }
+                        else
+                        {
+                            //并口没有二维码
+                            //portPrinter.PrintQRCode(printEntities[i].content);
+                        }
+                    }
+
+
+                }
+                drivePrinter.PrintString(sb.ToString() + "\r\n\r\n\r\n\r\n\r\n");
+            }
+        }
+
+        private static StringBuilder ProcessNewlineString(string s)
+        {
+            int n = 0;
+            StringBuilder sb = new StringBuilder();
+            Regex regex = new Regex(@"^[\u4E00-\u9FA5]{0,}$");
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (regex.IsMatch(s[i].ToString()))
+                {
+                    n++;
+                    n++;
+                    if (n == 31)
+                    {
+                        if (i + 1 < s.Length && regex.IsMatch(s[i + 1].ToString()))
+                        {
+                            sb.Append(Environment.NewLine);
+                            n = 0;
+
+                        }
+                    }
+                    if (n == 32)
+                    {
+                        sb.Append(Environment.NewLine);
+                        n = 0;
+                    }
+                    sb.Append(s[i]);
+                }
+                else
+                {
+                    n++;
+                    if (n == 32)
+                    {
+                        if (i + 1 < s.Length)
+                        {
+                            sb.Append(Environment.NewLine);
+                            n = 0;
+                        }
+                    }
+                    sb.Append(s[i]);
+                }
+            }
+            return sb;
+        }
+
+        public static bool CheckStringChinese(char c)
+        {
+            bool res = false;
+            if ((int)c > 127)
+            {
+                res = true;
+            }
+            //for (int i = 0; i < text.Length; i++)
+            //{
+            //    if ((int)text[i] > 127)
+            //    {
+            //        res = true;
+            //    }
+            //}
+            return res;
+        }
+
+        public static int GetHanNumFromString(string str)
+        {
+            int count = 0;
+            Regex regex = new Regex(@"^[\u4E00-\u9FA5]{0,}$");
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (regex.IsMatch(str[i].ToString()))
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
         #endregion
 
@@ -505,6 +628,91 @@ namespace ZlPos.Utils
         }
         #endregion
 
+        #region printNote drive
+        internal static void printNote(StatisticsVM statisticsVM, DrivePrinter mPrinter)
+        {
+            if (statisticsVM == null)
+            {
+                return;
+            }
+            if (mPrinter == null)
+            {
+                return;
+            }
+            if (mPrinter.pageWidth == "small")
+            {
+                mPrinter.PrintString("             收银对账             \n");
+            }
+            else
+            {
+                mPrinter.PrintString("                      收银对账                    \n");
+            }
+            StringBuilder sb = new StringBuilder();
+            if (mPrinter.pageWidth == "small")
+            {
+                sb.Append("------------------------------\n");
+            }
+            else
+            {
+                sb.Append("----------------------------------------------\n");
+            }
+            sb.Append(Resources.R.branch_name + statisticsVM.branchname + "\n");
+            sb.Append(Resources.R.time + DateTime.Now.ToString("D") + "\n");
+            sb.Append(Resources.R.date_time + statisticsVM.starttime + "至" + statisticsVM.endtime + "\n");
+            sb.Append(Resources.R.shop_cashier_num + statisticsVM.cashiername + "\n");
+            sb.Append(Resources.R.ticketnums + statisticsVM.ticketnums + "\n");
+            sb.Append(Resources.R.ticketamount + statisticsVM.ticketamount + "\n");
+            sb.Append(Resources.R.returnnums + statisticsVM.returnnums + "\n");
+            sb.Append(Resources.R.returnamount + statisticsVM.returnamount + "\n");
+            sb.Append(Resources.R.rechargeamount + statisticsVM.rechargeamount + "\n");
+            sb.Append(Resources.R.subtotal + statisticsVM.subtotal + "\n");
+            if (mPrinter.pageWidth == "small")
+            {
+                sb.Append("------------------------------\n");
+            }
+            else
+            {
+                sb.Append("----------------------------------------------\n");
+            }
+            //mPrinter.PrintString(sb.ToString());
+
+            StringBuilder sbtb = new StringBuilder();
+
+            sbtb.Append(tableFormat(Resources.R.payType, true, 15, false));
+            sbtb.Append(tableFormat(Resources.R.mumber, false, 8, false));
+            sbtb.Append(tableFormat(Resources.R.money, false, 8, false));
+            sbtb.Append("\n");
+            sbtb.Append(tableFormat("现金", true, 15, false));
+            sbtb.Append(tableFormat(statisticsVM.cashnums, false, 8, true));
+            sbtb.Append(tableFormat(statisticsVM.cashamount, false, 8, true));
+            sbtb.Append("\n");
+            sbtb.Append(tableFormat("支付宝", true, 15, false));
+            sbtb.Append(tableFormat(statisticsVM.alinums, false, 8, true));
+            sbtb.Append(tableFormat(statisticsVM.aliamount, false, 8, true));
+            sbtb.Append("\n");
+            sbtb.Append(tableFormat("微信", true, 15, false));
+            sbtb.Append(tableFormat(statisticsVM.wxnums, false, 8, true));
+            sbtb.Append(tableFormat(statisticsVM.wxamount, false, 8, true));
+            sbtb.Append("\n");
+
+            foreach (ZidingyizhifuBean zidingyizhifuBean in statisticsVM.zidingyizhifu)
+            {
+                sbtb.Append(tableFormat(zidingyizhifuBean.zidingyiname, true, 15, false));
+                sbtb.Append(tableFormat(zidingyizhifuBean.zidingyinums, false, 8, true));
+                sbtb.Append(tableFormat(zidingyizhifuBean.zidingyiamount, false, 8, true));
+                sbtb.Append("\n");
+            }
+            sbtb.Append(tableFormat("合计", true, 15, false));
+            sbtb.Append(tableFormat("", false, 8, true));
+            sbtb.Append(tableFormat(statisticsVM.subtotal, false, 8, true));
+            sbtb.Append("\\n\\n\\n");
+            //驱动打印改为一次性打印
+            sb.Append(sbtb);
+            mPrinter.PrintString(sb.ToString() + "\\n\\n\\n\\n\\n");
+            //mPrinter.PrintString("\n\n\n\n\n");
+        }
+        #endregion
+
         #region tableFormat
         public static string tableFormat(string text, bool left, int number, bool isNumber)
         {
@@ -560,6 +768,9 @@ namespace ZlPos.Utils
             }
             return stringBuffer.ToString();
         }
+
+
+
 
 
 

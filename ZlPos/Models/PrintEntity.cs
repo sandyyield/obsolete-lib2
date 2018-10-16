@@ -13,5 +13,8 @@ namespace ZlPos.Models
 
         //add 2018年9月4日 '0'or null =false '1'=true
         public string isQRCode { get; set; }
+
+        //add 2018年10月15日
+        public string needAutoNewLine { get; set; }
     }
 }

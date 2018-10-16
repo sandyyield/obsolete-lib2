@@ -37,6 +37,10 @@ namespace ZlPos.Models
         //add 2018/01/15 打印小票份数
         [SugarColumn(IsNullable = true)]
         public string printernumber { get; set; }
+
+        //add 2018年10月15日 驱动打印>>驱动名称
+        [SugarColumn(IsNullable = true)]
+        public string printerName { get; set; }
         
     }
 }

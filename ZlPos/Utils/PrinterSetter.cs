@@ -45,6 +45,11 @@ namespace ZlPos.Utils
                     case "LPT":
                         LPTPrinterSetter.setLPT(printerConfigEntity, webCallback);
                         break;
+                    //add 增加驱动打印 2018年10月15日
+                    case "drive":
+                        DrivePrinterSetter drivePrinterSetter = new DrivePrinterSetter();
+                        drivePrinterSetter.SetDrivePrinterSetter(printerConfigEntity, webCallback);
+                        break;
                     default:
                         responseEntity.code = ResponseCode.Failed;
                         responseEntity.msg = "打印机类型不可用";

@@ -22,6 +22,8 @@ namespace ZlPos.Utils
         private serialPort portPrinter;
         //add 2018年5月29日
         private LPTPrinter lptPrinter;
+        //add 2018年10月15日 驱动打印机
+        private DrivePrinter drivePrinter;
 
         private PrinterConfigEntity printerConfigEntity;
 
@@ -67,5 +69,6 @@ namespace ZlPos.Utils
         internal BluetoothPrinter BluetoothPrinter { get => bluetoothPrinter; set => bluetoothPrinter = value; }
         internal serialPort PortPrinter { get => portPrinter; set => portPrinter = value; }
         public LPTPrinter LptPrinter { get => lptPrinter; set => lptPrinter = value; }
+        public DrivePrinter DrivePrinter { get => drivePrinter; set => drivePrinter = value; }
     }
 }
