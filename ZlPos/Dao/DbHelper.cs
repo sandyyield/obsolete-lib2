@@ -116,7 +116,10 @@ namespace ZlPos.Dao
                     case 10:
                         UpgradingSchema.UpgradingVersion<PayDetailEntity>(new string[] { "createtime" });
                         break;
-                    
+                    case 11:
+                        UpgradingSchema.UpgradingVersion<PrinterConfigEntity>(new string[] { "printerName" });
+                        break;
+
                 }
                 //生成数据库配置文件
                 CreateConfig();

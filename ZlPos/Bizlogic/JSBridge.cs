@@ -30,6 +30,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 using System.Linq;
+using System.Drawing.Printing;
 
 namespace ZlPos.Bizlogic
 {
@@ -2320,6 +2321,42 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region GetPrinterQueue
+        /// <summary>
+        /// 获取打印队列
+        /// </summary>
+        public void GetPrinterQueue()
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            List<string> printQueue = new List<string>();
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    using (PrintDocument pd = new PrintDocument())
+                    {
+                        for (int i = 0; i < PrinterSettings.InstalledPrinters.Count; i++)  //开始遍历
+                        {
+                            printQueue.Add(PrinterSettings.InstalledPrinters[i]);  //取得名称
+                        }
+
+                        responseEntity.code = ResponseCode.SUCCESS;
+                        responseEntity.msg = "获取打印机队列成功";
+                        responseEntity.data = printQueue;
+                    }
+                }
+                catch (Exception e)
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "GetPrinterQueue err";
+                    logger.Error("获取打印机队列失败", e);
+                }
+                browser.ExecuteScriptAsync("getPrinterQueueCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
+                //mWebViewHandle.Invoke("getPrinterQueueCallBack", responseEntity);
+            });
+        }
+        #endregion
+
         #region SetPrinter
         public void SetPrinter(string json)
         {
@@ -2508,6 +2545,14 @@ namespace ZlPos.Bizlogic
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
+                                //add 2018年10月15日 
+                                case PrinterTypeEnum.drive:
+                                    DrivePrinter drivePrinter = PrinterManager.Instance.DrivePrinter;
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printModel(content, drivePrinter);
+                                    }
+                                    break;
                                 default:
                                     responseEntity.code = ResponseCode.Failed;
                                     responseEntity.msg = "非法打印机类型";
@@ -2663,6 +2708,13 @@ namespace ZlPos.Bizlogic
                                     }
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
+                                    break;
+                                case PrinterTypeEnum.drive:
+                                    DrivePrinter drivePrinter = PrinterManager.Instance.DrivePrinter;
+                                    for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
+                                    {
+                                        PrintUtils.printNote(statisticsVM, drivePrinter);
+                                    }
                                     break;
                                 default:
                                     responseEntity.code = ResponseCode.Failed;

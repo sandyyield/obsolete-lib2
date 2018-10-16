@@ -10,6 +10,8 @@ namespace ZlPos.Enums
         usb,
         bluetooth,
         port,
-        LPT
+        LPT,
+        //2018年10月15日 驱动打印
+        drive
     }
 }
