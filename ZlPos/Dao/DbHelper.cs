@@ -119,6 +119,26 @@ namespace ZlPos.Dao
                     case 11:
                         UpgradingSchema.UpgradingVersion<PrinterConfigEntity>(new string[] { "printerName" });
                         break;
+                    case 12:
+                        //add 2018/10/12
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "spucode" });
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "commoditylevel" });
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "speccode" });
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "specvalue" });
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "season" });
+
+                        //add 2018/10/15
+                        UpgradingSchema.UpgradingVersion<PayDetailEntity>(new string[] { "apiordercode" });
+
+                        //add 2018/10/16
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "spucode" });
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "commoditylevel" });
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "speccode" });
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "specvalue" });
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "season" });
+                        break;
+
+
 
                 }
                 //生成数据库配置文件

@@ -150,6 +150,49 @@ namespace ZlPos.Utils
             }
         }
 
+        /// <summary>
+        /// 打印服装版商品标签
+        /// </summary>
+        /// <param name="commodityEntity"></param>
+        /// <param name="number"></param>
+        private void SendGarmentLabel(CommodityEntity commodityEntity, int number)
+        {
+            byte[] enddata = { 0x0a };//换行
+
+            List<string> s = new List<string>();
+            s.Add("SIZE 40 mm,30 mm");
+            s.Add("GAP 2 0");//TODO...
+            s.Add("DIRECTION 0");
+            s.Add("REFERENCE 0,0");
+            s.Add("SET TEAR ON");
+            s.Add("CLS");
+            s.Add("TEXT 80,20,\"TSS24.BF2\",0,1,1,\"" + commodityEntity.commodityname + "\"");
+            s.Add("TEXT 40,70,\"TSS24.BF2\",0,1,1,\"" + "颜色:" + commodityEntity.color + "\"");
+            s.Add("TEXT 40,100,\"TSS24.BF2\",0,1,1,\"" + "尺码:" + commodityEntity.size +  "\"");
+            s.Add("TEXT 40,130,\"TSS24.BF2\",0,1,1,\"" + "零售价:" + "\"");
+            s.Add("TEXT 280,100,\"TSS24.BF2\",0,2,2,\"" + commodityEntity.saleprice + "\"");
+            s.Add("TEXT 10,130,\"TSS24.BF2\",0,1,1,\"" + "条码 " + "\"");
+            if (!string.IsNullOrEmpty(commodityEntity.barcode))
+            {
+                s.Add("BARCODE 40,160,\"128M\",40,1,0,2,2,\"" + commodityEntity.barcode + "\"");
+            }
+
+            //s.Add(" PRINT " + number);
+            s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);
+            s.Add("SOUND 2,100");
+
+            foreach (var item in s)
+            {
+                if (!string.IsNullOrEmpty(item))
+                {
+
+                    byte[] strb = Encoding.Default.GetBytes(item);
+                    SendData_Printer(strb);
+                    SendData_Printer(enddata);
+                }
+            }
+        }
+
         private void SendData_Printer(byte[] str)
         {
             NewUsb.SendData2USB(str, str.Length);
@@ -243,6 +286,37 @@ namespace ZlPos.Utils
                 NewUsb.CloseUSBPort();
             }
         }
+
+        /// <summary>
+        /// 打印服装版商品标签
+        /// </summary>
+        /// <param name="s"></param>
+        internal void PrintGarmentLabel(string commodityInfo)
+        {
+            if (Connect_Printer())
+            {
+                if (!string.IsNullOrEmpty(commodityInfo))
+                {
+                    PrintCommodityEntity printCommodityEntity = JsonConvert.DeserializeObject<PrintCommodityEntity>(commodityInfo);
+                    List<CommodityEntity> commodityEntityList = printCommodityEntity.commodityList;
+                    if (commodityEntityList != null)
+                    {
+                        foreach (CommodityEntity item in commodityEntityList)
+                        {
+                            SendGarmentLabel(item, printCommodityEntity.number);
+                            Thread.Sleep(3000);
+                        }
+                        NewUsb.CloseUSBPort();
+                    }
+                }
+            }
+            else
+            {
+                logger.Info("连接标签打印机失败 GprinterUtils");
+            }
+        }
+
+        
 
         /// <summary>
         /// 标签打印 打印商品订单
@@ -366,6 +440,6 @@ namespace ZlPos.Utils
             }
         }
 
-
+        
     }
 }

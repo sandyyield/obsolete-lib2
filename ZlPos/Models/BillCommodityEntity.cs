@@ -132,5 +132,17 @@ namespace ZlPos.Models
         //add 2018年8月29日
         [SugarColumn(IsNullable = true)]
         public string barcodes { get; set; }
+
+        //add 2018/10/16
+        [SugarColumn(IsNullable = true)]
+        public string spucode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string commoditylevel { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string speccode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specvalue { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string season { get; set; }
     }
 }

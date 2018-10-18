@@ -43,5 +43,9 @@ namespace ZlPos.Models
         // add 2018年8月27日
         [SugarColumn(IsNullable = true)]
         public string createtime { get; set; }
+
+        // add 2018/10/15
+        [SugarColumn(IsNullable = true)]
+        public string apiordercode { get; set; }
     }
 }

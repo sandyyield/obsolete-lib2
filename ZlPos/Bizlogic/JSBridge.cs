@@ -1536,6 +1536,7 @@ namespace ZlPos.Bizlogic
                             commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                 && i.commoditystatus == "0"
                                                                                 && i.del == "0"
+                                                                                && i.commoditylevel == "1"
                                                                                 && (string.IsNullOrEmpty(categorycode) || i.categorycode == categorycode)
                                                                                 && (i.commodityname.Contains(keyword) || i.commoditycode.Contains(keyword) || i.mnemonic.Contains(keyword))
                                                                                 ).ToList();
@@ -1790,13 +1791,29 @@ namespace ZlPos.Bizlogic
                     {
                         using (var db = SugarDao.GetInstance())
                         {
-                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                            ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
+                                                                            it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
+                            if (shopConfigEntity != null && "12".Equals(shopConfigEntity.industryid))
+                            {
+                                commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                     && i.commoditystatus == "0"
                                                                                     && i.del == "0"
                                                                                     && i.categorycode == categoryCode
-                                                                                    && i.commodityclassify != "3")
+                                                                                    && i.commodityclassify != "3"
+                                                                                    && i.commoditylevel == "2")
                                                                                     .OrderBy(i => i.categorycode, SqlSugar.OrderByType.Desc)
                                                                                     .ToList();
+                            }
+                            else
+                            {
+                                commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                        && i.commoditystatus == "0"
+                                                                                        && i.del == "0"
+                                                                                        && i.categorycode == categoryCode
+                                                                                        && i.commodityclassify != "3")
+                                                                                        .OrderBy(i => i.categorycode, SqlSugar.OrderByType.Desc)
+                                                                                        .ToList();
+                            }
                         }
 
                     }
@@ -1904,17 +1921,37 @@ namespace ZlPos.Bizlogic
                     using (var db = SugarDao.GetInstance())
                     {
                         var total = 0;
-                        //数据pageindex 从1开始 故++
-                        commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                            && i.commoditystatus == "0"
-                                                                            && i.del == "0"
-                                                                            && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
-                                                                            && i.commodityclassify != "3")
-                                                                            //&& (i.commodityname.Contains("keyword")
-                                                                            //    || i.mnemonic.Contains("keyword")))
-                                                                            //.ToList();
-                                                                            .OrderBy(i => i.id)
-                                                                            .ToPageList(pageindex + 1, pagesize, ref total);
+                        ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
+                                                                            it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
+                        if (shopConfigEntity != null && "12".Equals(shopConfigEntity.industryid))//服装版
+                        {
+                            //数据pageindex 从1开始 故++
+                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                && i.commoditystatus == "0"
+                                                                                && i.del == "0"
+                                                                                && i.commoditylevel == "2"
+                                                                                && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
+                                                                                && i.commodityclassify != "3")
+                                                                                //&& (i.commodityname.Contains("keyword")
+                                                                                //    || i.mnemonic.Contains("keyword")))
+                                                                                //.ToList();
+                                                                                .OrderBy(i => i.id)
+                                                                                .ToPageList(pageindex + 1, pagesize, ref total);
+                        }
+                        else
+                        {
+                            //数据pageindex 从1开始 故++
+                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                && i.commoditystatus == "0"
+                                                                                && i.del == "0"
+                                                                                && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
+                                                                                && i.commodityclassify != "3")
+                                                                                //&& (i.commodityname.Contains("keyword")
+                                                                                //    || i.mnemonic.Contains("keyword")))
+                                                                                //.ToList();
+                                                                                .OrderBy(i => i.id)
+                                                                                .ToPageList(pageindex + 1, pagesize, ref total);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -1931,6 +1968,43 @@ namespace ZlPos.Bizlogic
             //    commodityEntities = commodityEntities.GetRange(0, 50);
             //}
 
+            return JsonConvert.SerializeObject(commodityEntities);
+        }
+        #endregion
+
+        #region GetSKUCommodityBySPUCode
+        /// <summary>
+        /// 服装版根据spucode查询所有SKU商品
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public string GetSKUCommodityBySPUCode(string code)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            List<CommodityEntity> commodityEntities = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using (var db = SugarDao.GetInstance())
+                    {
+                        commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                            && i.commoditystatus == "0"
+                                                                            && i.del == "0"
+                                                                            && i.shopcode == code)
+                                                                            .ToList();
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("GetSKUCommodityBySPUCode err", e);
+                }
+            }
+            if (commodityEntities == null)
+            {
+                commodityEntities = new List<CommodityEntity>();
+            }
             return JsonConvert.SerializeObject(commodityEntities);
         }
         #endregion
@@ -2413,6 +2487,38 @@ namespace ZlPos.Bizlogic
             }
         }
         #endregion
+
+        #region PrintGarmentLabel
+        public void PrintGarmentLabel(string s)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    if (GPrinterManager.Instance.Init)
+                    {
+                        GPrinterUtils.Instance.PrintGarmentLabel(s);
+                        responseEntity.code = ResponseCode.SUCCESS;
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "请设置标签打印机";
+                    }
+                }
+                catch (Exception e)
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = e.Message;
+                    logger.Error("PrintGarmentLabel err", e);
+                }
+
+                mWebViewHandle.Invoke("printGarmentLabelCallBack", responseEntity);
+            });
+        }
+        #endregion
+
 
         ///// <summary>
         ///// 打印条码标签
@@ -3172,13 +3278,44 @@ namespace ZlPos.Bizlogic
         #endregion
 
         #region SyncCommoditytoBarcodeScale
+        /**
+        * @ ip:同步到秤的ip地址
+        * @ pluMessageEntityList:
+        * @ clear:是否全量同步          1:全量
+        * @ brand:品牌    ACS_TM_jijing,//吉景条码秤 ACS_TM_dahua,//大华条码秤
+        */
+        public void SyncCommoditytoBarcodeScale(string ss)
+        {
+            logger.Info("syncCommoditytoBarcodeScale(" + ss + ")-- switch");
+            SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
+            switch (syncScaleVM.brand)
+            {
+                case "ACS_TM_dahua":
+                    SyncCommoditytoBarcodeScale_dahua(ss);
+                    break;
+                case "ACS_TM_jijing":
+                    SyncCommoditytoBarcodeScale_jijing(ss);
+                    break;
+                default:
+                    break;
+            }
+        }
+        #endregion
+
+        private void SyncCommoditytoBarcodeScale_jijing(string ss)
+        {
+            //TODO...
+            MessageBox.Show("未接入 正在开发...");
+        }
+
+        #region SyncCommoditytoBarcodeScale_dahua
         /// <summary>
         /// 同步条码称方法
         /// </summary>
         /// <param name="ss"> @ ip:同步到秤的ip地址 @ pluMessageEntityList: @ clear:是否全量同步          1:全量</param>
-        public void SyncCommoditytoBarcodeScale(string ss)
+        public void SyncCommoditytoBarcodeScale_dahua(string ss)
         {
-            logger.Info("syncCommoditytoBarcodeScale(" + ss + ")");
+            logger.Info("syncCommoditytoBarcodeScale_dahua(" + ss + ")");
             SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
             IPAddress ip = IPAddress.Parse(syncScaleVM.ip);
             List<PluMessageEntity> pluMessageEntities = syncScaleVM.pluMessageEntityList;

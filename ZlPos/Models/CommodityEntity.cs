@@ -142,5 +142,24 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public string updateuser { get; set; }
 
+        //add 2018年10月12日
+        [SugarColumn(IsNullable = true)]
+        public string spucode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string commoditylevel { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string speccode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specvalue { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string season { get; set; }
+
+        //不入库，不返回，用来接收服装版打印标签的规格
+        [SugarColumn(IsIgnore = true)]
+        public string size { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string color { get; set; }
+
+
     }
 }
