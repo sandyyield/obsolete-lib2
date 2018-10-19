@@ -121,5 +121,10 @@ namespace ZlPos.Models
         public List<PayDetailEntity> paydetails { get; set; }
         [SugarColumn(IsIgnore = true)]
         public List<DisCountDetailEntity> discountdetails { get; set; }
+        
+        //add 2018年10月18日
+        [SugarColumn(IsNullable = true)]
+        public string whichversion { get; set; }
+
     }
 }

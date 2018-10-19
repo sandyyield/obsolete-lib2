@@ -137,6 +137,10 @@ namespace ZlPos.Dao
                         UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "specvalue" });
                         UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "season" });
                         break;
+                    case 13:
+                        //add 2018年10月18日 这个正式版 并到12上去
+                        UpgradingSchema.UpgradingVersion<BillEntity>(new string[] { "whichversion" });
+                        break;
 
 
 

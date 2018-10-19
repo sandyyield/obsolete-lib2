@@ -887,7 +887,8 @@ namespace ZlPos.Bizlogic
                         insertDate = DateTime.Now;
                     }
                     billEntity.insertTime = Utils.DateUtils.ConvertDataTimeToLong(insertDate);
-
+                    //add 2018年10月18日
+                    billEntity.whichversion = "1018";
                     dbManager.SaveOrUpdate(billEntity);
                 }
                 catch (Exception e)
@@ -1992,7 +1993,7 @@ namespace ZlPos.Bizlogic
                         commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                             && i.commoditystatus == "0"
                                                                             && i.del == "0"
-                                                                            && i.shopcode == code)
+                                                                            && i.spucode == code)
                                                                             .ToList();
                     }
                 }
