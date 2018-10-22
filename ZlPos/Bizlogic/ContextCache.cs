@@ -228,7 +228,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        #region BarcodeStyle cache
+        #region BarcodeScale cache
         public static string getBarcodeStyle()
         {
             using (var db = SugarDao.GetInstance())

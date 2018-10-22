@@ -1802,7 +1802,7 @@ namespace ZlPos.Bizlogic
                                                                                     && i.categorycode == categoryCode
                                                                                     && i.commodityclassify != "3"
                                                                                     && i.commoditylevel == "2")
-                                                                                    .OrderBy(i => i.categorycode, SqlSugar.OrderByType.Desc)
+                                                                                    .OrderBy(i => i.commoditycode, SqlSugar.OrderByType.Asc)
                                                                                     .ToList();
                             }
                             else
@@ -1812,7 +1812,7 @@ namespace ZlPos.Bizlogic
                                                                                         && i.del == "0"
                                                                                         && i.categorycode == categoryCode
                                                                                         && i.commodityclassify != "3")
-                                                                                        .OrderBy(i => i.categorycode, SqlSugar.OrderByType.Desc)
+                                                                                        .OrderBy(i => i.commoditycode, SqlSugar.OrderByType.Asc)
                                                                                         .ToList();
                             }
                         }
@@ -1936,7 +1936,7 @@ namespace ZlPos.Bizlogic
                                                                                 //&& (i.commodityname.Contains("keyword")
                                                                                 //    || i.mnemonic.Contains("keyword")))
                                                                                 //.ToList();
-                                                                                .OrderBy(i => i.id)
+                                                                                .OrderBy(i => i.commoditycode,OrderByType.Asc)
                                                                                 .ToPageList(pageindex + 1, pagesize, ref total);
                         }
                         else
@@ -1950,7 +1950,7 @@ namespace ZlPos.Bizlogic
                                                                                 //&& (i.commodityname.Contains("keyword")
                                                                                 //    || i.mnemonic.Contains("keyword")))
                                                                                 //.ToList();
-                                                                                .OrderBy(i => i.id)
+                                                                                .OrderBy(i => i.commoditycode,OrderByType.Asc)
                                                                                 .ToPageList(pageindex + 1, pagesize, ref total);
                         }
                     }
@@ -3221,27 +3221,28 @@ namespace ZlPos.Bizlogic
         /// <param name="scaleConfig"></param>
         public void SaveBarcodeScale(string scaleConfig)
         {
-            if (!string.IsNullOrEmpty(scaleConfig))
-            {
-                BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
-                List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
-                CacheManager.InsertBarcodeScale(barcodeScaleConfigEntity.barcodeStyle);
-                DbManager dbManager = DBUtils.Instance.DbManager;
-                if (scaleList != null && scaleList.Count > 0)
-                {
-                    foreach (BarcodeScaleEntity barcodeScaleEntity in scaleList)
-                    {
-                        try
-                        {
-                            dbManager.SaveOrUpdate(barcodeScaleEntity);
-                        }
-                        catch (Exception e)
-                        {
-                            logger.Info("保存条码信息出错>>" + e.Message + e.StackTrace);
-                        }
-                    }
-                }
-            }
+            //if (!string.IsNullOrEmpty(scaleConfig))
+            //{
+            //    BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
+            //    List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
+            //    CacheManager.InsertBarcodeScale(barcodeScaleConfigEntity.barcodeStyle);
+            //    DbManager dbManager = DBUtils.Instance.DbManager;
+            //    if (scaleList != null && scaleList.Count > 0)
+            //    {
+            //        foreach (BarcodeScaleEntity barcodeScaleEntity in scaleList)
+            //        {
+            //            try
+            //            {
+            //                dbManager.SaveOrUpdate(barcodeScaleEntity);
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                logger.Info("保存条码信息出错>>" + e.Message + e.StackTrace);
+            //            }
+            //        }
+            //    }
+            //}
+            CacheManager.InsertBarcodeScale(scaleConfig);
         }
         #endregion
 
@@ -3252,29 +3253,30 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetBarcodeScale()
         {
-            BarcodeScaleConfigEntity barcodeScaleConfigEntity = new BarcodeScaleConfigEntity();
-            List<BarcodeScaleEntity> barcodeScaleEntityList = null;
-            DbManager dbManager = DBUtils.Instance.DbManager;
-            try
-            {
-                using (var db = SugarDao.GetInstance())
-                {
-                    barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
-                    barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
-            }
+            //BarcodeScaleConfigEntity barcodeScaleConfigEntity = new BarcodeScaleConfigEntity();
+            //List<BarcodeScaleEntity> barcodeScaleEntityList = null;
+            //DbManager dbManager = DBUtils.Instance.DbManager;
+            //try
+            //{
+            //    using (var db = SugarDao.GetInstance())
+            //    {
+            //        barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
+            //        barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
+            //}
 
-            string barcodeStyle = CacheManager.GetBarcodeScale();
-            barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
-            if (barcodeScaleEntityList == null)
-            {
-                barcodeScaleEntityList = new List<BarcodeScaleEntity>();
-            }
-            return JsonConvert.SerializeObject(barcodeScaleConfigEntity);
+            //string barcodeStyle = CacheManager.GetBarcodeScale();
+            //barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
+            //if (barcodeScaleEntityList == null)
+            //{
+            //    barcodeScaleEntityList = new List<BarcodeScaleEntity>();
+            //}
+            //return JsonConvert.SerializeObject(barcodeScaleConfigEntity);
+            return CacheManager.GetBarcodeScale();
         }
         #endregion
 

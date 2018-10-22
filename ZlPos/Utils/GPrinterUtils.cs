@@ -169,12 +169,12 @@ namespace ZlPos.Utils
             s.Add("TEXT 80,20,\"TSS24.BF2\",0,1,1,\"" + commodityEntity.commodityname + "\"");
             s.Add("TEXT 40,70,\"TSS24.BF2\",0,1,1,\"" + "颜色:" + commodityEntity.color + "\"");
             s.Add("TEXT 40,100,\"TSS24.BF2\",0,1,1,\"" + "尺码:" + commodityEntity.size +  "\"");
-            s.Add("TEXT 40,130,\"TSS24.BF2\",0,1,1,\"" + "零售价:" + "\"");
-            s.Add("TEXT 280,100,\"TSS24.BF2\",0,2,2,\"" + commodityEntity.saleprice + "\"");
-            s.Add("TEXT 10,130,\"TSS24.BF2\",0,1,1,\"" + "条码 " + "\"");
+            s.Add("TEXT 40,130,\"TSS24.BF2\",0,1,1,\"" + "零售价:" + commodityEntity.saleprice + "\"");
+            //s.Add("TEXT 280,100,\"TSS24.BF2\",0,2,2,\"" + commodityEntity.saleprice + "\"");
+            //s.Add("TEXT 10,130,\"TSS24.BF2\",0,1,1,\"" + "条码 " + "\"");
             if (!string.IsNullOrEmpty(commodityEntity.barcode))
             {
-                s.Add("BARCODE 40,160,\"128M\",40,1,0,2,2,\"" + commodityEntity.barcode + "\"");
+                s.Add("BARCODE 40,160,\"128M\",40,1,0,1,1,\"" + commodityEntity.barcode + "\"");
             }
 
             //s.Add(" PRINT " + number);
@@ -268,7 +268,8 @@ namespace ZlPos.Utils
                     }
                     else
                     {
-                        int count = Int32.Parse(billCommodityEntity.salenums);
+                        Double doubleCount = Double.Parse(billCommodityEntity.salenums);
+                        int count = (int)doubleCount;//Int32.Parse(billCommodityEntity.salenums);
                         if (count > 1)
                         {
                             for (int m = 1; m <= count; m++)

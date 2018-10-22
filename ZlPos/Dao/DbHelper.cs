@@ -140,6 +140,9 @@ namespace ZlPos.Dao
                     case 13:
                         //add 2018年10月18日 这个正式版 并到12上去
                         UpgradingSchema.UpgradingVersion<BillEntity>(new string[] { "whichversion" });
+                        //直接让测试卸载重装
+                        UpgradingSchema.UpgradingVersion<CommodityPriceEntity>(new string[] { "spucode" });
+                        UpgradingSchema.UpgradingVersion<CommodityPriceEntity>(new string[] { "commoditylevel" });
                         break;
 
 
