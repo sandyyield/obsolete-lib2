@@ -106,7 +106,7 @@ namespace ZlPos
             //开始检查更新-这是最简单的模式.请现在 assemblyInfo.cs 中配置更新地址,参见对应的文件.
             //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple();
 
-            FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
+            //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
 
             ///*
             // * 如果您希望更加简单的使用而不用去加这样的属性，或者您想程序运行的时候自定义，您可以通过下列方式的任何一种方式取代上面的属性声明：

@@ -1534,17 +1534,36 @@ namespace ZlPos.Bizlogic
                     {
                         using (var db = SugarDao.GetInstance())
                         {
-                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                            ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
+                                                                           it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
+                            if (shopConfigEntity != null && "12".Equals(shopConfigEntity.industryid))//服装版
+                            {
+                                commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                 && i.commoditystatus == "0"
                                                                                 && i.del == "0"
                                                                                 && i.commoditylevel == "1"
                                                                                 && (string.IsNullOrEmpty(categorycode) || i.categorycode == categorycode)
                                                                                 && (i.commodityname.Contains(keyword) || i.commoditycode.Contains(keyword) || i.mnemonic.Contains(keyword))
                                                                                 ).ToList();
-                            barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                && i.del == "0").ToList();
-                            commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                    && i.branchcode == userEntity.branchcode).ToList();
+                                barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                    && i.del == "0").ToList();
+                                commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                        && i.branchcode == userEntity.branchcode).ToList();
+                            }
+                            else
+                            {
+                                commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                && i.commoditystatus == "0"
+                                                                                && i.del == "0"
+                                                                                && i.commoditylevel == "1"
+                                                                                && (string.IsNullOrEmpty(categorycode) || i.categorycode == categorycode)
+                                                                                && (i.commodityname.Contains(keyword) || i.commoditycode.Contains(keyword) || i.mnemonic.Contains(keyword))
+                                                                                ).ToList();
+                                barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                    && i.del == "0").ToList();
+                                commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                        && i.branchcode == userEntity.branchcode).ToList();
+                            }
                         }
 
                         for (int i = 0; i < commodityEntities.Count; i++)
@@ -3305,11 +3324,47 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region SyncCommoditytoBarcodeScale_jijing
         private void SyncCommoditytoBarcodeScale_jijing(string ss)
         {
-            //TODO...
-            MessageBox.Show("未接入 正在开发...");
+            logger.Info("syncCommoditytoBarcodeScale_dahua(" + ss + ")");
+            SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
+            IPAddress ip = IPAddress.Parse(syncScaleVM.ip);
+            List<PluMessageEntity> pluMessageEntities = syncScaleVM.pluMessageEntityList;
+            int clear = syncScaleVM.clean;
+
+
+            Action<string, int> sendMessage = (syncScaleStatus, point) =>
+            {
+                SyncScaleEntity syncScaleEntity = new SyncScaleEntity();
+                syncScaleEntity.status = syncScaleStatus;
+                syncScaleEntity.point = point;
+                Task.Factory.StartNew(() =>
+                {
+                    browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
+                });
+            };
+
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback((state) =>
+            {
+                int TIMOUT = 5000;
+                int MAXNUM = 5;
+                try
+                {
+                    sendMessage(SyncScaleStatus.SOCKET_OPENING, 0);
+                    byte[] buf = new byte[1024];
+                    IPEndPoint udpPoint = new IPEndPoint(ip, 9001);
+
+                }
+                catch (Exception e)
+                {
+                    logger.Info("SyncCommoditytoBarcodeScale异常>>" + e.Message + e.StackTrace);
+                }
+            }), new object[] { });
+            return;
         }
+        #endregion
 
         #region SyncCommoditytoBarcodeScale_dahua
         /// <summary>
