@@ -53,5 +53,25 @@ namespace ZlPos.Utils
         {
             ContextCache.SetBJQprint(s);
         }
+
+        public static string GetBJQTemplet()
+        {
+            return ContextCache.getBJQTemplet();
+        }
+        
+        public static void InsertBJQTemplet(string s)
+        {
+            ContextCache.setBJQTemplet(s);
+        }
+
+        public static string GetBQTemplet()
+        {
+            return ContextCache.getBQTemplet();
+        }
+
+        public static void InsertBQTemplet(string s)
+        {
+            ContextCache.setBQTemplet(s);
+        }
     }
 }

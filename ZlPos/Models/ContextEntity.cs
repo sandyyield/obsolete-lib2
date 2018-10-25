@@ -38,5 +38,12 @@ namespace ZlPos.Models
         //add 增加BJQprint 缓存
         [SugarColumn(IsNullable = true)]
         public string BJQprint { get; set; }
+
+        //add 2018年10月25日 增加BQTemplet 和 BJQTemplet缓存
+        [SugarColumn(IsNullable = true)]
+        public string BQTemplet { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string BJQTemplet { get; set; }
     }
 }

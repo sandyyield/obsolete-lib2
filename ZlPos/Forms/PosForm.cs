@@ -43,7 +43,7 @@ namespace ZlPos.Forms
             //{
             //    //创建文件并执行
             //    File.Create(tempFilePath).Close();
-            //    using (var db = Dao.SugarDao.GetInstance())
+            //    using (var db = Dao.SugarDao.Instance)
             //    {
             //        //update BillEntity set ticketstatue = 'cached' where ticketstatue = 'updated' and insertTime >= 1536189391000 and insertTime <= 1536422340000
             //        var t10 = db.Updateable<BillEntity>().UpdateColumns(it => new BillEntity() { ticketstatue = "cached" }).Where(it => it.insertTime >= 1536189391000

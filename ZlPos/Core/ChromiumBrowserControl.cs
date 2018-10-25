@@ -107,7 +107,7 @@ namespace ZlPos.Core
             {
                 PrinterConfigEntity printerConfigEntity;
                 //先从数据库取出上次缓存的配置
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     printerConfigEntity = db.Queryable<PrinterConfigEntity>().First();
                 }

@@ -29,7 +29,7 @@ namespace ZlPos.Dao
             #region old code
             //try
             //{
-            //    using (var db = SugarDao.GetInstance())
+            //    using (var db = SugarDao.Instance)
             //    {
             //        if (dataArr.GetType().IsGenericType)
             //        {
@@ -145,7 +145,7 @@ namespace ZlPos.Dao
         [Obsolete]
         public void Delete<T>(T entity) where T : class, new()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 try
                 {
@@ -161,7 +161,7 @@ namespace ZlPos.Dao
 
         public void SaveAndInsert<T>(T entity) where T : class, new()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 try
                 {
@@ -189,7 +189,7 @@ namespace ZlPos.Dao
         public void SaveOrUpdate<T>(T entity)
             where T : class, new()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 try
                 {
@@ -225,7 +225,7 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
 
                     if (commoditys == null)
@@ -240,7 +240,7 @@ namespace ZlPos.Dao
                     }
 
                     //数据处理
-                    if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name))
+                    if (!db.DbMaintenance.IsAnyTable(typeof(CommodityEntity).Name,false))
                     {
                         //db.CodeFirst.InitTables(entity.GetType().Name);
                         db.CodeFirst.InitTables(typeof(CommodityEntity));
@@ -348,7 +348,7 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
 
                     if (barCodeEntity2 == null)
@@ -363,7 +363,7 @@ namespace ZlPos.Dao
                     }
 
                     //数据处理
-                    if (!db.DbMaintenance.IsAnyTable(typeof(BarCodeEntity2).Name))
+                    if (!db.DbMaintenance.IsAnyTable(typeof(BarCodeEntity2).Name,false))
                     {
                         //db.CodeFirst.InitTables(entity.GetType().Name);
                         db.CodeFirst.InitTables(typeof(BarCodeEntity2));
@@ -454,27 +454,27 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                if (array == null)
+                {
+                    logger.Info("BulkSaveOrUpdateCommodityPriceEntityList:commoditys is null");
+                    return;
+                }
+                if (array.Length == 0)
+                {
+                    logger.Info("BulkSaveOrUpdateCommodityPriceEntityList:commoditys coult is 0");
+                    return;
+                }
+                using (var db = SugarDao.Instance)
                 {
 
-                    if (array == null)
-                    {
-                        logger.Info("BulkSaveOrUpdateCommodityPriceEntityList:commoditys is null");
-                        return;
-                    }
-                    if (array.Length == 0)
-                    {
-                        logger.Info("BulkSaveOrUpdateCommodityPriceEntityList:commoditys coult is 0");
-                        return;
-                    }
 
                     //数据处理
-                    if (!db.DbMaintenance.IsAnyTable(typeof(T).Name))
+                    if (!db.DbMaintenance.IsAnyTable(typeof(T).Name,false))
                     {
                         db.CodeFirst.InitTables(typeof(T));
                         //第一次建表直接插入完事
                         db.Insertable(array).Where(true, true).ExecuteCommand();
-                        return;
+                        //return;
 
                     }
                     else
@@ -554,7 +554,7 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     //db.Ado.BeginTran();
                     if (!db.DbMaintenance.IsAnyTable(table.GetType().Name, false))

@@ -26,7 +26,7 @@ namespace ZlPos.Dao
             string tableName = typeof(T).Name;
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     //获取旧表数据
                     var oldDt = db.Ado.GetDataTable("select * from " + tableName);
@@ -65,10 +65,10 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     //判断表是否存在
-                    if (db.DbMaintenance.IsAnyTable("BarCodeEntity"))
+                    if (db.DbMaintenance.IsAnyTable("BarCodeEntity",false))
                     {
                         //删除老表
                         db.DbMaintenance.DropTable("BarCodeEntity");
@@ -90,7 +90,7 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     //获取旧表数据
                     var oldDt = db.Ado.GetDataTable("select * from CommodityEntity");
@@ -123,7 +123,7 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     //获取旧表数据
                     var oldDt = db.Ado.GetDataTable("select * from ContextEntity");
@@ -158,7 +158,7 @@ namespace ZlPos.Dao
         {
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     //获取旧表数据
                     var oldDt = db.Ado.GetDataTable("select * from BillCommodityEntity");

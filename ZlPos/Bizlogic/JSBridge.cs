@@ -370,7 +370,7 @@ namespace ZlPos.Bizlogic
                         DbManager dbManager = DBUtils.Instance.DbManager;
                         if (loginEntity != null)
                         {
-                            using (var db = SugarDao.GetInstance())
+                            using (var db = SugarDao.Instance)
                             {
                                 List<UserEntity> userList;
                                 if (!(String.IsNullOrEmpty(loginEntity.account)))
@@ -631,7 +631,7 @@ namespace ZlPos.Bizlogic
                     List<BarCodeEntity2> barCodes = null;
                     List<CommodityPriceEntity> commodityPriceList = null;
 
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         // TODO: 2017/11/3 按固定精确度返回，
                         //固定精确到shopcode
@@ -764,7 +764,7 @@ namespace ZlPos.Bizlogic
             {
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         string shopcode = _LoginUserManager.UserEntity.shopcode;
                         string branchcode = _LoginUserManager.UserEntity.branchcode;
@@ -996,7 +996,7 @@ namespace ZlPos.Bizlogic
 
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(it => it.ticketstatue == state
                                                                                     && it.shopcode == shopcode
@@ -1080,7 +1080,7 @@ namespace ZlPos.Bizlogic
                             if (startDate != null && endDate != null)
                             {
                                 var totalCount = 0;
-                                using (var db = SugarDao.GetInstance())
+                                using (var db = SugarDao.Instance)
                                 {
                                     List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
                                                                                                     && i.cashierid == queryBillEntity.cashierid
@@ -1172,7 +1172,7 @@ namespace ZlPos.Bizlogic
                     DbManager dbManager = DBUtils.Instance.DbManager;
                     if (startDate != null && endDate != null)
                     {
-                        using (var db = SugarDao.GetInstance())
+                        using (var db = SugarDao.Instance)
                         {
                             string id = _LoginUserManager.UserEntity.userid;
                             List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
@@ -1258,7 +1258,7 @@ namespace ZlPos.Bizlogic
                     {
                         TotalBillVM totalBillVM = new TotalBillVM();
                         List<TotalBillVM.PayTypeEntity> paytypes = new List<TotalBillVM.PayTypeEntity>();
-                        using (var db = SugarDao.GetInstance())
+                        using (var db = SugarDao.Instance)
                         {
 
                             string id = _LoginUserManager.UserEntity.userid;
@@ -1358,7 +1358,7 @@ namespace ZlPos.Bizlogic
             List<string> ticketcodeList = JsonConvert.DeserializeObject<List<string>>(json);
             if (ticketcodeList != null)
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     foreach (string ticketcode in ticketcodeList)
                     {
@@ -1397,7 +1397,7 @@ namespace ZlPos.Bizlogic
             DbManager dbManager = DBUtils.Instance.DbManager;
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
 
                     BillEntity billEntity = db.Queryable<BillEntity>().Where(it => it.ticketcode == ticketcode).First();
@@ -1446,7 +1446,7 @@ namespace ZlPos.Bizlogic
         public long GetHangUpNumber()
         {
             long number = 0;
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 try
                 {
@@ -1478,7 +1478,7 @@ namespace ZlPos.Bizlogic
             DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
             dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
             //DateTime insertDate = DateTime.MinValue;
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 try
                 {
@@ -1532,7 +1532,7 @@ namespace ZlPos.Bizlogic
                     UserEntity userEntity = _LoginUserManager.UserEntity;
                     try
                     {
-                        using (var db = SugarDao.GetInstance())
+                        using (var db = SugarDao.Instance)
                         {
                             ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
                                                                            it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
@@ -1676,7 +1676,7 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                     && i.commoditystatus == "0"
@@ -1714,7 +1714,7 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         BarCodeEntity2 barCodeEntity = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
                                                                                             //&& i.barcodes.Contains(barcode)).First();
@@ -1759,7 +1759,7 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                     && i.commoditystatus == "0"
@@ -1809,7 +1809,7 @@ namespace ZlPos.Bizlogic
                     UserEntity userEntity = _LoginUserManager.UserEntity;
                     try
                     {
-                        using (var db = SugarDao.GetInstance())
+                        using (var db = SugarDao.Instance)
                         {
                             ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
                                                                             it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
@@ -1896,7 +1896,7 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         commodityEntities = db.Queryable<CommodityEntity>()
                                                 .Where(i => i.shopcode == userEntity.shopcode
@@ -1938,7 +1938,7 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         var total = 0;
                         ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
@@ -2007,7 +2007,7 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                             && i.commoditystatus == "0"
@@ -2040,7 +2040,7 @@ namespace ZlPos.Bizlogic
             string payList = "";
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     var paycodeModelList = db.Queryable<PayDetailEntity>().GroupBy(i => i.paycode).ToList();
                     List<string> payCodeList = new List<string>();
@@ -2398,7 +2398,7 @@ namespace ZlPos.Bizlogic
             string config = "";
             try
             {
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     PrinterConfigEntity printerConfigEntity = db.Queryable<PrinterConfigEntity>().First();
                     if (printerConfigEntity != null)
@@ -2486,6 +2486,61 @@ namespace ZlPos.Bizlogic
             return;
         }
         #endregion
+
+        #region SetPrinterTemplet
+        /// <summary>
+        /// 模板设置(标签&标价签）
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="printerType">"BQ" OR "BJQ"</param>
+        public void SetPrinterTemplet(string s,string printerType)
+        {
+            if(string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
+            {
+                logger.Info("SetPrinterTemplet json or printertype is null.");
+                return;
+            }
+            switch (printerType)
+            {
+                case "BQ":
+                    CacheManager.InsertBQTemplet(s);
+                    break;
+                case "BJQ":
+                    CacheManager.InsertBJQTemplet(s);
+                    break;
+                default:
+                    break;
+            }
+        }
+        #endregion
+
+        #region GetPrinterTemplet
+        /// <summary>
+        /// 获取模板设置
+        /// </summary>
+        /// <param name="printerType"> "BQ" OR "BJQ"</param>
+        /// <returns></returns>
+        public string GetPrinterTemplet(string printerType)
+        {
+            string s = "";
+            if (!string.IsNullOrEmpty(printerType))
+            {
+                switch (printerType)
+                {
+                    case "BQ":
+                        s = CacheManager.GetBQTemplet();
+                        break;
+                    case "BJQ":
+                        s = CacheManager.GetBJQTemplet();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return s;
+        }
+
+        #endregion 
 
         #region SetNote (null mehtod)
         public void SetNote(string json)
@@ -2979,10 +3034,10 @@ namespace ZlPos.Bizlogic
                                 responseEntity.msg = "设置成功";
                                 CustomerShowManager.Instance.Init = true;
                                 CustomerShowManager.Instance.SerialPort = serialport;
-                                using (var db = SugarDao.GetInstance())
+                                using (var db = SugarDao.Instance)
                                 {
                                     DbManager dbManager = DBUtils.Instance.DbManager;
-                                    if (db.DbMaintenance.IsAnyTable(typeof(CustomerShowConfigEntity).Name))
+                                    if (db.DbMaintenance.IsAnyTable(typeof(CustomerShowConfigEntity).Name,false))
                                     {
                                         db.DbMaintenance.DropTable(typeof(CustomerShowConfigEntity).Name);
                                     }
@@ -3031,7 +3086,7 @@ namespace ZlPos.Bizlogic
             ResponseEntity responseEntity = new ResponseEntity();
             CustomerShowConfigEntity customerShowConfigEntity = null;
             DbManager dbManager = DBUtils.Instance.DbManager;
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 try
                 {
@@ -3277,7 +3332,7 @@ namespace ZlPos.Bizlogic
             //DbManager dbManager = DBUtils.Instance.DbManager;
             //try
             //{
-            //    using (var db = SugarDao.GetInstance())
+            //    using (var db = SugarDao.Instance)
             //    {
             //        barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
             //        barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
@@ -3510,7 +3565,7 @@ namespace ZlPos.Bizlogic
                 {
                     string shopcode = _LoginUserManager.UserEntity.shopcode;
                     string branchcode = _LoginUserManager.UserEntity.branchcode;
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         commodityEntityList = db.Queryable<CommodityEntity>().Where(i => i.shopcode == shopcode
                                                                                 && i.commoditystatus == "0"
@@ -3930,7 +3985,7 @@ namespace ZlPos.Bizlogic
             try
             {
 
-                using (var db = SugarDao.GetInstance())
+                using (var db = SugarDao.Instance)
                 {
                     Employee employees = JsonConvert.DeserializeObject<Employee>(json);
                     db.Insertable(employees).ExecuteCommand();
@@ -3986,7 +4041,7 @@ namespace ZlPos.Bizlogic
             {
                 try
                 {
-                    using (var db = SugarDao.GetInstance())
+                    using (var db = SugarDao.Instance)
                     {
                         //db.DbMaintenance.DropTable("PrinterConfigEntity");
                         //if (db.DbMaintenance.IsAnyTable(typeof(PrinterConfigEntity).Name))

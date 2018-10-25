@@ -12,9 +12,9 @@ namespace ZlPos.Bizlogic
         #region readcard cache
         public static string GetReadCard()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
                 {
                     ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                     if (contextEntity == null)
@@ -32,7 +32,7 @@ namespace ZlPos.Bizlogic
 
         public static void SetReadCard(string v)
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                 if (contextEntity == null)
@@ -49,9 +49,9 @@ namespace ZlPos.Bizlogic
         #region BJQprint
         public static string getBJQprint()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
                 {
                     ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                     if (contextEntity == null)
@@ -69,7 +69,7 @@ namespace ZlPos.Bizlogic
 
         public static void SetBJQprint(string v)
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                 if (contextEntity == null)
@@ -85,7 +85,7 @@ namespace ZlPos.Bizlogic
         #region Scale cache
         public static string getScale()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 if (db.DbMaintenance.IsAnyTable(typeof(ContextEntity).Name,false))
                 {
@@ -105,7 +105,7 @@ namespace ZlPos.Bizlogic
 
         public static void setScale(string v)
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                 if (contextEntity == null)
@@ -121,9 +121,9 @@ namespace ZlPos.Bizlogic
         #region shopcode cache
         public static string GetShopcode()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
                 {
                     ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                     if (contextEntity == null)
@@ -141,7 +141,7 @@ namespace ZlPos.Bizlogic
 
         public static void SetShopcode(string v)
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                 if (contextEntity == null)
@@ -159,9 +159,9 @@ namespace ZlPos.Bizlogic
         #region SerialPort cache
         public static string GetSerialPort()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
                 {
                     ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                     if (contextEntity == null)
@@ -179,7 +179,7 @@ namespace ZlPos.Bizlogic
 
         public static void SetSerialPort(string v)
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                 if (contextEntity == null)
@@ -195,9 +195,9 @@ namespace ZlPos.Bizlogic
         #region Gprint cache
         public static string getGprint()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
                 {
                     ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                     if (contextEntity == null)
@@ -215,7 +215,7 @@ namespace ZlPos.Bizlogic
 
         public static void setGprint(string v)
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                 if (contextEntity == null)
@@ -231,9 +231,9 @@ namespace ZlPos.Bizlogic
         #region BarcodeScale cache
         public static string getBarcodeStyle()
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
-                if (db.DbMaintenance.IsAnyTable("ContextEntity"))
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
                 {
                     ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                     if (contextEntity == null)
@@ -251,7 +251,7 @@ namespace ZlPos.Bizlogic
 
         public static void setBarcodeStyle(string v)
         {
-            using (var db = SugarDao.GetInstance())
+            using (var db = SugarDao.Instance)
             {
                 ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
                 if (contextEntity == null)
@@ -263,6 +263,82 @@ namespace ZlPos.Bizlogic
             }
         }
         #endregion 
+
+
+        #region BQTemplet cache
+        public static string getBQTemplet()
+        {
+            using (var db = SugarDao.Instance)
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.BQTemplet;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setBQTemplet(string v)
+        {
+            using (var db = SugarDao.Instance)
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.BQTemplet = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion 
+
+
+
+        #region BJQTemplet cache
+        public static string getBJQTemplet()
+        {
+            using (var db = SugarDao.Instance)
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity",false))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.BJQTemplet;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setBJQTemplet(string v)
+        {
+            using (var db = SugarDao.Instance)
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.BJQTemplet = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion 
+
 
     }
 }
