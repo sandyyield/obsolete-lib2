@@ -17,5 +17,8 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public string sacleIp { get; set; }
 
+        [SugarColumn(IsNullable = true)]
+        public string brand { get; set; }
+
     }
 }
