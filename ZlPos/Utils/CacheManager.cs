@@ -64,14 +64,24 @@ namespace ZlPos.Utils
             ContextCache.setBJQTemplet(s);
         }
 
-        public static string GetBQTemplet()
+        public static string GetSPBQTemplet()
         {
-            return ContextCache.getBQTemplet();
+            return ContextCache.getSPBQTemplet();
         }
 
-        public static void InsertBQTemplet(string s)
+        public static void InsertSPBQTemplet(string s)
         {
-            ContextCache.setBQTemplet(s);
+            ContextCache.setSPBQTemplet(s);
+        }
+
+        public static string GetDDBQTemplet()
+        {
+            return ContextCache.getDDBQTemplet();
+        }
+
+        public static void InsertDDBQTemplet(string s)
+        {
+            ContextCache.setDDBQTemplet(s);
         }
     }
 }

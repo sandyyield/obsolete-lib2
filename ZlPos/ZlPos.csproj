@@ -115,6 +115,7 @@
     <Compile Include="Bean\ResposeEntity.cs" />
     <Compile Include="Bizlogic\AppContext.cs" />
     <Compile Include="Bizlogic\ContextCache.cs" />
+    <Compile Include="Bizlogic\JsonUntity.cs" />
     <Compile Include="Bizlogic\MyDataRowComparer.cs" />
     <Compile Include="Bizlogic\DeException.cs" />
     <Compile Include="Bizlogic\ICallback.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Models\QueryBillEntity.cs" />
     <Compile Include="Models\SyncScaleEntity.cs" />
     <Compile Include="Models\SyncScaleVM.cs" />
+    <Compile Include="Models\TemplatePropertyEntity.cs" />
     <Compile Include="Models\TotalBillVM.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\LoadPOSDll.cs" />

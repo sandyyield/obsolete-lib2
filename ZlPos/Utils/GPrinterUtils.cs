@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using ZlPos.Bizlogic;
 using ZlPos.Models;
 
 namespace ZlPos.Utils
@@ -168,7 +169,7 @@ namespace ZlPos.Utils
             s.Add("CLS");
             s.Add("TEXT 80,20,\"TSS24.BF2\",0,1,1,\"" + commodityEntity.commodityname + "\"");
             s.Add("TEXT 40,70,\"TSS24.BF2\",0,1,1,\"" + "颜色:" + commodityEntity.color + "\"");
-            s.Add("TEXT 40,100,\"TSS24.BF2\",0,1,1,\"" + "尺码:" + commodityEntity.size +  "\"");
+            s.Add("TEXT 40,100,\"TSS24.BF2\",0,1,1,\"" + "尺码:" + commodityEntity.size + "\"");
             s.Add("TEXT 40,130,\"TSS24.BF2\",0,1,1,\"" + "零售价:" + commodityEntity.saleprice + "\"");
             //s.Add("TEXT 280,100,\"TSS24.BF2\",0,2,2,\"" + commodityEntity.saleprice + "\"");
             //s.Add("TEXT 10,130,\"TSS24.BF2\",0,1,1,\"" + "条码 " + "\"");
@@ -317,7 +318,7 @@ namespace ZlPos.Utils
             }
         }
 
-        
+
 
         /// <summary>
         /// 标签打印 打印商品订单
@@ -441,6 +442,61 @@ namespace ZlPos.Utils
             }
         }
 
-        
+        internal void BQPrintTemplet(string json, string width, string height)
+        {
+            try
+            {
+
+                var printLst = JsonConvert.DeserializeObject<List<List<TemplatePropertyEntity>>>(json);
+
+                foreach (var templateslst in printLst)
+                {
+                    byte[] enddata = { 0x0a };//换行
+                    List<string> s = new List<string>();
+                    s.Add("SIZE " + width + " mm," + height + " mm");
+                    s.Add("GAP 2 0");
+                    s.Add("DIRECTION 0");
+                    s.Add("REFERENCE 0,0");
+                    s.Add("SET TEAR ON");
+                    s.Add("CLS");
+                    foreach (var item in templateslst)
+                    {
+                        if (item.isBarCode == 1 && !string.IsNullOrEmpty(item.text))
+                        {
+                            string[] arr = item.text.Split(',');
+                            s.Add("BARCODE " + item.directionX + "," + item.directionY + ",\"128M\"," + item.directionX + ",1,0," + item.font + ",\"" + arr[0] + "\"");
+                        }
+                        else
+                        {
+                            s.Add("TEXT " + item.directionX + "," + item.directionY + ",\"TSS24.BF2\",0," + item.font + ",\"" + item.text + "\"");
+                        }
+                    }
+                    s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);
+                    s.Add("SOUND 2,100");
+                    foreach (var item in s)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+
+                            byte[] strb = Encoding.Default.GetBytes(item);
+                            SendData_Printer(strb);
+                            SendData_Printer(enddata);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+
+            return;
+        }
+
+
+        internal void BJQPrintTemplet(string s)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

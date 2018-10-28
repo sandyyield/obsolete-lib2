@@ -21,8 +21,8 @@ namespace ZlPos.Dao
             get
             {
                 //string reval = "DataSource=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.db"; //这里可以动态根据cookies或session实现多库切换
-                //string reval = "Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.db;";
-                string reval = "Data Source=" + @"E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\DataBase" + @"\zlCloudPos.db;";
+                string reval = "Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "DataBase\\zlCloudPos.db;";
+                //string reval = "Data Source=" + @"E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\DataBase" + @"\zlCloudPos.db;";
                 return reval;
             }
         }

@@ -1955,7 +1955,7 @@ namespace ZlPos.Bizlogic
                                                                                 //&& (i.commodityname.Contains("keyword")
                                                                                 //    || i.mnemonic.Contains("keyword")))
                                                                                 //.ToList();
-                                                                                .OrderBy(i => i.commoditycode,OrderByType.Asc)
+                                                                                .OrderBy(i => i.commoditycode, OrderByType.Asc)
                                                                                 .ToPageList(pageindex + 1, pagesize, ref total);
                         }
                         else
@@ -1969,7 +1969,7 @@ namespace ZlPos.Bizlogic
                                                                                 //&& (i.commodityname.Contains("keyword")
                                                                                 //    || i.mnemonic.Contains("keyword")))
                                                                                 //.ToList();
-                                                                                .OrderBy(i => i.commoditycode,OrderByType.Asc)
+                                                                                .OrderBy(i => i.commoditycode, OrderByType.Asc)
                                                                                 .ToPageList(pageindex + 1, pagesize, ref total);
                         }
                     }
@@ -2493,17 +2493,20 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <param name="printerType">"BQ" OR "BJQ"</param>
-        public void SetPrinterTemplet(string s,string printerType)
+        public void SetPrinterTemplet(string s, string printerType)
         {
-            if(string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
+            if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
             {
                 logger.Info("SetPrinterTemplet json or printertype is null.");
                 return;
             }
             switch (printerType)
             {
-                case "BQ":
-                    CacheManager.InsertBQTemplet(s);
+                case "SPBQ":
+                    CacheManager.InsertSPBQTemplet(s);
+                    break;
+                case "DDBQ":
+                    CacheManager.InsertDDBQTemplet(s);
                     break;
                 case "BJQ":
                     CacheManager.InsertBJQTemplet(s);
@@ -2527,8 +2530,11 @@ namespace ZlPos.Bizlogic
             {
                 switch (printerType)
                 {
-                    case "BQ":
-                        s = CacheManager.GetBQTemplet();
+                    case "SPBQ":
+                        s = CacheManager.GetSPBQTemplet();
+                        break;
+                    case "DDBQ":
+                        s = CacheManager.GetDDBQTemplet();
                         break;
                     case "BJQ":
                         s = CacheManager.GetBJQTemplet();
@@ -2540,7 +2546,105 @@ namespace ZlPos.Bizlogic
             return s;
         }
 
-        #endregion 
+        #endregion
+
+        #region PrintTemplet
+        /// <summary>
+        /// 标签 标价签模板打印
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="printerType"></param>
+        public void PrintTemplet(string s, string printerType,string width,string height)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
+                {
+                    logger.Info("PrintTemplet json or printertype is null.");
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "打印参数或打印类型为空";
+                    mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+                }
+                try
+                {
+
+                    if (CacheManager.GetGprint() as string != null)
+                    {
+                        List<string> usblist = GPrinterUtils.Instance.FindUSBPrinter();
+                        if (usblist == null)
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "未发现可用USB设备";
+
+                        }
+                        else
+                        {
+                            //GPrinterManager.Instance.usbDeviceArrayList = usblist;
+                            //GPrinterManager.Instance.Init = true;
+                            //GPrinterManager.Instance.PrinterTypeEnum = "usb";
+                            //每次都先设置完再打印
+                            if (GPrinterUtils.Instance.Connect_Printer())
+                            {
+                                if (GPrinterManager.Instance.Init)
+                                {
+                                    switch (printerType)
+                                    {
+                                        case "SPBQ":
+                                        case "DDBQ":
+                                            GPrinterUtils.Instance.BQPrintTemplet(s,width,height);
+                                            responseEntity.code = ResponseCode.SUCCESS;
+                                            break;
+                                        case "BJQ":
+                                            GPrinterUtils.Instance.BJQPrintTemplet(s);
+                                            responseEntity.code = ResponseCode.SUCCESS;
+                                            break;
+                                        default:
+                                            logger.Error("非法打印机类型");
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "请设置标签打印机";
+                                }
+                            }
+                            else
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "连接标签打印机失败";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "请设置标签打印机";
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("PrintTemplet err >> ", e);
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = e.Message;
+                }
+
+                mWebViewHandle.Invoke("printBarcodeLabelCallBack", responseEntity);
+            });
+
+        }
+        #endregion
+
+        public void BQPrintTemplet(string s)
+        {
+
+        }
+
+        public void BJQPrintTemplet(string s)
+        {
+
+        }
 
         #region SetNote (null mehtod)
         public void SetNote(string json)
@@ -2658,8 +2762,8 @@ namespace ZlPos.Bizlogic
                     {
                         responseEntity.code = ResponseCode.Failed;
                         responseEntity.msg = "打印机未设置，请设置打印机";
-                        //SToastUtil.toast(mWebView.getContext(), "打印机未设置，请设置打印机");
-                    }
+                    //SToastUtil.toast(mWebView.getContext(), "打印机未设置，请设置打印机");
+                }
 
 
 
@@ -2726,8 +2830,8 @@ namespace ZlPos.Bizlogic
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
-                                //add 2018年10月15日 
-                                case PrinterTypeEnum.drive:
+                            //add 2018年10月15日 
+                            case PrinterTypeEnum.drive:
                                     DrivePrinter drivePrinter = PrinterManager.Instance.DrivePrinter;
                                     for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
                                     {
@@ -3037,7 +3141,7 @@ namespace ZlPos.Bizlogic
                                 using (var db = SugarDao.Instance)
                                 {
                                     DbManager dbManager = DBUtils.Instance.DbManager;
-                                    if (db.DbMaintenance.IsAnyTable(typeof(CustomerShowConfigEntity).Name,false))
+                                    if (db.DbMaintenance.IsAnyTable(typeof(CustomerShowConfigEntity).Name, false))
                                     {
                                         db.DbMaintenance.DropTable(typeof(CustomerShowConfigEntity).Name);
                                     }
@@ -3239,8 +3343,8 @@ namespace ZlPos.Bizlogic
                             WeightUtil.Instance.Open(scaleConfigEntity.port, scaleConfigEntity.brand);
                             WeightUtil.Instance.Listener = (number) =>
                             {
-                                //browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
-                                logger.Info("getweigth callback invoke : number =>> " + number);
+                            //browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
+                            logger.Info("getweigth callback invoke : number =>> " + number);
                                 if (string.IsNullOrEmpty(number))
                                 {
                                     responseEntity.code = ResponseCode.Failed;
@@ -3260,14 +3364,14 @@ namespace ZlPos.Bizlogic
                             responseEntity.code = ResponseCode.Failed;
                             responseEntity.msg = "未设置电子秤";
                             mWebViewHandle.Invoke("getWeightCallBack", responseEntity);
-                            //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
-                        }
+                        //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                    }
                     }
                     catch (Exception e)
                     {
                         logger.Error(e.Message + e.StackTrace);
-                        //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
-                        responseEntity.code = ResponseCode.Failed;
+                    //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                    responseEntity.code = ResponseCode.Failed;
                         responseEntity.msg = e.Message + e.StackTrace;
                         mWebViewHandle.Invoke("getWeightCallBack", responseEntity);
                     }
@@ -3521,8 +3625,8 @@ namespace ZlPos.Bizlogic
                         }
                         try
                         {
-                            //socket.Shutdown(SocketShutdown.Both);
-                            socket.Close();
+                        //socket.Shutdown(SocketShutdown.Both);
+                        socket.Close();
                         }
                         catch (Exception e)
                         {
@@ -3555,8 +3659,8 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                //ResponseEntity responseEntity = new ResponseEntity();
-                DbManager dbManager = DBUtils.Instance.DbManager;
+            //ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
                 List<CommodityEntity> commodityEntityList = null;
                 List<BarCodeEntity2> barCodeEntityList = null;
                 List<CommodityPriceEntity> commodityPriceEntityList = null;
@@ -3589,16 +3693,16 @@ namespace ZlPos.Bizlogic
                     for (int i = 0; i < commodityEntityList.Count; i++)
                     {
                         CommodityEntity commodityEntity = commodityEntityList[i];
-                        //从plu编号表获取上次保存的信息
-                        if (pluMessageEntityList != null && pluMessageEntityList.Count > 0)
+                    //从plu编号表获取上次保存的信息
+                    if (pluMessageEntityList != null && pluMessageEntityList.Count > 0)
                         {
                             foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
                             {
                                 if (commodityEntity.commoditycode.Equals(pluMessageEntity.commoditycode))
                                 {
                                     commodityEntity.plu = pluMessageEntity.plu;
-                                    //                            commodityEntity.setValidtime(pluMessageEntity.getIndate());
-                                    commodityEntity.tare = pluMessageEntity.tare;
+                                //                            commodityEntity.setValidtime(pluMessageEntity.getIndate());
+                                commodityEntity.tare = pluMessageEntity.tare;
                                     pluMessageEntityList.Remove(pluMessageEntity);
                                     break;
                                 }
@@ -3608,8 +3712,8 @@ namespace ZlPos.Bizlogic
                         {
                             commodityEntity.plu = "" + (i + 1);
                         }
-                        //从条码表获取商品对应的条码
-                        if (barCodeEntityList != null)
+                    //从条码表获取商品对应的条码
+                    if (barCodeEntityList != null)
                         {
                             for (int a = 0; a < barCodeEntityList.Count; a++)
                             {
@@ -3626,7 +3730,7 @@ namespace ZlPos.Bizlogic
                                     }
                                     commodityEntity.barcode = barcodes;//用商品条码
                                                                        //barCodeEntityList.RemoveAt(a);
-                                    break;
+                                break;
                                 }
                             }
                         }
@@ -3634,24 +3738,24 @@ namespace ZlPos.Bizlogic
                         {
                             commodityEntity.barcode = "";
                         }
-                        //从调价表获取商品单价
-                        if (commodityPriceEntityList != null)
+                    //从调价表获取商品单价
+                    if (commodityPriceEntityList != null)
                         {
                             for (int a = 0; a < commodityPriceEntityList.Count; a++)
                             {
                                 if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
                                 {
                                     commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
-                                    //commodityPriceEntityList.RemoveAt(a);
-                                    break;
+                                //commodityPriceEntityList.RemoveAt(a);
+                                break;
                                 }
                             }
                         }
                     }
                 }
-                //responseEntity.data = commodityEntityList;
-                //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
-                browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
+            //responseEntity.data = commodityEntityList;
+            //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
+            browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
             });
             return;
             //return JsonConvert.SerializeObject(commodityEntityList);
@@ -3853,8 +3957,8 @@ namespace ZlPos.Bizlogic
                 ResponseEntity responseEntity = new ResponseEntity();
                 try
                 {
-                    //CacheManager.GetGprint() as string
-                    if (CacheManager.GetGprint() as string != null)
+                //CacheManager.GetGprint() as string
+                if (CacheManager.GetGprint() as string != null)
                     {
                         List<string> usblist = GPrinterUtils.Instance.FindUSBPrinter();
                         if (usblist == null)
@@ -3868,8 +3972,8 @@ namespace ZlPos.Bizlogic
                             GPrinterManager.Instance.usbDeviceArrayList = usblist;
                             GPrinterManager.Instance.Init = true;
                             GPrinterManager.Instance.PrinterTypeEnum = "usb";
-                            //每次都先设置完再打印
-                            if (GPrinterUtils.Instance.Connect_Printer())
+                        //每次都先设置完再打印
+                        if (GPrinterUtils.Instance.Connect_Printer())
                             {
                                 if (GPrinterManager.Instance.Init)
                                 {

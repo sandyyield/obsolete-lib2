@@ -145,7 +145,7 @@ namespace ZlPos.Dao
                         UpgradingSchema.UpgradingVersion<CommodityPriceEntity>(new string[] { "commoditylevel" });
                         break;
                     case 14:
-                        UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "BJQTemplet", "BQTemplet" });
+                        UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "SPBQTemplet", "DDBQTemplet", "BJQTemplet" });
                         break;
                     
 

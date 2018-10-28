@@ -265,8 +265,8 @@ namespace ZlPos.Bizlogic
         #endregion 
 
 
-        #region BQTemplet cache
-        public static string getBQTemplet()
+        #region SPBQTemplet cache
+        public static string getSPBQTemplet()
         {
             using (var db = SugarDao.Instance)
             {
@@ -277,7 +277,7 @@ namespace ZlPos.Bizlogic
                     {
                         return "";
                     }
-                    return contextEntity.BQTemplet;
+                    return contextEntity.SPBQTemplet;
                 }
                 else
                 {
@@ -286,7 +286,7 @@ namespace ZlPos.Bizlogic
             }
         }
 
-        public static void setBQTemplet(string v)
+        public static void setSPBQTemplet(string v)
         {
             using (var db = SugarDao.Instance)
             {
@@ -295,12 +295,48 @@ namespace ZlPos.Bizlogic
                 {
                     contextEntity = new ContextEntity();
                 }
-                contextEntity.BQTemplet = v;
+                contextEntity.SPBQTemplet = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion
+
+
+        #region DDBQTemplet cache
+        public static string getDDBQTemplet()
+        {
+            using (var db = SugarDao.Instance)
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity", false))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.DDBQTemplet;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setDDBQTemplet(string v)
+        {
+            using (var db = SugarDao.Instance)
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.DDBQTemplet = v;
                 DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
             }
         }
         #endregion 
-
 
 
         #region BJQTemplet cache
