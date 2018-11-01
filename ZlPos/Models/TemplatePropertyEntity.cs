@@ -52,5 +52,7 @@ namespace ZlPos.Models
         /// 
         /// </summary>
         public string angle { get; set; }
+
+        
     }
 }

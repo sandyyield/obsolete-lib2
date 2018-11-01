@@ -39,15 +39,15 @@ namespace ZlPos.Dao
                     IsAutoCloseConnection = true,
                     InitKeyType = InitKeyType.Attribute
                 });
-                //db.Aop.OnLogExecuting = (sql, pars) =>
-                //{
-                //    logger.Debug("Sql>>>" + sql + Environment.NewLine + db.Utilities.SerializeObject(pars.ToDictionary(i => i.ParameterName, i => i.Value)));
-                //    //if (db.TempItems == null)
-                //    //{
-                //    //    db.TempItems = new Dictionary<string, object>();
-                //    //}
-                //    //db.TempItems.Add("logTime", DateTime.Now);
-                //};
+                db.Aop.OnLogExecuting = (sql, pars) =>
+                {
+                    logger.Debug("Sql>>>" + sql + Environment.NewLine + db.Utilities.SerializeObject(pars.ToDictionary(i => i.ParameterName, i => i.Value)));
+                    //if (db.TempItems == null)
+                    //{
+                    //    db.TempItems = new Dictionary<string, object>();
+                    //}
+                    //db.TempItems.Add("logTime", DateTime.Now);
+                };
                 //db.Aop.OnLogExecuted = (sql, pars) =>
                 //{
                 //    var startingTime = db.TempItems["logTime"];

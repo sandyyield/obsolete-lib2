@@ -447,43 +447,46 @@ namespace ZlPos.Utils
             try
             {
 
-                var printLst = JsonConvert.DeserializeObject<List<List<TemplatePropertyEntity>>>(json);
+                var printLst = JsonConvert.DeserializeObject<List<TemplatePropertyEntity>>(json);
 
-                foreach (var templateslst in printLst)
+
+                byte[] enddata = { 0x0a };//换行
+                List<string> s = new List<string>();
+                s.Add("SIZE " + width + " mm," + height + " mm");
+                //s.Add("SIZE 60 mm,40 mm");
+                s.Add("GAP 2 0");
+                s.Add("DIRECTION 0");
+                s.Add("REFERENCE 0,0");
+                s.Add("SET TEAR ON");
+                s.Add("CLS");
+                foreach (var its in printLst)
                 {
-                    byte[] enddata = { 0x0a };//换行
-                    List<string> s = new List<string>();
-                    s.Add("SIZE " + width + " mm," + height + " mm");
-                    s.Add("GAP 2 0");
-                    s.Add("DIRECTION 0");
-                    s.Add("REFERENCE 0,0");
-                    s.Add("SET TEAR ON");
-                    s.Add("CLS");
-                    foreach (var item in templateslst)
                     {
-                        if (item.isBarCode == 1 && !string.IsNullOrEmpty(item.text))
+                        if (its.isBarCode == 1 && !string.IsNullOrEmpty(its.text))
                         {
-                            string[] arr = item.text.Split(',');
-                            s.Add("BARCODE " + item.directionX + "," + item.directionY + ",\"128M\"," + item.directionX + ",1,0," + item.font + ",\"" + arr[0] + "\"");
+                            string[] arr = its.text.Split(',');
+                            //s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.directionX) * 8 + ",1,0," + its.font + ",\"" + arr[0] + "\"");
+                            s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) * 8 + ",1,0," + its.font + ",\"" + 12345678 + "\"");
                         }
                         else
                         {
-                            s.Add("TEXT " + item.directionX + "," + item.directionY + ",\"TSS24.BF2\",0," + item.font + ",\"" + item.text + "\"");
-                        }
-                    }
-                    s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);
-                    s.Add("SOUND 2,100");
-                    foreach (var item in s)
-                    {
-                        if (!string.IsNullOrEmpty(item))
-                        {
-
-                            byte[] strb = Encoding.Default.GetBytes(item);
-                            SendData_Printer(strb);
-                            SendData_Printer(enddata);
+                            s.Add("TEXT " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"TSS24.BF2\",0," + its.font + ",\"" + its.text + "\"");
                         }
                     }
                 }
+                s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);
+                s.Add("SOUND 2,100");
+                foreach (var item in s)
+                {
+                    if (!string.IsNullOrEmpty(item))
+                    {
+
+                        byte[] strb = Encoding.Default.GetBytes(item);
+                        SendData_Printer(strb);
+                        SendData_Printer(enddata);
+                    }
+                }
+
             }
             catch (Exception e)
             {
@@ -494,9 +497,57 @@ namespace ZlPos.Utils
         }
 
 
-        internal void BJQPrintTemplet(string s)
+        internal void BJQPrintTemplet(string json, string width, string height)
         {
-            throw new NotImplementedException();
+            try
+            {
+
+                var printLst = JsonConvert.DeserializeObject<List<TemplatePropertyEntity>>(json);
+
+
+                byte[] enddata = { 0x0a };//换行
+                List<string> s = new List<string>();
+                s.Add("SIZE " + width + " mm," + height + " mm");
+                //s.Add("SIZE 60 mm,40 mm");
+                s.Add("BLINE 32 mm,0 mm");
+                s.Add("DIRECTION 1");
+                s.Add("REFERENCE 0,0");
+                s.Add("SET TEAR ON");
+                s.Add("CLS");
+                foreach (var its in printLst)
+                {
+                    {
+                        if (its.isBarCode == 1 && !string.IsNullOrEmpty(its.text))
+                        {
+                            string[] arr = its.text.Split(',');
+                            s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) * 8 + ",1,0," + its.font + ",\"" + arr[0] + "\"");
+                        }
+                        else
+                        {
+                            s.Add("TEXT " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"TSS24.BF2\",0," + its.font + ",\"" + its.text + "\"");
+                        }
+                    }
+                }
+                s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);
+                s.Add("SOUND 2,100");
+                foreach (var item in s)
+                {
+                    if (!string.IsNullOrEmpty(item))
+                    {
+
+                        byte[] strb = Encoding.Default.GetBytes(item);
+                        SendData_Printer(strb);
+                        SendData_Printer(enddata);
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+
+            return;
         }
     }
 }

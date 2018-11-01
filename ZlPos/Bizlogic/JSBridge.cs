@@ -1946,31 +1946,60 @@ namespace ZlPos.Bizlogic
                         if (shopConfigEntity != null && "12".Equals(shopConfigEntity.industryid))//服装版
                         {
                             //数据pageindex 从1开始 故++
-                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                && i.commoditystatus == "0"
-                                                                                && i.del == "0"
-                                                                                && i.commoditylevel == "2"
-                                                                                && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
-                                                                                && i.commodityclassify != "3")
-                                                                                //&& (i.commodityname.Contains("keyword")
-                                                                                //    || i.mnemonic.Contains("keyword")))
-                                                                                //.ToList();
-                                                                                .OrderBy(i => i.commoditycode, OrderByType.Asc)
-                                                                                .ToPageList(pageindex + 1, pagesize, ref total);
+                            //commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                            //                                                    && i.commoditystatus == "0"
+                            //                                                    && i.del == "0"
+                            //                                                    && i.commoditylevel == "2"
+                            //                                                    && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
+                            //                                                    && i.commodityclassify != "3")
+                            //                                                    //&& (i.commodityname.Contains("keyword")
+                            //                                                    //    || i.mnemonic.Contains("keyword")))
+                            //                                                    //.ToList();
+                            //                                                    .OrderBy(i => i.commoditycode, OrderByType.Asc)
+                            //                                                    .ToPageList(pageindex + 1, pagesize, ref total);
+                            //还需要从barcode中查出来
+                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
+                              {
+                                JoinType.Left,c.commoditycode == bc.commoditycode
+                              })
+                              .Where((c, bc) =>
+                                  c.shopcode == userEntity.shopcode
+                                  && c.commoditystatus == "0"
+                                  && c.del == "0"
+                                  && c.commodityclassify != "3"
+                                  && c.commoditylevel == "2"
+                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
+                                  ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                                  .ToPageList(pageindex + 1, pagesize, ref total);
+
+
+
                         }
                         else
                         {
                             //数据pageindex 从1开始 故++
-                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                && i.commoditystatus == "0"
-                                                                                && i.del == "0"
-                                                                                && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
-                                                                                && i.commodityclassify != "3")
-                                                                                //&& (i.commodityname.Contains("keyword")
-                                                                                //    || i.mnemonic.Contains("keyword")))
-                                                                                //.ToList();
-                                                                                .OrderBy(i => i.commoditycode, OrderByType.Asc)
-                                                                                .ToPageList(pageindex + 1, pagesize, ref total);
+                            //commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                            //                                                    && i.commoditystatus == "0"
+                            //                                                    && i.del == "0"
+                            //                                                    && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
+                            //                                                    && i.commodityclassify != "3")
+                            //                                                    //&& (i.commodityname.Contains("keyword")
+                            //                                                    //    || i.mnemonic.Contains("keyword")))
+                            //                                                    //.ToList();
+                            //                                                    .OrderBy(i => i.commoditycode, OrderByType.Asc)
+                            //                                                    .ToPageList(pageindex + 1, pagesize, ref total);
+                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
+                              {
+                                JoinType.Left,c.commoditycode == bc.commoditycode
+                              })
+                              .Where((c, bc) =>
+                                  c.shopcode == userEntity.shopcode
+                                  && c.commoditystatus == "0"
+                                  && c.del == "0"
+                                  && c.commodityclassify != "3"
+                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
+                                  ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                                  .ToPageList(pageindex + 1, pagesize, ref total);
                         }
                     }
                 }
@@ -2554,7 +2583,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="s"></param>
         /// <param name="printerType"></param>
-        public void PrintTemplet(string s, string printerType,string width,string height)
+        public void PrintTemplet(string s, string printerType, string width, string height)
         {
             Task.Factory.StartNew(() =>
             {
@@ -2592,11 +2621,11 @@ namespace ZlPos.Bizlogic
                                     {
                                         case "SPBQ":
                                         case "DDBQ":
-                                            GPrinterUtils.Instance.BQPrintTemplet(s,width,height);
+                                            GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
                                             responseEntity.code = ResponseCode.SUCCESS;
                                             break;
                                         case "BJQ":
-                                            GPrinterUtils.Instance.BJQPrintTemplet(s);
+                                            GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
                                             responseEntity.code = ResponseCode.SUCCESS;
                                             break;
                                         default:
@@ -2630,7 +2659,7 @@ namespace ZlPos.Bizlogic
                     responseEntity.msg = e.Message;
                 }
 
-                mWebViewHandle.Invoke("printBarcodeLabelCallBack", responseEntity);
+                mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
             });
 
         }
@@ -2762,8 +2791,8 @@ namespace ZlPos.Bizlogic
                     {
                         responseEntity.code = ResponseCode.Failed;
                         responseEntity.msg = "打印机未设置，请设置打印机";
-                    //SToastUtil.toast(mWebView.getContext(), "打印机未设置，请设置打印机");
-                }
+                        //SToastUtil.toast(mWebView.getContext(), "打印机未设置，请设置打印机");
+                    }
 
 
 
@@ -2830,8 +2859,8 @@ namespace ZlPos.Bizlogic
                                     responseEntity.code = ResponseCode.SUCCESS;
                                     responseEntity.msg = "小票打印成功";
                                     break;
-                            //add 2018年10月15日 
-                            case PrinterTypeEnum.drive:
+                                //add 2018年10月15日 
+                                case PrinterTypeEnum.drive:
                                     DrivePrinter drivePrinter = PrinterManager.Instance.DrivePrinter;
                                     for (int i = 0; i < PrinterManager.Instance.PrintNumber; i++)
                                     {
@@ -3343,8 +3372,8 @@ namespace ZlPos.Bizlogic
                             WeightUtil.Instance.Open(scaleConfigEntity.port, scaleConfigEntity.brand);
                             WeightUtil.Instance.Listener = (number) =>
                             {
-                            //browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
-                            logger.Info("getweigth callback invoke : number =>> " + number);
+                                //browser.ExecuteScriptAsync("getWeightCallBack('" + number + "')");
+                                logger.Info("getweigth callback invoke : number =>> " + number);
                                 if (string.IsNullOrEmpty(number))
                                 {
                                     responseEntity.code = ResponseCode.Failed;
@@ -3364,14 +3393,14 @@ namespace ZlPos.Bizlogic
                             responseEntity.code = ResponseCode.Failed;
                             responseEntity.msg = "未设置电子秤";
                             mWebViewHandle.Invoke("getWeightCallBack", responseEntity);
-                        //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
-                    }
+                            //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                        }
                     }
                     catch (Exception e)
                     {
                         logger.Error(e.Message + e.StackTrace);
-                    //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
-                    responseEntity.code = ResponseCode.Failed;
+                        //browser.ExecuteScriptAsync("getWeightCallBack(" + "'" + "" + "'" + ")");
+                        responseEntity.code = ResponseCode.Failed;
                         responseEntity.msg = e.Message + e.StackTrace;
                         mWebViewHandle.Invoke("getWeightCallBack", responseEntity);
                     }
@@ -3399,28 +3428,28 @@ namespace ZlPos.Bizlogic
         /// <param name="scaleConfig"></param>
         public void SaveBarcodeScale(string scaleConfig)
         {
-            //if (!string.IsNullOrEmpty(scaleConfig))
-            //{
-            //    BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
-            //    List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
-            //    CacheManager.InsertBarcodeScale(barcodeScaleConfigEntity.barcodeStyle);
-            //    DbManager dbManager = DBUtils.Instance.DbManager;
-            //    if (scaleList != null && scaleList.Count > 0)
-            //    {
-            //        foreach (BarcodeScaleEntity barcodeScaleEntity in scaleList)
-            //        {
-            //            try
-            //            {
-            //                dbManager.SaveOrUpdate(barcodeScaleEntity);
-            //            }
-            //            catch (Exception e)
-            //            {
-            //                logger.Info("保存条码信息出错>>" + e.Message + e.StackTrace);
-            //            }
-            //        }
-            //    }
-            //}
-            CacheManager.InsertBarcodeScale(scaleConfig);
+            if (!string.IsNullOrEmpty(scaleConfig))
+            {
+                BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
+                List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
+                CacheManager.InsertBarcodeScale(barcodeScaleConfigEntity.barcodeStyle);
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                if (scaleList != null && scaleList.Count > 0)
+                {
+                    foreach (BarcodeScaleEntity barcodeScaleEntity in scaleList)
+                    {
+                        try
+                        {
+                            dbManager.SaveOrUpdate(barcodeScaleEntity);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Info("保存条码信息出错>>" + e.Message + e.StackTrace);
+                        }
+                    }
+                }
+            }
+            //CacheManager.InsertBarcodeScale(scaleConfig);
         }
         #endregion
 
@@ -3431,30 +3460,30 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetBarcodeScale()
         {
-            //BarcodeScaleConfigEntity barcodeScaleConfigEntity = new BarcodeScaleConfigEntity();
-            //List<BarcodeScaleEntity> barcodeScaleEntityList = null;
-            //DbManager dbManager = DBUtils.Instance.DbManager;
-            //try
-            //{
-            //    using (var db = SugarDao.Instance)
-            //    {
-            //        barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
-            //        barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
-            //}
+            BarcodeScaleConfigEntity barcodeScaleConfigEntity = new BarcodeScaleConfigEntity();
+            List<BarcodeScaleEntity> barcodeScaleEntityList = null;
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            try
+            {
+                using (var db = SugarDao.Instance)
+                {
+                    barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
+                    barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
+            }
 
-            //string barcodeStyle = CacheManager.GetBarcodeScale();
-            //barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
-            //if (barcodeScaleEntityList == null)
-            //{
-            //    barcodeScaleEntityList = new List<BarcodeScaleEntity>();
-            //}
-            //return JsonConvert.SerializeObject(barcodeScaleConfigEntity);
-            return CacheManager.GetBarcodeScale();
+            string barcodeStyle = CacheManager.GetBarcodeScale();
+            barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
+            if (barcodeScaleEntityList == null)
+            {
+                barcodeScaleEntityList = new List<BarcodeScaleEntity>();
+            }
+            return JsonConvert.SerializeObject(barcodeScaleConfigEntity);
+            //return CacheManager.GetBarcodeScale();
         }
         #endregion
 
@@ -3625,8 +3654,8 @@ namespace ZlPos.Bizlogic
                         }
                         try
                         {
-                        //socket.Shutdown(SocketShutdown.Both);
-                        socket.Close();
+                            //socket.Shutdown(SocketShutdown.Both);
+                            socket.Close();
                         }
                         catch (Exception e)
                         {
@@ -3659,8 +3688,8 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-            //ResponseEntity responseEntity = new ResponseEntity();
-            DbManager dbManager = DBUtils.Instance.DbManager;
+                //ResponseEntity responseEntity = new ResponseEntity();
+                DbManager dbManager = DBUtils.Instance.DbManager;
                 List<CommodityEntity> commodityEntityList = null;
                 List<BarCodeEntity2> barCodeEntityList = null;
                 List<CommodityPriceEntity> commodityPriceEntityList = null;
@@ -3693,16 +3722,16 @@ namespace ZlPos.Bizlogic
                     for (int i = 0; i < commodityEntityList.Count; i++)
                     {
                         CommodityEntity commodityEntity = commodityEntityList[i];
-                    //从plu编号表获取上次保存的信息
-                    if (pluMessageEntityList != null && pluMessageEntityList.Count > 0)
+                        //从plu编号表获取上次保存的信息
+                        if (pluMessageEntityList != null && pluMessageEntityList.Count > 0)
                         {
                             foreach (PluMessageEntity pluMessageEntity in pluMessageEntityList)
                             {
                                 if (commodityEntity.commoditycode.Equals(pluMessageEntity.commoditycode))
                                 {
                                     commodityEntity.plu = pluMessageEntity.plu;
-                                //                            commodityEntity.setValidtime(pluMessageEntity.getIndate());
-                                commodityEntity.tare = pluMessageEntity.tare;
+                                    //                            commodityEntity.setValidtime(pluMessageEntity.getIndate());
+                                    commodityEntity.tare = pluMessageEntity.tare;
                                     pluMessageEntityList.Remove(pluMessageEntity);
                                     break;
                                 }
@@ -3712,8 +3741,8 @@ namespace ZlPos.Bizlogic
                         {
                             commodityEntity.plu = "" + (i + 1);
                         }
-                    //从条码表获取商品对应的条码
-                    if (barCodeEntityList != null)
+                        //从条码表获取商品对应的条码
+                        if (barCodeEntityList != null)
                         {
                             for (int a = 0; a < barCodeEntityList.Count; a++)
                             {
@@ -3730,7 +3759,7 @@ namespace ZlPos.Bizlogic
                                     }
                                     commodityEntity.barcode = barcodes;//用商品条码
                                                                        //barCodeEntityList.RemoveAt(a);
-                                break;
+                                    break;
                                 }
                             }
                         }
@@ -3738,24 +3767,24 @@ namespace ZlPos.Bizlogic
                         {
                             commodityEntity.barcode = "";
                         }
-                    //从调价表获取商品单价
-                    if (commodityPriceEntityList != null)
+                        //从调价表获取商品单价
+                        if (commodityPriceEntityList != null)
                         {
                             for (int a = 0; a < commodityPriceEntityList.Count; a++)
                             {
                                 if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
                                 {
                                     commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
-                                //commodityPriceEntityList.RemoveAt(a);
-                                break;
+                                    //commodityPriceEntityList.RemoveAt(a);
+                                    break;
                                 }
                             }
                         }
                     }
                 }
-            //responseEntity.data = commodityEntityList;
-            //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
-            browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
+                //responseEntity.data = commodityEntityList;
+                //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
+                browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
             });
             return;
             //return JsonConvert.SerializeObject(commodityEntityList);
@@ -3957,8 +3986,8 @@ namespace ZlPos.Bizlogic
                 ResponseEntity responseEntity = new ResponseEntity();
                 try
                 {
-                //CacheManager.GetGprint() as string
-                if (CacheManager.GetGprint() as string != null)
+                    //CacheManager.GetGprint() as string
+                    if (CacheManager.GetGprint() as string != null)
                     {
                         List<string> usblist = GPrinterUtils.Instance.FindUSBPrinter();
                         if (usblist == null)
@@ -3972,8 +4001,8 @@ namespace ZlPos.Bizlogic
                             GPrinterManager.Instance.usbDeviceArrayList = usblist;
                             GPrinterManager.Instance.Init = true;
                             GPrinterManager.Instance.PrinterTypeEnum = "usb";
-                        //每次都先设置完再打印
-                        if (GPrinterUtils.Instance.Connect_Printer())
+                            //每次都先设置完再打印
+                            if (GPrinterUtils.Instance.Connect_Printer())
                             {
                                 if (GPrinterManager.Instance.Init)
                                 {
