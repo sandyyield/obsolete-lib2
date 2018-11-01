@@ -120,11 +120,12 @@ namespace ZlPos
 
             logger.Info("Initiallize chromium core..");
 
-            CefSettings cefSettings = new CefSettings();
-            //禁用调试日志
-            cefSettings.LogSeverity = LogSeverity.Disable;
+            //放到Form init中间去
+            //CefSettings cefSettings = new CefSettings();
+            ////禁用调试日志
+            //cefSettings.LogSeverity = LogSeverity.Disable;
 
-            Cef.Initialize(cefSettings, true, true);
+            //Cef.Initialize(cefSettings, true, true);
 
             TaskScheduler.UnobservedTaskException += (s, e) =>
             {

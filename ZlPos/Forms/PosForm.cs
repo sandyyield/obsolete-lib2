@@ -1,5 +1,6 @@
 ﻿using CefSharp;
 using CefSharp.WinForms;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,14 +23,48 @@ namespace ZlPos.Forms
     {
         private ChromiumBrowserControl chromiumBrowser; //= new ChromiumBrowser();
 
-        private ChromiumWebBrowser secondScreenWebView;
+        //private ChromiumWebBrowser secondScreenWebView;
+        private Control secondScreenWebView;
 
         //private BoundObject bound;
 
         private JSBridge hostApp = JSBridge.Instance;
 
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        //加载依赖程序集 
+        Assembly assemblyCefSharp = Assembly.LoadFrom(Application.StartupPath + "\\CefSharp.dll");
+        Assembly assemblyCefSharp_core = Assembly.LoadFrom(Application.StartupPath + "\\CefSharp.Core.dll");
+        Assembly assemblyCefSharp_WinForms = Assembly.LoadFrom(Application.StartupPath + "\\CefSharp.WinForms.dll");
+
+
         public PosForm()
         {
+            //CefSettings cefSettings = new CefSettings();
+            ////禁用调试日志
+            //cefSettings.LogSeverity = LogSeverity.Disable;
+
+            //Cef.Initialize(cefSettings, true, true);
+            try
+            {
+                Type t_CefSettings = assemblyCefSharp_core.GetType("CefSharp.CefSettings");
+                var cefSettings = Activator.CreateInstance(t_CefSettings);
+                //禁用调试日志
+                t_CefSettings.GetProperty("LogSeverity").SetValue(cefSettings, 99, null);
+
+                Type Cef = assemblyCefSharp_core.GetType("CefSharp.Cef");
+                MethodInfo initializeMethod = Cef.GetMethod("Initialize", new Type[] { t_CefSettings, typeof(bool), typeof(bool) });
+                if (initializeMethod != null)
+                {
+                    var res = initializeMethod.Invoke(Cef, new object[] { cefSettings, true, true });
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("Cef Initialize Err", e);
+            }
+
+
             //如果存在进程 则激活
             ThreadPool.RegisterWaitForSingleObject(Program.ProgramStarted, OnProgramStarted, null, -1, false);
 
@@ -71,15 +106,30 @@ namespace ZlPos.Forms
             this.Controls.Add(chromiumBrowser);
 
             //副屏初始化
-            string secondScreenFile = System.AppDomain.CurrentDomain.BaseDirectory + "Html\\" + System.Configuration.ConfigurationManager.AppSettings["CustomerScreen"];//testJsCallNetMethod.html";
-            secondScreenWebView = new ChromiumWebBrowser(@"file:///" + secondScreenFile.Replace("\\", "/"))
-            //secondScreenWebView = new ChromiumWebBrowser("https://zhonglunnet032001.oss-cn-shanghai.aliyuncs.com/attachment/20180110/2587e38d-411c-4d9c-b0dd-7fe3159d129e.mp4")
-            {
-                Dock = DockStyle.Fill
-            };
+            //string secondScreenFile = System.AppDomain.CurrentDomain.BaseDirectory + "Html\\" + System.Configuration.ConfigurationManager.AppSettings["CustomerScreen"];//testJsCallNetMethod.html";
+            //secondScreenWebView = new ChromiumWebBrowser(@"file:///" + secondScreenFile.Replace("\\", "/"))
+            ////secondScreenWebView = new ChromiumWebBrowser("https://zhonglunnet032001.oss-cn-shanghai.aliyuncs.com/attachment/20180110/2587e38d-411c-4d9c-b0dd-7fe3159d129e.mp4")
+            //{
+            //    Dock = DockStyle.Fill
+            //};
 
-            hostApp._SecondScreenWebView = secondScreenWebView;
-            hostApp.OpenSecondScreen();
+            //hostApp._SecondScreenWebView = secondScreenWebView;
+            //hostApp.OpenSecondScreen();
+
+            //副屏初始化
+            try
+            {
+                string secondScreenFile = System.AppDomain.CurrentDomain.BaseDirectory + "Html\\" + System.Configuration.ConfigurationManager.AppSettings["CustomerScreen"];//testJsCallNetMethod.html";
+                Type t_ChromiumWebBrowser = assemblyCefSharp_WinForms.GetType("CefSharp.WinForms.ChromiumWebBrowser");
+                secondScreenWebView = Activator.CreateInstance(t_ChromiumWebBrowser, new object[] { @"file:///" + secondScreenFile.Replace("\\", "/") }) as Control;
+                t_ChromiumWebBrowser.GetProperty("Dock").SetValue(secondScreenWebView, DockStyle.Fill, null);
+                hostApp._SecondScreenWebView = secondScreenWebView;
+                hostApp.OpenSecondScreen();
+            }
+            catch(Exception e)
+            {
+                logger.Error("副屏初始化失败", e);
+            }
 
             //this.KeyPreview = true;
             //KeyDown += PosForm_KeyDown;
