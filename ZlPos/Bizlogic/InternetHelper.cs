@@ -1,8 +1,10 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -13,17 +15,19 @@ namespace ZlPos.Bizlogic
         [DllImport("wininet.dll")]
         private extern static bool InternetGetConnectedState(int Description, int ReservedValue);
 
+        private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static bool IsConnectInternet()
         {
             PingTxt();
             int Description = 0;
             bool isOpenInternet = InternetGetConnectedState(Description, 0);
-            return isOpenInternet || PingTxt();
+            return isOpenInternet && PingTxt();
         }
 
         public static bool IsConnectInternetXP()
         {
+            logger.Info("xp network");
             return PingTxt();
             //try
             //{
@@ -53,7 +57,8 @@ namespace ZlPos.Bizlogic
 
         public static bool PingTxt()
         {
-            string url = "https://ls.zhonglunnet.com/ping.txt";
+            string url = "http://ls.zhonglunnet.com/ping.txt";
+            //string url = "https://www.google.com/ping.txt";
             bool result = false;
             try
             {
@@ -73,6 +78,7 @@ namespace ZlPos.Bizlogic
             }
             catch(Exception e)
             {
+                logger.Info("WebClient err", e);
                 result = false;
             }
             return result;

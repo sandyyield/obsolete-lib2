@@ -31,6 +31,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Linq;
 using System.Drawing.Printing;
+using System.Text.RegularExpressions;
 
 namespace ZlPos.Bizlogic
 {
@@ -1970,6 +1971,7 @@ namespace ZlPos.Bizlogic
                                   && c.commoditylevel == "2"
                                   && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
                                   ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                                  //.GroupBy((c,bc) => c.commoditycode)
                                   .ToPageList(pageindex + 1, pagesize, ref total);
 
 
@@ -1999,6 +2001,7 @@ namespace ZlPos.Bizlogic
                                   && c.commodityclassify != "3"
                                   && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
                                   ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                                   //.GroupBy((c, bc) => c.commoditycode)
                                   .ToPageList(pageindex + 1, pagesize, ref total);
                         }
                     }
@@ -3836,6 +3839,13 @@ namespace ZlPos.Bizlogic
                 StringBuilder sb = new StringBuilder("!0W");
                 if (Int32.Parse(pluMessageEntity.plu) > 4000 || Int32.Parse(pluMessageEntity.plu) < 0)
                 {
+                    return "";
+                }
+                //add 2018年11月3日
+                Regex r = new Regex("^[0-9]\\d*$");
+                if (!r.Match(pluMessageEntity.barcode).Success)
+                {
+                    logger.Info("barcode非法---barcode:" + pluMessageEntity.barcode);
                     return "";
                 }
                 sb.Append(formatCode(pluMessageEntity.plu, 4));//PLU编码

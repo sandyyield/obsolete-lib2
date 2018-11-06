@@ -149,8 +149,11 @@ namespace ZlPos.Dao
                         break;
                     case 15:
                         UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "SPBQTemplet", "DDBQTemplet", "BJQTemplet" });
+                        UpgradingSchema.UpgradingVersion<BillEntity>(new string[] { "cashtocard","molinmoney" });
+                        UpgradingSchema.UpgradingVersion<DisCountDetailEntity>(new string[] { "saleactivitytypecode", "activitycode" });
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "molinmoney" });
                         break;
-                    
+
 
 
 

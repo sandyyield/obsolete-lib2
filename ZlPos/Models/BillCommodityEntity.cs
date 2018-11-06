@@ -144,5 +144,9 @@ namespace ZlPos.Models
         public string specvalue { get; set; }
         [SugarColumn(IsNullable = true)]
         public string season { get; set; }
+
+        //add 2018年11月3日
+        [SugarColumn(IsNullable = true)]
+        public string molinmoney { get; set; }
     }
 }

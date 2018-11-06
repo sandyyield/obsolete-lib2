@@ -126,5 +126,8 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public string whichversion { get; set; }
 
+        //add 2018年11月3日
+        [SugarColumn(IsNullable = true)]
+        public string molinmoney { get; set; }
     }
 }

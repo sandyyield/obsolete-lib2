@@ -28,5 +28,11 @@ namespace ZlPos.Models
         public String vouchername { get; set; }
         [SugarColumn(IsNullable = true)]
         public String voucherdocno { get; set; }
+
+        //add 2018年11月3日
+        [SugarColumn(IsNullable = true)]
+        public string saleactivitytypecode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string activitycode { get; set; }
     }
 }
