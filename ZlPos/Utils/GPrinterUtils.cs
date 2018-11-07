@@ -469,8 +469,8 @@ namespace ZlPos.Utils
                             if (its.isBarCode == 1 && !string.IsNullOrEmpty(its.text))
                             {
                                 string[] arr = its.text.Split(',');
-                                //s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.directionX) * 8 + ",1,0," + its.font + ",\"" + arr[0] + "\"");
-                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) * 8 + ",1,0," + its.font + ",\"" + 12345678 + "\"");
+                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) + ",1,0,2,2" +
+                                    ",\"" + arr[0] + "\"");
                             }
                             else
                             {
@@ -528,7 +528,7 @@ namespace ZlPos.Utils
                             if (its.isBarCode == 1 && !string.IsNullOrEmpty(its.text))
                             {
                                 string[] arr = its.text.Split(',');
-                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) * 8 + ",1,0," + its.font + ",\"" + arr[0] + "\"");
+                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) + ",1,0,2,2" + ",\"" + arr[0] + "\"");
                             }
                             else
                             {
@@ -536,7 +536,7 @@ namespace ZlPos.Utils
                             }
                         }
                     }
-                    s.Add(" PRINT " + GPrinterManager.Instance.PrintNumber);
+                    s.Add("PRINT " + BJQPrinterManager.Instance.PrintNumber);
                     s.Add("SOUND 2,100");
                     foreach (var item in s)
                     {
