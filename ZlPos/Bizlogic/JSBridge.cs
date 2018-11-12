@@ -2622,7 +2622,7 @@ namespace ZlPos.Bizlogic
                 try
                 {
 
-                    if (CacheManager.GetGprint() as string != null)
+                    if (CacheManager.GetGprint() as string != null || CacheManager.GetBJQprint() != null)
                     {
                         List<string> usblist = GPrinterUtils.Instance.FindUSBPrinter();
                         if (usblist == null)
@@ -2639,29 +2639,31 @@ namespace ZlPos.Bizlogic
                             //每次都先设置完再打印
                             if (GPrinterUtils.Instance.Connect_Printer())
                             {
-                                if (GPrinterManager.Instance.Init)
+                                //if (GPrinterManager.Instance.Init)
+                                //{
+                                switch (printerType)
                                 {
-                                    switch (printerType)
-                                    {
-                                        case "SPBQ":
-                                        case "DDBQ":
-                                            GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
-                                            responseEntity.code = ResponseCode.SUCCESS;
-                                            break;
-                                        case "BJQ":
-                                            GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
-                                            responseEntity.code = ResponseCode.SUCCESS;
-                                            break;
-                                        default:
-                                            logger.Error("非法打印机类型");
-                                            break;
-                                    }
+                                    case "SPBQ":
+                                    case "DDBQ":
+                                        GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
+                                        responseEntity.code = ResponseCode.SUCCESS;
+                                        break;
+                                    case "BJQ":
+                                        GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
+                                        responseEntity.code = ResponseCode.SUCCESS;
+                                        break;
+                                    default:
+                                        logger.Error("非法打印机类型");
+                                        responseEntity.code = ResponseCode.Failed;
+                                        responseEntity.msg = "非法打印机类型";
+                                        break;
                                 }
-                                else
-                                {
-                                    responseEntity.code = ResponseCode.Failed;
-                                    responseEntity.msg = "请设置标签打印机";
-                                }
+                                //}
+                                //else
+                                //{
+                                //    responseEntity.code = ResponseCode.Failed;
+                                //    responseEntity.msg = "请设置标签打印机";
+                                //}
                             }
                             else
                             {
@@ -2673,7 +2675,7 @@ namespace ZlPos.Bizlogic
                     else
                     {
                         responseEntity.code = ResponseCode.Failed;
-                        responseEntity.msg = "请设置标签打印机";
+                        responseEntity.msg = "请设置标签打印机或标价签打印机";
                     }
                 }
                 catch (Exception e)

@@ -78,8 +78,15 @@ namespace ZlPos.Forms
                 Dock = DockStyle.Fill
             };
 
-            hostApp._SecondScreenWebView = secondScreenWebView;
-            hostApp.OpenSecondScreen();
+            //判断一下有几个屏幕
+            Screen[] sc;
+            sc = Screen.AllScreens;
+            if (sc.Length > 1)
+            {
+                hostApp._SecondScreenWebView = secondScreenWebView;
+                hostApp.OpenSecondScreen();
+
+            }
 
             //this.KeyPreview = true;
             //KeyDown += PosForm_KeyDown;

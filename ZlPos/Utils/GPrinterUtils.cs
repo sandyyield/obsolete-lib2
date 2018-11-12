@@ -469,7 +469,8 @@ namespace ZlPos.Utils
                             if (its.isBarCode == 1 && !string.IsNullOrEmpty(its.text))
                             {
                                 string[] arr = its.text.Split(',');
-                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) + ",1,0,2,2" +
+                                //arr[0] = "6901028075763"; //硬中华条码  --调试用的
+                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128\"," + Int32.Parse(its.height) + ",1,0,2,2" +
                                     ",\"" + arr[0] + "\"");
                             }
                             else
@@ -528,7 +529,7 @@ namespace ZlPos.Utils
                             if (its.isBarCode == 1 && !string.IsNullOrEmpty(its.text))
                             {
                                 string[] arr = its.text.Split(',');
-                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128M\"," + Int32.Parse(its.height) + ",1,0,2,2" + ",\"" + arr[0] + "\"");
+                                s.Add("BARCODE " + Int32.Parse(its.directionX) * 8 + "," + Int32.Parse(its.directionY) * 8 + ",\"128\"," + Int32.Parse(its.height) + ",1,0,2,2" + ",\"" + arr[0] + "\"");
                             }
                             else
                             {
