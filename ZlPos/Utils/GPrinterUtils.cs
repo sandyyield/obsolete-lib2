@@ -119,7 +119,7 @@ namespace ZlPos.Utils
 
             List<string> s = new List<string>();
             s.Add("SIZE 50 mm,30 mm");
-            s.Add("GAP 2 0");//TODO...
+            s.Add("GAP 2 mm,0 mm");//TODO...
             s.Add("DIRECTION 0");
             s.Add("REFERENCE 0,0");
             s.Add("SET TEAR ON");
@@ -162,7 +162,7 @@ namespace ZlPos.Utils
 
             List<string> s = new List<string>();
             s.Add("SIZE 40 mm,30 mm");
-            s.Add("GAP 2 0");//TODO...
+            s.Add("GAP 2 mm,0 mm");//TODO...
             s.Add("DIRECTION 0");
             s.Add("REFERENCE 0,0");
             s.Add("SET TEAR ON");
@@ -335,7 +335,7 @@ namespace ZlPos.Utils
                 List<string> s = new List<string>();
 
                 s.Add("SIZE 60 mm,40 mm");
-                s.Add("GAP 2 0");//TODO...
+                s.Add("GAP 2 mm,0 mm");//TODO...
                 s.Add("DIRECTION 0");
                 s.Add("REFERENCE 0,0");
                 s.Add("SET TEAR ON");
@@ -399,7 +399,7 @@ namespace ZlPos.Utils
 
             List<string> s = new List<string>();
             s.Add("SIZE 60 mm,40 mm");
-            s.Add("GAP 2 0");//TODO...
+            //s.Add("GAP 2 0");//TODO...
             s.Add("DIRECTION 0");
             s.Add("REFERENCE 0,0");
             s.Add("SET TEAR ON");
@@ -453,12 +453,13 @@ namespace ZlPos.Utils
                 foreach (var printLst in lst)
                 {
 
-
+                    var str = "GAP 2 mm,0 mm";
                     byte[] enddata = { 0x0a };//换行
                     List<string> s = new List<string>();
                     s.Add("SIZE " + width + " mm," + height + " mm");
                     //s.Add("SIZE 60 mm,40 mm");
-                    s.Add("GAP 2 0");
+                    //s.Add("GAP 2 ,0");
+                    s.Add(str);
                     s.Add("DIRECTION 0");
                     s.Add("REFERENCE 0,0");
                     s.Add("SET TEAR ON");

@@ -25,5 +25,16 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public string del { get; set; }
+
+        //add 2018年11月15日
+        [SugarColumn(IsNullable = true)]
+        public string branchcode { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string branchname { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string datalevel { get; set; }
+
     }
 }

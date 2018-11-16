@@ -26,5 +26,9 @@ namespace ZlPos.Models
         // add: 2018/03/28
         [SugarColumn(IsNullable = true)]
         public String isshow { get; set; }
+
+        //add 2018年11月15日
+        [SugarColumn(IsNullable = true)]
+        public String ordernum { get; set; }
     }
 }

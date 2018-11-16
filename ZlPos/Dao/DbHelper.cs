@@ -153,7 +153,13 @@ namespace ZlPos.Dao
                         UpgradingSchema.UpgradingVersion<DisCountDetailEntity>(new string[] { "saleactivitytypecode", "activitycode" });
                         UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "molinmoney" });
                         break;
-
+                    case 16:
+                        //add 2018年11月15日
+                        UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "branchname", "required", "remark", "speclevel", "updownstatus", "datalevel" });
+                        UpgradingSchema.UpgradingVersion<BarCodeEntity2>(new string[] { "branchcode", "branchname", "datalevel" });
+                        UpgradingSchema.UpgradingVersion<PayTypeEntity>(new string[] { "ordernum" });
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "speclevel" });
+                        break;
 
 
 

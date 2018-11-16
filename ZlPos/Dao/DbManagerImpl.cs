@@ -572,5 +572,31 @@ namespace ZlPos.Dao
                 throw ex;
             }
         }
+
+        public void Insert<T>(T entity) where T : class, new()
+        {
+            try
+            {
+                using(var db = SugarDao.Instance)
+                {
+                    if (!db.DbMaintenance.IsAnyTable(typeof(T).Name, false))
+                    {
+                        db.CodeFirst.InitTables(typeof(T));
+                        //第一次建表直接插入完事
+                        db.Insertable(entity).Where(true, true).ExecuteCommand();
+                        //return;
+
+                    }
+                    else
+                    {
+                        db.Insertable(entity).Where(true).ExecuteCommand();
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                logger.Error("Insert db err :", e);
+            }
+        }
     }
 }

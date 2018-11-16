@@ -160,6 +160,19 @@ namespace ZlPos.Models
         [SugarColumn(IsIgnore = true)]
         public string color { get; set; }
 
+        //add 2018年11月15日
+        [SugarColumn(IsNullable = true)]
+        public string branchname { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string required { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string remark { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string speclevel { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string updownstatus { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string datalevel { get; set; }
 
     }
 }
