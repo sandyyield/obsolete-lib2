@@ -124,6 +124,8 @@ namespace ZlPos
             //禁用调试日志
             cefSettings.LogSeverity = LogSeverity.Disable;
 
+            cefSettings.CachePath = Application.StartupPath + "\\CachePath";
+
             Cef.Initialize(cefSettings, true, true);
 
             TaskScheduler.UnobservedTaskException += (s, e) =>
