@@ -458,7 +458,7 @@ namespace ZlPos.Utils
                     List<string> s = new List<string>();
                     s.Add("SIZE " + width + " mm," + height + " mm");
                     //s.Add("SIZE 60 mm,40 mm");
-                    s.Add("GAP 2 0");
+                    s.Add("GAP 2 mm,0 mm");
                     s.Add("DIRECTION 0");
                     s.Add("REFERENCE 0,0");
                     s.Add("SET TEAR ON");
