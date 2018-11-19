@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-//using CefSharp;
-//using CefSharp.WinForms;
+using CefSharp;
+using CefSharp.WinForms;
 using ZlPos.Dao;
 using Newtonsoft.Json;
 using ZlPos.Bean;
@@ -43,11 +43,9 @@ namespace ZlPos.Bizlogic
         //private static ILog logger = null;
         private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        //private static ChromiumWebBrowser browser;
-        private static Control browser;
+        private static ChromiumWebBrowser browser;
 
-        //public ChromiumWebBrowser _SecondScreenWebView { get; set; }
-        public Control _SecondScreenWebView { get; set; }
+        public ChromiumWebBrowser _SecondScreenWebView { get; set; }
 
         private SecondScreenFrm SecondScreen;
 
@@ -77,14 +75,7 @@ namespace ZlPos.Bizlogic
 
         private DataProcessor _DataProcessor = DataProcessor.Instance;
 
-        //加载依赖程序集 
-        static Assembly assemblyCefSharp = Assembly.LoadFrom(Application.StartupPath + "\\CefSharp.dll");
-        static Assembly assemblyCefSharp_core = Assembly.LoadFrom(Application.StartupPath + "\\CefSharp.Core.dll");
-        static Assembly assemblyCefSharp_WinForms = Assembly.LoadFrom(Application.StartupPath + "\\CefSharp.WinForms.dll");
 
-        static Type t_WebBrowserExtensions;
-
-        static MethodInfo ExecuteScriptAsyncMethod;
 
 
         /// <summary>
@@ -102,8 +93,6 @@ namespace ZlPos.Bizlogic
             {
                 if (instance == null)
                 {
-                    t_WebBrowserExtensions = assemblyCefSharp.GetType("CefSharp.WebBrowserExtensions");
-                    ExecuteScriptAsyncMethod = t_WebBrowserExtensions.GetMethods().FirstOrDefault(m => m.Name == "ExecuteScriptAsync" && m.GetParameters().Length == 2);
                     instance = new JSBridge();
                     mWebViewHandle = new WebViewHandle(AsyncCallbackMethod);
                 }
@@ -116,8 +105,7 @@ namespace ZlPos.Bizlogic
 
         }
 
-        //public ChromiumWebBrowser Browser { get => browser; set => browser = value; }
-        public Control Browser { get => browser; set => browser = value; }
+        public ChromiumWebBrowser Browser { get => browser; set => browser = value; }
         //public void DownLoadFile { get => this.downLoadFile; set => this.downLoadFile = value; }
 
 
@@ -126,8 +114,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         public void ExecuteScriptAsync()
         {
-            //browser.ExecuteScriptAsync("printInvokeJSMethod('hello world')");
-            ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "printInvokeJSMethod('hello world')" });
+            browser.ExecuteScriptAsync("printInvokeJSMethod('hello world')");
         }
 
 
@@ -158,7 +145,7 @@ namespace ZlPos.Bizlogic
                 var os = Environment.OSVersion.Version;
                 OSVer = os.Major + "." + os.Minor;
 
-                //browser.ExecuteScriptAsync("getDeviceIdCallBack('" + OSVer + "')");
+                browser.ExecuteScriptAsync("getDeviceIdCallBack('" + OSVer + "')");
             });
             return RegHelper.GetKey2();
         }
@@ -316,10 +303,7 @@ namespace ZlPos.Bizlogic
         /// <param name="ZoomLevel"></param>
         public void SetZoomLevel(double ZoomLevel)
         {
-            //browser.SetZoomLevel(ZoomLevel);
-            t_WebBrowserExtensions.GetMethods().FirstOrDefault(m => m.Name == "SetZoomLevel" && m.GetParameters().Length == 2)
-                .Invoke(null, new object[] { browser, ZoomLevel });
-
+            browser.SetZoomLevel(ZoomLevel);
         }
         #endregion
 
@@ -351,20 +335,7 @@ namespace ZlPos.Bizlogic
             {
                 if (_SecondScreenWebView != null)
                 {
-                    try
-                    {
-
-                        //_SecondScreenWebView.ExecuteScriptAsync(p1 + "('" + p2 + "')");
-
-
-                        //t_WebBrowserExtensions = assemblyCefSharp.GetType("CefSharp.WebBrowserExtensions");
-                        //MethodInfo method = t_WebBrowserExtensions.GetMethods().FirstOrDefault(m => m.Name == "ExecuteScriptAsync" && m.GetParameters().Length == 2);
-                        ExecuteScriptAsyncMethod.Invoke(null, new object[] { _SecondScreenWebView, p1 + "('" + p2 + "')" });
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error("SecondScreenAction err", e);
-                    }
+                    _SecondScreenWebView.ExecuteScriptAsync(p1 + "('" + p2 + "')");
                 }
             });
         }
@@ -850,8 +821,7 @@ namespace ZlPos.Bizlogic
             shopcode = ContextCache.GetShopcode();
             Task.Factory.StartNew(() =>
             {
-                //browser.ExecuteScriptAsync("getLastUserNameCallBack('" + shopcode + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getLastUserNameCallBack('" + shopcode + "')" });
+                browser.ExecuteScriptAsync("getLastUserNameCallBack('" + shopcode + "')");
             });
             //ResponseEntity responseEntity = new ResponseEntity();
             //try
@@ -1079,8 +1049,7 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Error(e.Message + e.StackTrace);
                 }
-                //browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getAllSaleBillCallBack('" + target + "','" + allBill + "')" });
+                browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
                 //return "";
             });
         }
@@ -1106,8 +1075,7 @@ namespace ZlPos.Bizlogic
                         string end = queryBillEntity.endtime;
                         if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
                         {
-                            //browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + result + "')");
-                            ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getAllSaleBillByParamsCallBack('" + result + "')" });
+                            browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + result + "')");
                             return;
                         }
                         DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
@@ -1179,8 +1147,7 @@ namespace ZlPos.Bizlogic
                     logger.Error("getAllSaleBillByParams : json 解析异常", e);
                 }
                 string finalAllBills = JsonConvert.SerializeObject(billAndCountEntity);
-                //browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + finalAllBills + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getAllSaleBillByParamsCallBack('" + finalAllBills + "')" });
+                browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + finalAllBills + "')");
             });
         }
         #endregion
@@ -1201,8 +1168,7 @@ namespace ZlPos.Bizlogic
                 string result = "[]";
                 if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
                 {
-                    //browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "')");
-                    ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getSelectTimeSaleBillByPaginationCallBack('" + result + "')" });
+                    browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "')");
                     return;
                 }
                 DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
@@ -1262,8 +1228,7 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info(e.Message + e.StackTrace);
                 }
-                //browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "','" + pageindex + "','" + pagesize + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getSelectTimeSaleBillByPaginationCallBack('" + result + "','" + pageindex + "','" + pagesize + "')" });
+                browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "','" + pageindex + "','" + pagesize + "')");
             });
 
             //return result;
@@ -1287,8 +1252,7 @@ namespace ZlPos.Bizlogic
 
                 if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
                 {
-                    //browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
-                    ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getSelectTimeSaleBillCallBack('" + result + "')" });
+                    browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
                     return;
                 }
                 DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
@@ -1386,8 +1350,7 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info(e.Message + e.StackTrace);
                 }
-                //browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getSelectTimeSaleBillCallBack('" + result + "')" });
+                browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
             });
         }
         #endregion
@@ -1709,8 +1672,7 @@ namespace ZlPos.Bizlogic
                     logger.Info("保存和更新商品信息接口：用户未登录");
                     responseEntity.code = ResponseCode.Failed;
                 }
-                //browser.ExecuteScriptAsync("saveCommodityListCallBack('" + target + "', '" + JsonConvert.SerializeObject(responseEntity) + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "saveCommodityListCallBack('" + target + "', '" + JsonConvert.SerializeObject(responseEntity) + "')" });
+                browser.ExecuteScriptAsync("saveCommodityListCallBack('" + target + "', '" + JsonConvert.SerializeObject(responseEntity) + "')");
             });
         }
         #endregion
@@ -2262,8 +2224,7 @@ namespace ZlPos.Bizlogic
                 deviceEntity.devices = devices;
                 responseEntity.data = deviceEntity;
                 //mWebViewHandle.Invoke("getUsbDevicesCallBack", responseEntity);
-                //browser.ExecuteScriptAsync("getUsbDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getUsbDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')" });
+                browser.ExecuteScriptAsync("getUsbDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
             });
             return;
         }
@@ -2413,8 +2374,7 @@ namespace ZlPos.Bizlogic
                 ResponseEntity responseEntity = new ResponseEntity();
                 USBGPrinterSetter usbGPrinterSetter = new USBGPrinterSetter();
                 //ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
-                //browser.ExecuteScriptAsync("getGPrintUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetGPrinter() + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getGPrintUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetGPrinter() + "')" });
+                browser.ExecuteScriptAsync("getGPrintUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetGPrinter() + "')");
             });
             return;
 
@@ -2429,8 +2389,7 @@ namespace ZlPos.Bizlogic
                 ResponseEntity responseEntity = new ResponseEntity();
                 USBGPrinterSetter usbGPrinterSetter = new USBGPrinterSetter();
                 //ThreadPool.QueueUserWorkItem(CallbackMethod, new object[] { "getGPrintUsbDevicesCallBack", responseEntity });
-                //browser.ExecuteScriptAsync("getBJQUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetBJQPrinter() + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getBJQUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetBJQPrinter() + "')" });
+                browser.ExecuteScriptAsync("getBJQUsbDevicesCallBack('" + usbGPrinterSetter.GetUsbDevices() + "','" + GetBJQPrinter() + "')");
             });
             return;
         }
@@ -2505,8 +2464,7 @@ namespace ZlPos.Bizlogic
                     responseEntity.code = ResponseCode.SUCCESS;
                     responseEntity.data = deviceEntity;
                     //mWebViewHandle?.Invoke("getBluetoothDevicesCallBack", responseEntity);
-                    //browser.ExecuteScriptAsync("getBluetoothDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
-                    ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getBluetoothDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')" });
+                    browser.ExecuteScriptAsync("getBluetoothDevicesCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
                 }
                 catch (Exception e)
                 {
@@ -2588,8 +2546,7 @@ namespace ZlPos.Bizlogic
                     responseEntity.msg = "GetPrinterQueue err";
                     logger.Error("获取打印机队列失败", e);
                 }
-                //browser.ExecuteScriptAsync("getPrinterQueueCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getPrinterQueueCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')" });
+                browser.ExecuteScriptAsync("getPrinterQueueCallBack('" + JsonConvert.SerializeObject(responseEntity) + "','" + GetPrinter() + "')");
                 //mWebViewHandle.Invoke("getPrinterQueueCallBack", responseEntity);
             });
         }
@@ -3707,8 +3664,7 @@ namespace ZlPos.Bizlogic
                 syncScaleEntity.point = point;
                 Task.Factory.StartNew(() =>
                 {
-                    //browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
-                    ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')" });
+                    browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
                 });
             };
 
@@ -3754,8 +3710,7 @@ namespace ZlPos.Bizlogic
                  syncScaleEntity.point = point;
                  Task.Factory.StartNew(() =>
                  {
-                     //browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
-                     ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')" });
+                     browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
                  });
              };
 
@@ -3975,8 +3930,7 @@ namespace ZlPos.Bizlogic
                 }
                 //responseEntity.data = commodityEntityList;
                 //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
-                //browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')" });
+                browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
             });
             return;
             //return JsonConvert.SerializeObject(commodityEntityList);
@@ -4010,8 +3964,7 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info("saveWeightCommodity err>>" + e.Message + e.StackTrace);
                 }
-                //browser.ExecuteScriptAsync("saveWeightCommodityCallBack()");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "saveWeightCommodityCallBack()" });
+                browser.ExecuteScriptAsync("saveWeightCommodityCallBack()");
             });
         }
         #endregion
@@ -4295,8 +4248,7 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                //browser.ExecuteScriptAsync("intentToCallBack('" + url + "')");
-                ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, "intentToCallBack('" + url + "')" });
+                browser.ExecuteScriptAsync("intentToCallBack('" + url + "')");
             });
             return true;
         }
@@ -4352,8 +4304,7 @@ namespace ZlPos.Bizlogic
             object[] paramsArr = (object[])state;
             string methodName = paramsArr[0] as string;
             ResponseEntity responseEntity = paramsArr[1] as ResponseEntity;
-            //browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
-            ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')" });
+            browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
         }
 
         /// <summary>
@@ -4363,8 +4314,7 @@ namespace ZlPos.Bizlogic
         /// <param name="responseEntity">回调的数据包</param>
         private static void AsyncCallbackMethod(string methodName, ResponseEntity responseEntity)
         {
-            //browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
-            ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')" });
+            browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
         }
 
         private void CallbackMethod4SetPrinter(object state)
@@ -4372,8 +4322,7 @@ namespace ZlPos.Bizlogic
             object[] paramsArr = (object[])state;
             string methodName = paramsArr[0] as string;
             ResponseEntity responseEntity = paramsArr[1] as ResponseEntity;
-            //browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
-            ExecuteScriptAsyncMethod.Invoke(null, new object[] { browser, methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')" });
+            browser.ExecuteScriptAsync(methodName + "('" + JsonConvert.SerializeObject(responseEntity) + "')");
             if (responseEntity.code == ResponseCode.SUCCESS)
             {
                 try
