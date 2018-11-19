@@ -13,9 +13,11 @@ namespace ZlPos.Forms
 {
     public partial class SecondScreenFrm : Form
     {
-        public static ChromiumWebBrowser chromiumWebBrowser;
+        //public static ChromiumWebBrowser chromiumWebBrowser;
+        public static Control chromiumWebBrowser;
 
-        public SecondScreenFrm(ChromiumWebBrowser secondScreenChromiumWebBrowser)
+        //public SecondScreenFrm(ChromiumWebBrowser secondScreenChromiumWebBrowser)
+        public SecondScreenFrm(Control secondScreenChromiumWebBrowser)
         {
             chromiumWebBrowser = secondScreenChromiumWebBrowser;
             chromiumWebBrowser.Dock = DockStyle.Fill;
