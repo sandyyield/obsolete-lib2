@@ -1990,7 +1990,7 @@ namespace ZlPos.Bizlogic
                                   && c.del == "0"
                                   && c.commodityclassify != "3"
                                   && c.commoditylevel == "2"
-                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
+                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword) || SqlFunc.Contains(c.commoditycode,keyword))
                                   ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
                                   .GroupBy((c, bc) => c.id)
                                   .ToPageList(pageindex + 1, pagesize, ref total);
@@ -2020,7 +2020,7 @@ namespace ZlPos.Bizlogic
                                   && c.commoditystatus == "0"
                                   && c.del == "0"
                                   && c.commodityclassify != "3"
-                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
+                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword) || SqlFunc.Contains(c.commoditycode, keyword))
                                   ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
                                    .GroupBy((c, bc) => c.id)
                                   .ToPageList(pageindex + 1, pagesize, ref total);

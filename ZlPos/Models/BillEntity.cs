@@ -126,6 +126,10 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public string whichversion { get; set; }
 
+        //add 2018/11/01
+        [SugarColumn(IsNullable = true)]
+        public string cashtocard { get; set; }//零转储
+
         //add 2018年11月3日
         [SugarColumn(IsNullable = true)]
         public string molinmoney { get; set; }
