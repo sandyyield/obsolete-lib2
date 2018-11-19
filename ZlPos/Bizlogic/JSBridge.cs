@@ -528,7 +528,8 @@ namespace ZlPos.Bizlogic
                             List<SupplierEntity> suppliers = commodityInfoVM.suppliers;
                             // add: 2018/2/27
                             List<BarCodeEntity2> barCodes = commodityInfoVM.barcodes;
-                            List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
+                            // edit 2018年11月19日 调价相关全部取消
+                            //List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
 
                             #region 已采用bulksave 方式提高存库效率
                             //保存商品分类信息
@@ -577,11 +578,12 @@ namespace ZlPos.Bizlogic
                             {
                                 dbManager.BulkSaveOrUpdate(barCodes.ToArray());
                             }
-                            //保存调价表信息
-                            if (commodityPriceEntityList != null)
-                            {
-                                dbManager.BulkSaveOrUpdate(commodityPriceEntityList.ToArray());
-                            }
+                            //edit 2018年11月19日
+                            ////保存调价表信息
+                            //if (commodityPriceEntityList != null)
+                            //{
+                            //    dbManager.BulkSaveOrUpdate(commodityPriceEntityList.ToArray());
+                            //}
                             #endregion
 
                             //TOFIX...这里要改成自增形式
@@ -637,8 +639,8 @@ namespace ZlPos.Bizlogic
                     List<CashierEntity> cashierEntities = null;
                     List<SupplierEntity> supplierEntities = null;
                     List<CommodityInfoVM> commodityInfoVMList = null;
-                    List<BarCodeEntity2> barCodes = null;
-                    List<CommodityPriceEntity> commodityPriceList = null;
+                    //List<BarCodeEntity2> barCodes = null;
+                    //List<CommodityPriceEntity> commodityPriceList = null;
 
                     using (var db = SugarDao.Instance)
                     {
@@ -653,11 +655,11 @@ namespace ZlPos.Bizlogic
                         categoryEntities = db.Queryable<CategoryEntity>().Where(it => it.shopcode == userEntity.shopcode
                                                                             && it.del == "0").OrderBy(it => it.categorycode).ToList();
 
-                        // add: 2018/2/27
-                        barCodes = db.Queryable<BarCodeEntity2>().Where(it => it.shopcode == userEntity.shopcode
-                                                                        //add 2018年11月15日
-                                                                        && it.branchcode == userEntity.branchcode
-                                                                        && it.del == "0").ToList();
+                        //// add: 2018/2/27
+                        //barCodes = db.Queryable<BarCodeEntity2>().Where(it => it.shopcode == userEntity.shopcode
+                        //                                                //add 2018年11月15日
+                        //                                                && it.branchcode == userEntity.branchcode
+                        //                                                && it.del == "0").ToList();
 
                         //固定精确到shopcode + branchcode
                         assistantsEntities = db.Queryable<AssistantsEntity>().Where(it => it.shopcode == userEntity.shopcode
@@ -666,8 +668,8 @@ namespace ZlPos.Bizlogic
                         cashierEntities = db.Queryable<CashierEntity>().Where(it => it.shopcode == userEntity.shopcode
                                                                             && it.branchcode == userEntity.branchcode).ToList();
 
-                        commodityPriceList = db.Queryable<CommodityPriceEntity>().Where(it => it.shopcode == userEntity.shopcode
-                                                                                    && it.branchcode == userEntity.branchcode).ToList();
+                        //commodityPriceList = db.Queryable<CommodityPriceEntity>().Where(it => it.shopcode == userEntity.shopcode
+                        //                                                            && it.branchcode == userEntity.branchcode).ToList();
 
                         //按 membermode 区分1共享和0非共享
                         if ("1".Equals(userEntity.membermodel)) //共享
@@ -717,15 +719,15 @@ namespace ZlPos.Bizlogic
                         {
                             supplierEntities = new List<SupplierEntity>();
                         }
-                        // add: 2018/2/27
-                        if (barCodes == null)
-                        {
-                            barCodes = new List<BarCodeEntity2>();
-                        }
-                        if (commodityPriceList == null)
-                        {
-                            commodityPriceList = new List<CommodityPriceEntity>();
-                        }
+                        //// add: 2018/2/27
+                        //if (barCodes == null)
+                        //{
+                        //    barCodes = new List<BarCodeEntity2>();
+                        //}
+                        //if (commodityPriceList == null)
+                        //{
+                        //    commodityPriceList = new List<CommodityPriceEntity>();
+                        //}
 
                         commodityInfoVM.categorys = categoryEntities;
                         commodityInfoVM.commoditys = commodityEntities;
@@ -734,8 +736,8 @@ namespace ZlPos.Bizlogic
                         commodityInfoVM.assistants = assistantsEntities;
                         commodityInfoVM.users = cashierEntities;
                         commodityInfoVM.suppliers = supplierEntities;
-                        commodityInfoVM.barcodes = barCodes;
-                        commodityInfoVM.commoditypricelist = commodityPriceList;
+                        //commodityInfoVM.barcodes = barCodes;
+                        //commodityInfoVM.commoditypricelist = commodityPriceList;
                         responseEntity.data = commodityInfoVM;
                         responseEntity.code = ResponseCode.SUCCESS;
                         responseEntity.msg = "获取所有商品信息成功";
@@ -1537,7 +1539,7 @@ namespace ZlPos.Bizlogic
             {
                 List<CommodityEntity> commodityEntities = null;
                 List<BarCodeEntity2> barCodeEntityList = null;
-                List<CommodityPriceEntity> commodityPriceEntityList = null;
+                //List<CommodityPriceEntity> commodityPriceEntityList = null;
                 int total = 0;
                 if (_LoginUserManager.Login)
                 {
@@ -1548,106 +1550,75 @@ namespace ZlPos.Bizlogic
                         {
                             ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
                                                                            it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
-                            if (shopConfigEntity != null && "12".Equals(shopConfigEntity.industryid))//服装版
-                            {
-                                commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>(
-                                                                                (c, bc) => new object[] {
-                                                                                    JoinType.Left, c.commoditycode == bc.commoditycode 
-                                                                                                    && bc.del == "0" 
-                                                                                                    && bc.shopcode == userEntity.shopcode
-                                                                                                    //add 2018年11月15日
-                                                                                                    && c.branchcode == userEntity.branchcode
-                                                                                                    && bc.branchcode == userEntity.branchcode
-                                                                                    //JoinType.Left,c.commoditycode == cp.commoditycode && cp.shopcode == userEntity.shopcode && cp.branchcode == userEntity.branchcode
-                                                                                }
-                                                                                )
-                                                                                .Where((c, bc) => c.shopcode == userEntity.shopcode
-                                                                                && c.commoditystatus == "0"
-                                                                                && c.del == "0"
-                                                                                && c.commoditylevel == "1"
-                                                                                && (string.IsNullOrEmpty(categorycode) || c.categorycode == categorycode)
-                                                                                && (c.commodityname.Contains(keyword) || c.commoditycode.Contains(keyword) || c.mnemonic.Contains(keyword) || SqlFunc.Contains(bc.barcode, keyword))
-                                                                                )
-                                                                                .OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                                                                                .GroupBy((c, bc) => c.id)
-                                                                                //.Select()
-                                                                                .ToPageList(pageindex + 1, pagesize, ref total);
-                                barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                    //add 2018年11月15日
-                                                                                    && i.shopcode == userEntity.branchcode
-                                                                                    && i.del == "0").ToList();
-                                commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                        && i.branchcode == userEntity.branchcode).ToList();
-                            }
-                            else
-                            {
-                                commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>(
-                                                                                (c, bc) => new object[] {
-                                                                                    JoinType.Left, c.commoditycode == bc.commoditycode 
-                                                                                                    && bc.del == "0" 
-                                                                                                    && bc.shopcode == userEntity.shopcode
-                                                                                                    //add 2018年11月15日
-                                                                                                    && c.branchcode == userEntity.branchcode
-                                                                                                    && bc.branchcode == userEntity.branchcode
-                                                                                    //JoinType.Left,c.commoditycode == cp.commoditycode && cp.shopcode == userEntity.shopcode && cp.branchcode == userEntity.branchcode
-                                                                                }
-                                                                                )
-                                                                                .Where((c, bc) => c.shopcode == userEntity.shopcode
-                                                                                && c.commoditystatus == "0"
-                                                                                && c.del == "0"
-                                                                                //&& c.commoditylevel == "1"//非服装版不过滤
-                                                                                && (string.IsNullOrEmpty(categorycode) || c.categorycode == categorycode)
-                                                                                && (c.commodityname.Contains(keyword) || c.commoditycode.Contains(keyword) || c.mnemonic.Contains(keyword) || SqlFunc.Contains(bc.barcode, keyword))
-                                                                                )
-                                                                                .OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                                                                                .GroupBy((c, bc) => c.id)
 
-                                                                                .ToPageList(pageindex + 1, pagesize, ref total);
-                                barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                    //add 2018年11月15日
-                                                                                    && i.branchcode == userEntity.branchcode
-                                                                                    && i.del == "0").ToList();
-                                commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                        && i.branchcode == userEntity.branchcode).ToList();
-                                for (int i = 0; i < commodityEntities.Count; i++)
+                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>(
+                                                                            (c, bc) => new object[] {
+                                                                                    JoinType.Left, c.commoditycode == bc.commoditycode
+                                                                                                    && bc.del == "0"
+                                                                                                    && bc.shopcode == userEntity.shopcode
+                                                                                                    //add 2018年11月15日
+                                                                                                    && c.branchcode == userEntity.branchcode
+                                                                                                    && bc.branchcode == userEntity.branchcode
+                                                                                //JoinType.Left,c.commoditycode == cp.commoditycode && cp.shopcode == userEntity.shopcode && cp.branchcode == userEntity.branchcode
+                                                                            }
+                                                                            )
+                                                                            .Where((c, bc) => c.shopcode == userEntity.shopcode
+                                                                            && c.commoditystatus == "0"
+                                                                            && c.del == "0"
+                                                                            && c.commoditylevel == "1"
+                                                                            && (string.IsNullOrEmpty(categorycode) || c.categorycode == categorycode)
+                                                                            && (c.commodityname.Contains(keyword) || c.commoditycode.Contains(keyword) || c.mnemonic.Contains(keyword) || SqlFunc.Contains(bc.barcode, keyword))
+                                                                            )
+                                                                            .OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                                                                            .GroupBy((c, bc) => c.id)
+                                                                            //.Select()
+                                                                            .ToPageList(pageindex + 1, pagesize, ref total);
+                            barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                //add 2018年11月15日
+                                                                                && i.shopcode == userEntity.branchcode
+                                                                                && i.del == "0").ToList();
+                            //commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
+                            //                                                        && i.branchcode == userEntity.branchcode).ToList();
+
+                            for (int i = 0; i < commodityEntities.Count; i++)
+                            {
+                                CommodityEntity commodityEntity = commodityEntities[i];
+                                //从条码表获取商品对应的条码
+                                if (barCodeEntityList != null)
                                 {
-                                    CommodityEntity commodityEntity = commodityEntities[i];
-                                    //从条码表获取商品对应的条码
-                                    if (barCodeEntityList != null)
+                                    for (int a = 0; a < barCodeEntityList.Count; a++)
                                     {
-                                        for (int a = 0; a < barCodeEntityList.Count; a++)
+                                        if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
                                         {
-                                            if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
+                                            string barcodes = barCodeEntityList[a].barcode;
+                                            if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
                                             {
-                                                string barcodes = barCodeEntityList[a].barcode;
-                                                if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
-                                                {
-                                                    barcodes = barcodes.Split(',')[0];
-                                                }
-                                                if (string.IsNullOrEmpty(barcodes))
-                                                {
-                                                    barcodes = "";
-                                                }
-                                                commodityEntity.barcode = barcodes;//用商品条码
-                                                break;
+                                                barcodes = barcodes.Split(',')[0];
                                             }
-                                        }
-                                    }
-                                    if (commodityPriceEntityList != null)
-                                    {
-                                        for (int a = 0; a < commodityPriceEntityList.Count; a++)
-                                        {
-                                            if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
+                                            if (string.IsNullOrEmpty(barcodes))
                                             {
-                                                commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
-                                                break;
+                                                barcodes = "";
                                             }
+                                            commodityEntity.barcode = barcodes;//用商品条码
+                                            break;
                                         }
                                     }
                                 }
-
+                                //if (commodityPriceEntityList != null)
+                                //{
+                                //    for (int a = 0; a < commodityPriceEntityList.Count; a++)
+                                //    {
+                                //        if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
+                                //        {
+                                //            commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
+                                //            break;
+                                //        }
+                                //    }
+                                //}
                             }
+
                         }
+
                     }
                     catch (Exception e)
                     {
@@ -1704,6 +1675,45 @@ namespace ZlPos.Bizlogic
                 browser.ExecuteScriptAsync("saveCommodityListCallBack('" + target + "', '" + JsonConvert.SerializeObject(responseEntity) + "')");
             });
         }
+        #endregion
+
+
+        //add 2018年11月19日
+        #region SaveBarcodesList
+        public void SaveBarcodesList(string target, string barcodeListString)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            Task.Factory.StartNew(() =>
+            {
+                if (_LoginUserManager.Login)
+                {
+                    UserEntity userEntity = _LoginUserManager.UserEntity;
+                    try
+                    {
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        List<BarCodeEntity2> barCodeEntityList = JsonConvert.DeserializeObject<List<BarCodeEntity2>>(barcodeListString);
+                        if (barCodeEntityList != null)
+                        {
+                            dbManager.BulkSaveOrUpdate(barCodeEntityList);
+                        }
+                        responseEntity.code = ResponseCode.SUCCESS;
+                        responseEntity.msg = "保存barcode列表成功";
+                    }
+                    catch (Exception e)
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "保存barcode列表异常";
+                    }
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "用户未登录";
+                }
+                browser.ExecuteScriptAsync("saveBarcodesListCallBack('" + target + "', '" + JsonConvert.SerializeObject(responseEntity) + "')");
+            });
+        }
+
         #endregion
 
         #region GetCommodityById
@@ -1867,31 +1877,18 @@ namespace ZlPos.Bizlogic
                         {
                             ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
                                                                             it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
-                            if (shopConfigEntity != null && "12".Equals(shopConfigEntity.industryid))
-                            {
-                                commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                    //add 2018年11月15日
-                                                                                    && i.branchcode == userEntity.branchcode
-                                                                                    && i.commoditystatus == "0"
-                                                                                    && i.del == "0"
-                                                                                    && i.categorycode == categoryCode
-                                                                                    && i.commodityclassify != "3"
-                                                                                    && i.commoditylevel == "2")
-                                                                                    .OrderBy(i => i.commoditycode, SqlSugar.OrderByType.Asc)
-                                                                                    .ToList();
-                            }
-                            else
-                            {
-                                commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                        //add 2018年11月15日
-                                                                                        && i.branchcode == userEntity.branchcode
-                                                                                        && i.commoditystatus == "0"
-                                                                                        && i.del == "0"
-                                                                                        && i.categorycode == categoryCode
-                                                                                        && i.commodityclassify != "3")
-                                                                                        .OrderBy(i => i.commoditycode, SqlSugar.OrderByType.Asc)
-                                                                                        .ToList();
-                            }
+                            
+                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                //add 2018年11月15日
+                                                                                && i.branchcode == userEntity.branchcode
+                                                                                && i.commoditystatus == "0"
+                                                                                && i.del == "0"
+                                                                                && i.categorycode == categoryCode
+                                                                                && i.commodityclassify != "3"
+                                                                                && i.commoditylevel == "2")
+                                                                                .OrderBy(i => i.commoditycode, SqlSugar.OrderByType.Asc)
+                                                                                .ToList();
+                            
                         }
 
                     }
@@ -2003,76 +2000,30 @@ namespace ZlPos.Bizlogic
                         var total = 0;
                         ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
                                                                             it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
-                        if (shopConfigEntity != null && "12".Equals(shopConfigEntity.industryid))//服装版
-                        {
-                            //数据pageindex 从1开始 故++
-                            //commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                            //                                                    && i.commoditystatus == "0"
-                            //                                                    && i.del == "0"
-                            //                                                    && i.commoditylevel == "2"
-                            //                                                    && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
-                            //                                                    && i.commodityclassify != "3")
-                            //                                                    //&& (i.commodityname.Contains("keyword")
-                            //                                                    //    || i.mnemonic.Contains("keyword")))
-                            //                                                    //.ToList();
-                            //                                                    .OrderBy(i => i.commoditycode, OrderByType.Asc)
-                            //                                                    .ToPageList(pageindex + 1, pagesize, ref total);
-                            //还需要从barcode中查出来
-                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
-                              {
-                                JoinType.Left,c.commoditycode == bc.commoditycode 
-                                                && bc.del == "0" 
+
+                        commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
+                          {
+                                JoinType.Left,c.commoditycode == bc.commoditycode
+                                                && bc.del == "0"
                                                 && bc.shopcode == userEntity.shopcode
                                                 //add 2018年11月15日
                                                 && c.branchcode == userEntity.branchcode
                                                 && bc.branchcode == userEntity.branchcode
-                              })
-                              .Where((c, bc) =>
-                                  c.shopcode == userEntity.shopcode
-                                  && c.commoditystatus == "0"
-                                  && c.del == "0"
-                                  && c.commodityclassify != "3"
-                                  && c.commoditylevel == "2"
-                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
-                                  ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                                  .GroupBy((c, bc) => c.id)
-                                  .ToPageList(pageindex + 1, pagesize, ref total);
+                          })
+                          .Where((c, bc) =>
+                              c.shopcode == userEntity.shopcode
+                              && c.commoditystatus == "0"
+                              && c.del == "0"
+                              && c.commodityclassify != "3"
+                              && c.commoditylevel == "2"
+                              && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
+                              ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                              .GroupBy((c, bc) => c.id)
+                              .ToPageList(pageindex + 1, pagesize, ref total);
 
 
 
-                        }
-                        else
-                        {
-                            //数据pageindex 从1开始 故++
-                            //commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                            //                                                    && i.commoditystatus == "0"
-                            //                                                    && i.del == "0"
-                            //                                                    && (SqlFunc.Contains(i.commodityname, keyword) || SqlFunc.Contains(i.mnemonic, keyword))
-                            //                                                    && i.commodityclassify != "3")
-                            //                                                    //&& (i.commodityname.Contains("keyword")
-                            //                                                    //    || i.mnemonic.Contains("keyword")))
-                            //                                                    //.ToList();
-                            //                                                    .OrderBy(i => i.commoditycode, OrderByType.Asc)
-                            //                                                    .ToPageList(pageindex + 1, pagesize, ref total);
-                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
-                              {
-                                JoinType.Left,c.commoditycode == bc.commoditycode 
-                                                && bc.del == "0" 
-                                                && bc.shopcode == userEntity.shopcode
-                                                //add 2018年11月15日
-                                                && c.branchcode == userEntity.branchcode
-                                                && bc.branchcode == userEntity.branchcode
-                              })
-                              .Where((c, bc) =>
-                                  c.shopcode == userEntity.shopcode
-                                  && c.commoditystatus == "0"
-                                  && c.del == "0"
-                                  && c.commodityclassify != "3"
-                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
-                                  ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                                   .GroupBy((c, bc) => c.id)
-                                  .ToPageList(pageindex + 1, pagesize, ref total);
-                        }
+
                     }
                 }
                 catch (Exception e)
@@ -2129,6 +2080,53 @@ namespace ZlPos.Bizlogic
                 commodityEntities = new List<CommodityEntity>();
             }
             return JsonConvert.SerializeObject(commodityEntities);
+        }
+        #endregion
+
+        //add 2018年11月19日 
+        #region GetBarcodesByCommodityCode
+        /// <summary>
+        /// 商品添加购物车使用 根据commoditycode获取对应的barcode列表
+        /// </summary>
+        /// <param name="commodityCode"></param>
+        /// <returns></returns>
+        public string GetBarcodesByCommodityCode(string commodityCode)
+        {
+            string result = "";
+            List<BarCodeEntity2> barCodes = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+
+                    using (var db = SugarDao.Instance)
+                    {
+                        barCodes = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
+                                                                && i.branchcode == userEntity.branchcode
+                                                                && i.del == "0"
+                                                                && i.commoditycode == commodityCode)
+                                                                .ToList();
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("GetBarcodesByCommodityCode err", e);
+                }
+
+                if (barCodes != null && barCodes.Count > 0)
+                {
+                    string s = "";
+                    foreach (var barCodeEntity in barCodes)
+                    {
+                        s = s + barCodeEntity + ",";
+
+                    }
+                    result = s.Trim(',');
+                }
+            }
+            return result;
+
         }
         #endregion
 
@@ -3598,7 +3596,54 @@ namespace ZlPos.Bizlogic
         #region SyncCommoditytoBarcodeScale_TOLEDO
         private void SyncCommoditytoBarcodeScale_TOLEDO(string ss)
         {
-            throw new NotImplementedException();
+            logger.Info("syncCommoditytoBarcodeScale_dahua(" + ss + ")");
+            SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
+            IPAddress ip = IPAddress.Parse(syncScaleVM.ip);
+            List<PluMessageEntity> pluMessageEntities = syncScaleVM.pluMessageEntityList;
+            int clear = syncScaleVM.clean;
+
+
+            Action<string, int> sendMessage = (syncScaleStatus, point) =>
+            {
+                SyncScaleEntity syncScaleEntity = new SyncScaleEntity();
+                syncScaleEntity.status = syncScaleStatus;
+                syncScaleEntity.point = point;
+                Task.Factory.StartNew(() =>
+                {
+                    browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
+                });
+            };
+
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback((state) =>
+            {
+                //通知前端 任务开始
+
+
+
+                //生成任务文件
+                //首先生成data文件
+
+                //生成Command文件
+                //这里判断if (clear == 1) 则清除数据
+
+                //生成devicelist文件
+
+                //生成Task文件 并指定outputfile
+
+
+
+                //执行任务
+
+
+                //轮询遍历  直到任务完成or失败 wait 不管
+
+                //通知前端任务完成情况  
+
+
+                //end
+
+            }), new object[] { });
         }
         #endregion
 
@@ -3789,7 +3834,7 @@ namespace ZlPos.Bizlogic
                 DbManager dbManager = DBUtils.Instance.DbManager;
                 List<CommodityEntity> commodityEntityList = null;
                 List<BarCodeEntity2> barCodeEntityList = null;
-                List<CommodityPriceEntity> commodityPriceEntityList = null;
+                //List<CommodityPriceEntity> commodityPriceEntityList = null;
                 List<PluMessageEntity> pluMessageEntityList = null;
                 try
                 {
@@ -3808,8 +3853,8 @@ namespace ZlPos.Bizlogic
                                                                                 //2018年11月15日
                                                                                 && i.branchcode == branchcode
                                                                                 && i.del == "0").ToList();
-                        commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == shopcode
-                                                                                    && i.branchcode == branchcode).ToList();
+                        //commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == shopcode
+                        //                                                            && i.branchcode == branchcode).ToList();
 
                     }
                 }
@@ -3868,19 +3913,19 @@ namespace ZlPos.Bizlogic
                         {
                             commodityEntity.barcode = "";
                         }
-                        //从调价表获取商品单价
-                        if (commodityPriceEntityList != null)
-                        {
-                            for (int a = 0; a < commodityPriceEntityList.Count; a++)
-                            {
-                                if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
-                                {
-                                    commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
-                                    //commodityPriceEntityList.RemoveAt(a);
-                                    break;
-                                }
-                            }
-                        }
+                        ////从调价表获取商品单价
+                        //if (commodityPriceEntityList != null)
+                        //{
+                        //    for (int a = 0; a < commodityPriceEntityList.Count; a++)
+                        //    {
+                        //        if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
+                        //        {
+                        //            commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
+                        //            //commodityPriceEntityList.RemoveAt(a);
+                        //            break;
+                        //        }
+                        //    }
+                        //}
                     }
                 }
                 //responseEntity.data = commodityEntityList;

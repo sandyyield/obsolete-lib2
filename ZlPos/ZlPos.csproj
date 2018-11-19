@@ -122,6 +122,7 @@
     <Compile Include="Bizlogic\ICallbackJavaScript.cs" />
     <Compile Include="Bizlogic\InternetHelper.cs" />
     <Compile Include="Bizlogic\RegHelper.cs" />
+    <Compile Include="Bizlogic\ToledoUtils.cs" />
     <Compile Include="Core\DataProcessor.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Core\MenuHandler.cs" />
