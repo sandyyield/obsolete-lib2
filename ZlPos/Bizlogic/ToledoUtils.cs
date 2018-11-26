@@ -1,17 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace ZlPos.Bizlogic
 {
     class ToledoUtils
     {
-        private string ip = "";
-        private string port = "";
-        private string TaskPath = "";
-        private string OutputFile = "";
+
+        //Dll function declaration 
+        //Dll 函数声明
+        [DllImport("Library\\TOLEDO\\MTScaleAPI.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
+        public static extern bool ExecuteTaskInFile(string szTaskID, string szInputFile, string szOutputFile, bool bSynch);
+
+        [DllImport("Library\\TOLEDO\\MTScaleAPI.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr QueryTask(string szInput);
+
+        [DllImport("Library\\TOLEDO\\MTScaleAPI.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
+        public static extern void Free(IntPtr p);
+
+        public string ip { get; set; }
+        public string port { get; set; }
+        public string TaskPath { get; set; }
+        public string OutputFile { get; set; }
+
+        public string TaskID { get; set; }
 
         //查询执行结果用
         private string CommandID = "";
@@ -19,20 +35,79 @@ namespace ZlPos.Bizlogic
         public bool ClearData { get; set; }
 
 
-        private ToledoUtils() { }
+        //public ToledoUtils() { }
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="ip"></param>
+        ///// <param name="TaskPath"></param>
+        ///// <param name="port"></param>
+        //public ToledoUtils(string ip, string TaskPath, string port = "3001",string OutputFile = "TaskResult.xml")
+        //{
+        //    this.ip = ip;
+        //    this.TaskPath = TaskPath;
+        //    this.port = port;
+        //    this.OutputFile = OutputFile;
+        //}
+
+        public bool ExecuteTaskInFile(bool bSynch = false)
+        {
+            if (string.IsNullOrEmpty(TaskID))
+            {
+                return false;
+            }
+
+            return ExecuteTaskInFile(TaskID, TaskPath + "\\Task.xml", TaskPath + "\\TaskResult.xml", bSynch);
+        }
 
         /// <summary>
-        /// 
+        /// 查询任务状态来获取结果
         /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="TaskPath"></param>
-        /// <param name="port"></param>
-        public ToledoUtils(string ip, string TaskPath, string port = "3001",string OutputFile = "TaskResult.xml")
+        /// <returns></returns>
+        public bool QueryTask()
         {
-            this.ip = ip;
-            this.TaskPath = TaskPath;
-            this.port = port;
-            this.OutputFile = OutputFile;
+            bool result = false;
+            string strQueryTaskInput = "<MTTask><TaskID>" + TaskID + "</TaskID><TaskType>98</TaskType></MTTask>";
+            while (true)
+            {
+                //call QueryTask
+                //调用查询任务状态方法。
+                IntPtr p = QueryTask(strQueryTaskInput);
+                string strTmp = Marshal.PtrToStringAnsi(p);
+                //free returned string resource.
+                //释放动态库返回的字符串资源
+                Free(p);
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(strTmp);
+
+                if (xmlDoc.SelectSingleNode("MTTaskResult") != null)
+                {
+                    if (xmlDoc.SelectSingleNode("MTTaskResult").SelectSingleNode("TaskStatus") != null)
+                    {
+
+                        if (xmlDoc.SelectSingleNode("MTTaskResult").SelectSingleNode("TaskStatus").InnerText.Equals("Complete", StringComparison.OrdinalIgnoreCase))
+                        {
+                            //task execute complete .
+                            //任务执行结束
+                            result = true;
+                            break;
+                        }
+                        else if (xmlDoc.SelectSingleNode("MTTaskResult").SelectSingleNode("TaskStatus").InnerText.Equals("Error", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = false;
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
 
 
@@ -42,21 +117,40 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public void BuildTask(string guid)
         {
+            
+            TaskID = guid;
+
             XDocument TaskXml = new XDocument();
-            TaskXml.Add(GetTaskX(guid));
-            TaskXml.Save(TaskPath);
+            TaskXml.Add(GetTaskX(TaskID: guid));
+            TaskXml.Save(TaskPath + "\\Task.xml");
 
             XDocument DeviceListXml = new XDocument();
             DeviceListXml.Add(GetDeviceListX(ip, port));
-            DeviceListXml.Save(TaskPath);
+            DeviceListXml.Save(TaskPath + "\\DeviceList.xml");
 
             CommandID = Guid.NewGuid().ToString();
             XDocument CommandXml = new XDocument();
             CommandXml.Add(GetCommandX(CommandID: Guid.NewGuid().ToString(),ClearData:ClearData));
-            CommandXml.Save(TaskPath);
+            CommandXml.Save(TaskPath + "\\Command.xml");
+
+            //XDocument DataXml = new XDocument();
+            //DataXml.Add(new XElement("Data",GetItem()
 
 
+        }
 
+        public void BuildData()//string PLU, string commodityName, string price, string indate, string tare)
+        {
+            XDocument DataXml = new XDocument();
+            DataXml.Add(new XElement("Data"));//, GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare)));
+            DataXml.Save(TaskPath + "Data.xml");
+        }
+
+        public void AddData(string PLU, string commodityName, string price, string indate, string tare)
+        {
+            XDocument dataxml = XDocument.Load(TaskPath + "Data.xml");
+            dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare));
+            dataxml.Save(TaskPath + "Data.xml");
         }
 
 
@@ -77,25 +171,25 @@ namespace ZlPos.Bizlogic
                 new XElement("ScaleNo", "2"),
                 new XElement("ScaleType", "bPlus"),
                 new XElement("ConnectType", "Network"),
-                new XElement("ConnectParams"),
-                //new XElement("NetworkParams")),
-                //new object[] {
-                //    //TOCHANGE
-                //    new XAttribute("Type", "Network"),
-                //    new XAttribute("Address", "192.168.102.153"),
-                //    new XAttribute("Port","3001")
-                //    })),
+                new XElement("ConnectParams",
+                    new XElement("NetworkParams",
+                        new object[] {
+                            //TOCHANGE
+                            new XAttribute("Type", "Network"),
+                            new XAttribute("Address", ip),
+                            new XAttribute("Port",port)
+                            })),
                 new XElement("DecimalDigits", "2"),
                 new XElement("DataFile", "Command.xml")
                 )
             );
 
-            DeviceList.Element("ConnectParams").Add(new XElement("NetworkParams", new object[] {
-                                                        //TOCHANGE
-                                                        new XAttribute("Type", "Network"),
-                                                        new XAttribute("Address", ip),
-                                                        new XAttribute("Port",port)
-                                                        }));
+            //DeviceList.Element("ConnectParams").Add(new XElement("NetworkParams", new object[] {
+            //                                            //TOCHANGE
+            //                                            new XAttribute("Type", "Network"),
+            //                                            new XAttribute("Address", ip),
+            //                                            new XAttribute("Port",port)
+            //                                            }));
             return DeviceList;
         }
 
@@ -155,11 +249,11 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="PLU"></param>
         /// <returns></returns>
-        public XElement GetItem(string PLU,string commodityName,string price)
+        public XElement GetItem(string PLU,string commodityName,string price,string indate,string tare)
         {
             XElement Item = new XElement("Item");
 
-            Item.Add(new XElement("PLU", PLU));
+            Item.Add(new XElement("PLU", PLU)); //must
             Item.Add(new XElement("DepartmentID"));
             Item.Add(new XElement("Descriptions"));
             Item.Add(new XElement("Dates"));
@@ -180,7 +274,10 @@ namespace ZlPos.Bizlogic
             Item.Add(new XElement("Images"));
             Item.Add(new XElement("StaggerPrices"));
 
-
+            Item.Element("Descriptions").Add(Description(CommodityName: commodityName, ID: "0"));
+            Item.Element("ItemPrices").Add(ItemPrice(price));
+            Item.Element("Dates").Add(DateOffset(indate));
+            Item.Element("Tares").Add(TareID(tare));
             return Item;
         }
 
@@ -213,6 +310,22 @@ namespace ZlPos.Bizlogic
         {
             return new XElement("BarcodeID", barcode);
         }
+
+        //这里设保质期
+        public XElement DateOffset(string day)
+        {
+            //保质期 用indate
+            XElement DateOffset = new XElement("DateOffset", new object[] { new XAttribute("Type", "SellBy"), new XAttribute("UnitOfOffset", "day"), new XAttribute("PrintFormat", "YYMMDD") });
+            DateOffset.SetValue(day);
+            return DateOffset;
+        }
+
+        public XElement TareID(string tare)
+        {
+            return new XElement("TareID", tare);
+        }
+
+
 
 
 

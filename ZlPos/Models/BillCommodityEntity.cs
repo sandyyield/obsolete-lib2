@@ -152,5 +152,9 @@ namespace ZlPos.Models
         //add 2018年11月15日
         [SugarColumn(IsNullable = true)]
         public string speclevel { get; set; }
+
+        //add 2018年11月21日
+        [SugarColumn(IsNullable = true)]
+        public string mnemonic { get; set; }
     }
 }

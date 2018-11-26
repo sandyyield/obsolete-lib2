@@ -158,7 +158,7 @@ namespace ZlPos.Dao
                         UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "branchname", "required", "remark", "speclevel", "updownstatus", "datalevel" });
                         UpgradingSchema.UpgradingVersion<BarCodeEntity2>(new string[] { "branchcode", "branchname", "datalevel" });
                         UpgradingSchema.UpgradingVersion<PayTypeEntity>(new string[] { "ordernum" });
-                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "speclevel" });
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "speclevel", "mnemonic" });//1120 增加了一个mnemonic
                         break;
 
 
