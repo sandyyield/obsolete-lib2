@@ -7,7 +7,7 @@ using System.Text;
 namespace ZlPos.Models
 {
     [SugarTable("CommodityEntity")]
-    public class CommodityEntity
+    public class CommodityEntity : ModelContext
     {
         [SugarColumn(IsPrimaryKey = true, IsNullable = true)]
         public string id { get; set; }
@@ -119,7 +119,7 @@ namespace ZlPos.Models
 
 
         [SugarColumn(IsIgnore = true)]
-        public string barcode { get; set; }
+        //public string barcode { get; set; }
 
 
         //add 2018年8月27日
