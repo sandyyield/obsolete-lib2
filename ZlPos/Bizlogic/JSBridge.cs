@@ -1585,39 +1585,39 @@ namespace ZlPos.Bizlogic
                                                                                     && i.del == "0").ToList();
                                 commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                         && i.branchcode == userEntity.branchcode).ToList();
-                                for (int i = 0; i < commodityEntities.Count; i++)
+                            }
+                            for (int i = 0; i < commodityEntities.Count; i++)
+                            {
+                                CommodityEntity commodityEntity = commodityEntities[i];
+                                //从条码表获取商品对应的条码
+                                if (barCodeEntityList != null)
                                 {
-                                    CommodityEntity commodityEntity = commodityEntities[i];
-                                    //从条码表获取商品对应的条码
-                                    if (barCodeEntityList != null)
+                                    for (int a = 0; a < barCodeEntityList.Count; a++)
                                     {
-                                        for (int a = 0; a < barCodeEntityList.Count; a++)
+                                        if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
                                         {
-                                            if (commodityEntity.commoditycode.Equals(barCodeEntityList[a].commoditycode))
+                                            string barcodes = barCodeEntityList[a].barcode;
+                                            if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
                                             {
-                                                string barcodes = barCodeEntityList[a].barcode;
-                                                if (!string.IsNullOrEmpty(barcodes) && barcodes.Length > 0)
-                                                {
-                                                    barcodes = barcodes.Split(',')[0];
-                                                }
-                                                if (string.IsNullOrEmpty(barcodes))
-                                                {
-                                                    barcodes = "";
-                                                }
-                                                commodityEntity.barcode = barcodes;//用商品条码
-                                                break;
+                                                barcodes = barcodes.Split(',')[0];
                                             }
+                                            if (string.IsNullOrEmpty(barcodes))
+                                            {
+                                                barcodes = "";
+                                            }
+                                            commodityEntity.barcode = barcodes;//用商品条码
+                                            break;
                                         }
                                     }
-                                    if (commodityPriceEntityList != null)
+                                }
+                                if (commodityPriceEntityList != null)
+                                {
+                                    for (int a = 0; a < commodityPriceEntityList.Count; a++)
                                     {
-                                        for (int a = 0; a < commodityPriceEntityList.Count; a++)
+                                        if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
                                         {
-                                            if (commodityEntity.commoditycode.Equals(commodityPriceEntityList[a].commoditycode))
-                                            {
-                                                commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
-                                                break;
-                                            }
+                                            commodityEntity.saleprice = commodityPriceEntityList[a].saleprice;
+                                            break;
                                         }
                                     }
                                 }
@@ -1990,7 +1990,7 @@ namespace ZlPos.Bizlogic
                                   && c.del == "0"
                                   && c.commodityclassify != "3"
                                   && c.commoditylevel == "2"
-                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword) || SqlFunc.Contains(c.commoditycode,keyword))
+                                  && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword) || SqlFunc.Contains(c.commoditycode, keyword))
                                   ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
                                   .GroupBy((c, bc) => c.id)
                                   .ToPageList(pageindex + 1, pagesize, ref total);
