@@ -119,7 +119,7 @@ namespace ZlPos.Models
 
 
         [SugarColumn(IsIgnore = true)]
-        //public string barcode { get; set; }
+        public string barcode { get; set; }
 
 
         //add 2018年8月27日
