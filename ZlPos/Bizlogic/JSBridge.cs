@@ -1740,6 +1740,7 @@ namespace ZlPos.Bizlogic
                                                                                     && i.branchcode == userEntity.branchcode
                                                                                     && i.commoditystatus == "0"
                                                                                     && i.del == "0"
+                                                                                    && i.updownstatus == "1"
                                                                                     && i.id == id).ToList();
                     }
                 }
@@ -1791,8 +1792,9 @@ namespace ZlPos.Bizlogic
                                                                                         && i.branchcode == userEntity.branchcode
                                                                                         && i.commoditystatus == "0"
                                                                                         && i.del == "0"
+                                                                                        && i.updownstatus == "1"
                                                                                         && i.commoditycode == item.commoditycode).ToList();
-                                if(commodityEntities1 != null)
+                                if (commodityEntities1 != null)
                                 {
                                     commodityEntities.AddRange(commodityEntities1);
                                 }
@@ -1843,6 +1845,7 @@ namespace ZlPos.Bizlogic
                                                                                     && i.branchcode == userEntity.branchcode
                                                                                     && i.commoditystatus == "0"
                                                                                     && i.del == "0"
+                                                                                    && i.updownstatus == "1"
                                                                                     && i.commoditycode == commoditycode).ToList();
 
                     }
@@ -1900,6 +1903,7 @@ namespace ZlPos.Bizlogic
                                                                                 && i.del == "0"
                                                                                 && i.categorycode == categoryCode
                                                                                 //&& i.commodityclassify != "3"
+                                                                                && i.updownstatus == "1"
                                                                                 && i.commoditylevel == "2")
                                                                                 .OrderBy(i => i.commoditycode, SqlSugar.OrderByType.Asc)
                                                                                 .ToList();
@@ -1974,6 +1978,7 @@ namespace ZlPos.Bizlogic
                                                 && i.branchcode == userEntity.branchcode
                                                 && i.commoditystatus == "0"
                                                 && i.del == "0"
+                                                && i.updownstatus == "1"
                                                 && i.mnemonic.Contains(mnemonic)).ToList();
                     }
                 }
@@ -2081,6 +2086,7 @@ namespace ZlPos.Bizlogic
                                                                             && i.branchcode == userEntity.branchcode
                                                                             && i.commoditystatus == "0"
                                                                             && i.del == "0"
+                                                                            && i.updownstatus == "1"
                                                                             && i.spucode == code)
                                                                             .ToList();
                     }
@@ -3837,7 +3843,10 @@ namespace ZlPos.Bizlogic
 
 
                 //执行任务
-                toledoUtils.ExecuteTaskInFile();
+                if (!toledoUtils.ExecuteTaskInFile())
+                {
+                    logger.Error("TOLEDO:Call ExecuteTaskInFile Error");
+                }
 
                 //轮询遍历  直到任务完成or失败 wait 不管
                 if (toledoUtils.QueryTask())
@@ -4063,8 +4072,28 @@ namespace ZlPos.Bizlogic
                                                                                 //2018年11月15日
                                                                                 //&& i.branchcode == branchcode
                                                                                 && i.del == "0").ToList();
-                        //commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == shopcode
-                        //                                                            && i.branchcode == branchcode).ToList();
+
+                        //手动拼一下barcode吧
+                        if (commodityEntityList != null)
+                        {
+                            foreach (var commodityEntity in commodityEntityList)
+                            {
+                                if (barCodeEntityList != null)
+                                {
+                                    foreach (var barCodeEntity in barCodeEntityList)
+                                    {
+                                        if (commodityEntity.commoditycode.Equals(barCodeEntity.commoditycode))
+                                        {
+                                            commodityEntity.barcode = barCodeEntity.barcode;
+                                        }
+                                    }
+                                }
+                                if(commodityEntity.barcode == null)
+                                {
+                                    commodityEntity.barcode = "";
+                                }
+                            }
+                        }
 
                     }
                 }
@@ -4073,7 +4102,7 @@ namespace ZlPos.Bizlogic
                     logger.Info("db err>>" + e.Message + e.StackTrace);
                 }
 
-                
+
                 //responseEntity.data = commodityEntityList;
                 //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
                 browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");

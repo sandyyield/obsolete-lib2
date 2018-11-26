@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -101,6 +102,7 @@ namespace ZlPos.Bizlogic
                         }
                         else
                         {
+                            Thread.Sleep(100);
                             continue;
                         }
                     }
@@ -143,14 +145,14 @@ namespace ZlPos.Bizlogic
         {
             XDocument DataXml = new XDocument();
             DataXml.Add(new XElement("Data"));//, GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare)));
-            DataXml.Save(TaskPath + "Data.xml");
+            DataXml.Save(TaskPath + "\\Data.xml");
         }
 
         public void AddData(string PLU, string commodityName, string price, string indate, string tare)
         {
-            XDocument dataxml = XDocument.Load(TaskPath + "Data.xml");
+            XDocument dataxml = XDocument.Load(TaskPath + "\\Data.xml");
             dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare));
-            dataxml.Save(TaskPath + "Data.xml");
+            dataxml.Save(TaskPath + "\\Data.xml");
         }
 
 
@@ -201,7 +203,7 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public XElement GetTaskX(string TaskID,string DataFile = "DeviceList.xml",string OutputFile = "TaskResult.xml")
         {
-            XElement Task = new XElement("MTTaSK",
+            XElement Task = new XElement("MTTask",
                                 //TOCHANGE
                                 new XElement("TaskID", TaskID),
                                 new XElement("TaskType", "0"),
@@ -233,7 +235,7 @@ namespace ZlPos.Bizlogic
             //}
             XElement Command = new XElement("Commands",
                     new XElement("Command",
-                        new XElement("CommandText"),
+                        new XElement("CommandText",CommandText),
                         new XElement("CommandID", CommandID),
                         new XElement("Control", Control),
                         new XElement("ClearData", ClearData),
@@ -269,7 +271,6 @@ namespace ZlPos.Bizlogic
             Item.Add(new XElement("NutritionInformation"));
             Item.Add(new XElement("FixedQuantity"));
             Item.Add(new XElement("TraceInfoID"));
-            Item.Add(new XElement("TraceabilityFlag"));
             Item.Add(new XElement("PriceRule"));
             Item.Add(new XElement("Images"));
             Item.Add(new XElement("StaggerPrices"));
@@ -278,7 +279,18 @@ namespace ZlPos.Bizlogic
             Item.Element("ItemPrices").Add(ItemPrice(price));
             Item.Element("Dates").Add(DateOffset(indate));
             Item.Element("Tares").Add(TareID(tare));
+            Item.Element("LabelFormats").Add(LabelFormatID());
             return Item;
+        }
+
+        public XElement LabelFormatID()
+        {
+            XElement LabelFormatID = new XElement("Description",
+                new object[] {
+                    new XAttribute("Index", "0"),
+                    });
+            LabelFormatID.SetValue("1");
+            return LabelFormatID;
         }
 
         public XElement Description(string CommodityName,string ID,string Language = "zho", string Type = "ItemName")
@@ -294,7 +306,7 @@ namespace ZlPos.Bizlogic
 
         public XElement ItemPrice(string price,string index = "0", string UnitOfMeasureCode = "KGM", bool PriceOverrideFlag = false, bool DiscountFlag = false, string Currency = "CNY")
         {
-            XElement itemPrice = new XElement("Description", 
+            XElement itemPrice = new XElement("ItemPrice", 
                 new object[] {
                     new XAttribute("Index", index),
                     new XAttribute("UnitOfMeasureCode", UnitOfMeasureCode),
