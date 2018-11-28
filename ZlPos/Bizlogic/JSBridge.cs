@@ -1576,7 +1576,7 @@ namespace ZlPos.Bizlogic
                                                                             .ToPageList(pageindex + 1, pagesize, ref total);
                             barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
                                                                                 //add 2018年11月15日
-                                                                                && i.shopcode == userEntity.branchcode
+                                                                                //&& i.shopcode == userEntity.branchcode
                                                                                 && i.del == "0").ToList();
                             //commodityPriceEntityList = db.Queryable<CommodityPriceEntity>().Where(i => i.shopcode == userEntity.shopcode
                             //                                                        && i.branchcode == userEntity.branchcode).ToList();
@@ -2118,7 +2118,7 @@ namespace ZlPos.Bizlogic
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            List<CommodityEntity> commodityEntities = null;
+            List<CommodityEntity> commodityEntities = new List<CommodityEntity>();
             if (_LoginUserManager.Login)
             {
                 UserEntity userEntity = _LoginUserManager.UserEntity;
@@ -2134,7 +2134,8 @@ namespace ZlPos.Bizlogic
 
                         if ("barcode".Equals(type))
                         {
-                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
+
+                            var commodities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
                           {
                                 JoinType.Left,c.commoditycode == bc.commoditycode
                                                 && bc.del == "0"
@@ -2149,10 +2150,19 @@ namespace ZlPos.Bizlogic
                               && c.del == "0"
                               //&& c.commodityclassify != "3"
                               && c.commoditylevel == "2"
-                              && SqlFunc.Contains(c.barcode, keyword)
+                              && SqlFunc.Contains(bc.barcode, keyword)
                               ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
                               .GroupBy((c, bc) => c.spucode)
                               .ToPageList(pageindex + 1, pagesize, ref total);
+
+                            //foreach (var item in commodities)
+                            //{
+                            //    if (item.barcode.Contains(keyword))
+                            //    {
+                            //        commodityEntities.Add(item);
+                            //    }
+                            //}
+
                         }
                         else if ("spucode".Equals(type))
                         {
@@ -3690,24 +3700,24 @@ namespace ZlPos.Bizlogic
             {
                 BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
                 List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
-                CacheManager.InsertBarcodeScale(barcodeScaleConfigEntity.barcodeStyle);
-                DbManager dbManager = DBUtils.Instance.DbManager;
-                if (scaleList != null && scaleList.Count > 0)
-                {
-                    foreach (BarcodeScaleEntity barcodeScaleEntity in scaleList)
-                    {
-                        try
-                        {
-                            dbManager.SaveOrUpdate(barcodeScaleEntity);
-                        }
-                        catch (Exception e)
-                        {
-                            logger.Info("保存条码信息出错>>" + e.Message + e.StackTrace);
-                        }
-                    }
-                }
+                //CacheManager.InsertBarcodeStyle(barcodeScaleConfigEntity.barcodeStyle);
+                //DbManager dbManager = DBUtils.Instance.DbManager;
+                //if (scaleList != null && scaleList.Count > 0)
+                //{
+                //    foreach (BarcodeScaleEntity barcodeScaleEntity in scaleList)
+                //    {
+                //        try
+                //        {
+                //            dbManager.SaveOrUpdate(barcodeScaleEntity);
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            logger.Info("保存条码信息出错>>" + e.Message + e.StackTrace);
+                //        }
+                //    }
+                //}
+                CacheManager.InsertBarcodeScale(scaleConfig);
             }
-            //CacheManager.InsertBarcodeScale(scaleConfig);
         }
         #endregion
 
@@ -3720,27 +3730,36 @@ namespace ZlPos.Bizlogic
         {
             BarcodeScaleConfigEntity barcodeScaleConfigEntity = new BarcodeScaleConfigEntity();
             List<BarcodeScaleEntity> barcodeScaleEntityList = null;
-            DbManager dbManager = DBUtils.Instance.DbManager;
-            try
+            string BarcodeScaleCache = CacheManager.GetBarcodeScale();
+            if (!string.IsNullOrEmpty(BarcodeScaleCache))
             {
-                using (var db = SugarDao.Instance)
+                return BarcodeScaleCache;
+            }
+            //兼容老数据  保证他们之前的能用
+            else
+            {
+                DbManager dbManager = DBUtils.Instance.DbManager;
+                try
                 {
-                    barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
-                    barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
+                    using (var db = SugarDao.Instance)
+                    {
+                        barcodeScaleEntityList = db.Queryable<BarcodeScaleEntity>().ToList();
+                        barcodeScaleConfigEntity.barcodeScaleEntityList = barcodeScaleEntityList;
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
-            }
+                catch (Exception e)
+                {
+                    logger.Info("获取保存的条码秤信息" + e.Message + e.StackTrace);
+                }
 
-            string barcodeStyle = CacheManager.GetBarcodeScale();
-            barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
-            if (barcodeScaleEntityList == null)
-            {
-                barcodeScaleEntityList = new List<BarcodeScaleEntity>();
+                string barcodeStyle = CacheManager.GetBarcodeStyle();
+                barcodeScaleConfigEntity.barcodeStyle = barcodeStyle;
+                if (barcodeScaleEntityList == null)
+                {
+                    barcodeScaleEntityList = new List<BarcodeScaleEntity>();
+                }
+                return JsonConvert.SerializeObject(barcodeScaleConfigEntity);
             }
-            return JsonConvert.SerializeObject(barcodeScaleConfigEntity);
             //return CacheManager.GetBarcodeScale();
         }
         #endregion
@@ -3825,7 +3844,7 @@ namespace ZlPos.Bizlogic
 
                 foreach (var pluMessageEntity in pluMessageEntities)
                 {
-                    toledoUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare);
+                    toledoUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare,pluMessageEntity.barcode);
                 }
 
                 if (clear == 1)
@@ -3988,7 +4007,7 @@ namespace ZlPos.Bizlogic
                         sendMessage(SyncScaleStatus.PLU_CLEANED, 0);
                         sendMessage(SyncScaleStatus.PLU_SYNCING, 0);
                         logger.Info("开始同步");
-                        string barcodeStyle = CacheManager.GetBarcodeScale();
+                        string barcodeStyle = CacheManager.GetBarcodeStyle();
                         string style = "!0O01050301" + barcodeStyle + "000100000100010001000000000000000001";
                         sendMessage_btye(StringConvert.convertStringToBytesForTMC(style), socket);
                         string branchName = "!0Z01A" + StringConvert.getWordCode(_LoginUserManager.UserEntity.branchname) + "0000B";

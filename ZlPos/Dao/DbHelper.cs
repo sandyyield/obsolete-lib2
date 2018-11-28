@@ -156,9 +156,11 @@ namespace ZlPos.Dao
                     case 16:
                         //add 2018年11月15日
                         UpgradingSchema.UpgradingVersion<CommodityEntity>(new string[] { "branchname", "required", "remark", "speclevel", "updownstatus", "datalevel" });
-                        UpgradingSchema.UpgradingVersion<BarCodeEntity2>(new string[] { "branchcode", "branchname", "datalevel" });
+                        UpgradingSchema.UpgradingVersion<BarCodeEntity2>(new string[] { "branchcode", "branchname", "datalevel", "spucode" });
                         UpgradingSchema.UpgradingVersion<PayTypeEntity>(new string[] { "ordernum" });
                         UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "speclevel", "mnemonic" });//1120 增加了一个mnemonic
+                        //add 2018年11月28日
+                        UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "barcodeScale" });
                         break;
 
 

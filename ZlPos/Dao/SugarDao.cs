@@ -41,7 +41,7 @@ namespace ZlPos.Dao
                 });
                 db.Aop.OnLogExecuting = (sql, pars) =>
                 {
-                    //logger.Debug("Sql>>>" + sql + Environment.NewLine + db.Utilities.SerializeObject(pars.ToDictionary(i => i.ParameterName, i => i.Value)));
+                    logger.Debug("Sql>>>" + sql + Environment.NewLine + db.Utilities.SerializeObject(pars.ToDictionary(i => i.ParameterName, i => i.Value)));
                     //if (db.TempItems == null)
                     //{
                     //    db.TempItems = new Dictionary<string, object>();

@@ -36,5 +36,9 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public string datalevel { get; set; }
 
+        //add 2018年11月27日
+        [SugarColumn(IsNullable = true)]
+        public string spucode { get; set; }
+
     }
 }

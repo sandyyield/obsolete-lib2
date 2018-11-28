@@ -373,8 +373,44 @@ namespace ZlPos.Bizlogic
                 DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
             }
         }
-        #endregion 
+        #endregion
 
+
+        #region 
+        public static string getBarcodeScale()
+        {
+            using (var db = SugarDao.Instance)
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity", false))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.barcodeScale;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setBarcodeScale(string v)
+        {
+            using (var db = SugarDao.Instance)
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.barcodeScale = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion
 
     }
 }

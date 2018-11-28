@@ -148,10 +148,10 @@ namespace ZlPos.Bizlogic
             DataXml.Save(TaskPath + "\\Data.xml");
         }
 
-        public void AddData(string PLU, string commodityName, string price, string indate, string tare)
+        public void AddData(string PLU, string commodityName, string price, string indate, string tare,string barcode)
         {
             XDocument dataxml = XDocument.Load(TaskPath + "\\Data.xml");
-            dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare));
+            dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare,barcode:barcode));
             dataxml.Save(TaskPath + "\\Data.xml");
         }
 
@@ -251,12 +251,14 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="PLU"></param>
         /// <returns></returns>
-        public XElement GetItem(string PLU,string commodityName,string price,string indate,string tare)
+        public XElement GetItem(string PLU,string commodityName,string price,string indate,string tare,string barcode)
         {
             XElement Item = new XElement("Item");
 
             Item.Add(new XElement("PLU", PLU)); //must
             Item.Add(new XElement("DepartmentID"));
+            //这里是货号 用来存我们的barcode
+            Item.Add(new XElement("AlternativeItemIDs"));
             Item.Add(new XElement("Descriptions"));
             Item.Add(new XElement("Dates"));
             Item.Add(new XElement("ItemGroupID"));
@@ -280,7 +282,15 @@ namespace ZlPos.Bizlogic
             Item.Element("Dates").Add(DateOffset(indate));
             Item.Element("Tares").Add(TareID(tare));
             Item.Element("LabelFormats").Add(LabelFormatID());
+            //Item.Element("Barcodes").Add(BarcodeID(barcode));
+            Item.Element("AlternativeItemIDs").Add(AlternativeItemID(barcode));
             return Item;
+        }
+
+        private XElement AlternativeItemID(string barcode)
+        {
+            barcode = GetLastStr(barcode, 6);
+            return new XElement("AlternativeItemID", barcode);
         }
 
         public XElement LabelFormatID()
@@ -318,10 +328,31 @@ namespace ZlPos.Bizlogic
             return itemPrice;
         }
 
-        public XElement BarcodeID(string barcode)
+        //这里应该设置的是条码格式 按照序号提前送进机器中
+        //public XElement BarcodeID(string barcodeStyle)
+        //{
+           
+        //    return new XElement("BarcodeID", barcode);
+        //}
+
+        #region 获取后几位数 public string GetLastStr(string str,int num)
+        /// <summary>
+        /// 获取后几位数
+        /// </summary>
+        /// <param name="str">要截取的字符串</param>
+        /// <param name="num">返回的具体位数</param>
+        /// <returns>返回结果的字符串</returns>
+        private string GetLastStr(string str, int num)
         {
-            return new XElement("BarcodeID", barcode);
+            int count = 0;
+            if (str.Length > num)
+            {
+                count = str.Length - num;
+                str = str.Substring(count, num);
+            }
+            return str;
         }
+        #endregion
 
         //这里设保质期
         public XElement DateOffset(string day)

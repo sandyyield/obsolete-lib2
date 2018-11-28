@@ -34,12 +34,12 @@ namespace ZlPos.Utils
             return ContextCache.getGprint();
         }
 
-        public static void InsertBarcodeScale(string obj)
+        public static void InsertBarcodeStyle(string obj)
         {
             ContextCache.setBarcodeStyle(obj);
         }
 
-        public static string GetBarcodeScale()
+        public static string GetBarcodeStyle()
         {
             return ContextCache.getBarcodeStyle();
         }
@@ -82,6 +82,21 @@ namespace ZlPos.Utils
         public static void InsertDDBQTemplet(string s)
         {
             ContextCache.setDDBQTemplet(s);
+        }
+
+        //add 2018年11月28日
+        /// <summary>
+        /// 条码秤保存
+        /// </summary>
+        /// <param name="obj"></param>
+        public static void InsertBarcodeScale(string obj)
+        {
+            ContextCache.setBarcodeScale(obj);
+        }
+
+        public static string GetBarcodeScale()
+        {
+            return ContextCache.getBarcodeScale();
         }
     }
 }

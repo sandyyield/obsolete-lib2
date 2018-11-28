@@ -48,5 +48,9 @@ namespace ZlPos.Models
 
         [SugarColumn(IsNullable = true)]
         public string BJQTemplet { get; set; }
+        
+        //add 2018年11月28日 条码秤的缓存
+        [SugarColumn(IsNullable = true)]
+        public string barcodeScale { get; set; }
     }
 }
