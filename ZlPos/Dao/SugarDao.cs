@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using ZlPos.Bizlogic;
 
 namespace ZlPos.Dao
 {
@@ -39,22 +40,25 @@ namespace ZlPos.Dao
                     IsAutoCloseConnection = true,
                     InitKeyType = InitKeyType.Attribute
                 });
-                db.Aop.OnLogExecuting = (sql, pars) =>
+                if (AppContext.Instance.Debug)
                 {
-                    logger.Debug("Sql>>>" + sql + Environment.NewLine + db.Utilities.SerializeObject(pars.ToDictionary(i => i.ParameterName, i => i.Value)));
+                    db.Aop.OnLogExecuting = (sql, pars) =>
+                    {
+                        logger.Debug("Sql>>>" + sql + Environment.NewLine + db.Utilities.SerializeObject(pars.ToDictionary(i => i.ParameterName, i => i.Value)));
                     //if (db.TempItems == null)
                     //{
                     //    db.TempItems = new Dictionary<string, object>();
                     //}
                     //db.TempItems.Add("logTime", DateTime.Now);
                 };
-                //db.Aop.OnLogExecuted = (sql, pars) =>
-                //{
-                //    var startingTime = db.TempItems["logTime"];
-                //    db.TempItems.Remove("time");
-                //    var completedTime = DateTime.Now;
-                //    logger.Info("Sql executing time >>>  [" + (completedTime - Convert.ToDateTime(startingTime)).Milliseconds + "]ms");
-                //};
+                    //db.Aop.OnLogExecuted = (sql, pars) =>
+                    //{
+                    //    var startingTime = db.TempItems["logTime"];
+                    //    db.TempItems.Remove("time");
+                    //    var completedTime = DateTime.Now;
+                    //    logger.Info("Sql executing time >>>  [" + (completedTime - Convert.ToDateTime(startingTime)).Milliseconds + "]ms");
+                    //};
+                }
                 return db;
             }
         }

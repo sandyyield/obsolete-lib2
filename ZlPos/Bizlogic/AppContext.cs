@@ -32,6 +32,7 @@ namespace ZlPos.Bizlogic
         public int DatebaseVersion { get => _DatebaseVersion; set => _DatebaseVersion = value; }
         public string UpdateUrl { get => _UpdateUrl; set => _UpdateUrl = value; }
         public string XmlFile { get => _XmlFile; set => _XmlFile = value; }
+        public bool Debug { get => _Debug; set => _Debug = value; }
 
         private string _AppName;
 
@@ -42,6 +43,11 @@ namespace ZlPos.Bizlogic
         private string _UpdateUrl;
 
         private string _XmlFile;
+
+        /// <summary>
+        /// 是否debug模式
+        /// </summary>
+        private bool _Debug;
 
 
         private void InitConfigParam()

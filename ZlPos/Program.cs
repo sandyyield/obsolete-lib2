@@ -28,7 +28,7 @@ namespace ZlPos
         /// 应用程序的主入口点。
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
 #if DEBUG
             InitLog4netCfg(Level.Error);
@@ -118,7 +118,18 @@ namespace ZlPos
 
             #endregion
 
-            logger.Info("Initiallize chromium core..");
+            #region"判断是否开启debug模式"
+            if (args.Length > 0)
+            {
+                if ("DEBUG".Equals(args[0]))
+                {
+                    AppContext.Instance.Debug = true;
+                }
+            }
+                #endregion
+
+
+                logger.Info("Initiallize chromium core..");
 
             CefSettings cefSettings = new CefSettings();
             //禁用调试日志
@@ -126,6 +137,10 @@ namespace ZlPos
 
             cefSettings.CachePath = Application.StartupPath + "\\CachePath";
 
+            //add 2018年11月28日 关闭GPU加速  尝试解决屏闪问题
+            cefSettings.CefCommandLineArgs.Add("disable-gpu", "1");
+
+            //依赖性检查
             Cef.Initialize(cefSettings, true, true);
 
             TaskScheduler.UnobservedTaskException += (s, e) =>

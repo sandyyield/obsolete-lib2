@@ -1,5 +1,6 @@
 ﻿using CefSharp;
 using System.Windows.Forms;
+using ZlPos.Bizlogic;
 
 namespace ZlPos.Core
 {
@@ -12,15 +13,19 @@ namespace ZlPos.Core
 
         public bool OnPreKeyEvent(IWebBrowser browserControl, IBrowser browser, KeyType type, int windowsKeyCode, int nativeKeyCode, CefEventFlags modifiers, bool isSystemKey, ref bool isKeyboardShortcut)
         {
-            if (KeyType.RawKeyDown == type)
+            if (AppContext.Instance.Debug)
             {
-                //if (windowsKeyCode == (int)Keys.F5)
-                //{
-                //    browser.Reload(); //此处可以添加想要实现的代码段
-                //}
-                if (windowsKeyCode == (int)Keys.F12)
+
+                if (KeyType.RawKeyDown == type)
                 {
-                    browser.ShowDevTools();
+                    if (windowsKeyCode == (int)Keys.F5)
+                    {
+                        browser.Reload(); //此处可以添加想要实现的代码段
+                    }
+                    if (windowsKeyCode == (int)Keys.F12)
+                    {
+                        browser.ShowDevTools();
+                    }
                 }
             }
             return false;

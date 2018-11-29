@@ -148,10 +148,10 @@ namespace ZlPos.Bizlogic
             DataXml.Save(TaskPath + "\\Data.xml");
         }
 
-        public void AddData(string PLU, string commodityName, string price, string indate, string tare,string barcode)
+        public void AddData(string PLU, string commodityName, string price, string indate, string tare,string barcode,string type)
         {
             XDocument dataxml = XDocument.Load(TaskPath + "\\Data.xml");
-            dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare,barcode:barcode));
+            dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare,barcode:barcode,type:type));
             dataxml.Save(TaskPath + "\\Data.xml");
         }
 
@@ -251,7 +251,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="PLU"></param>
         /// <returns></returns>
-        public XElement GetItem(string PLU,string commodityName,string price,string indate,string tare,string barcode)
+        public XElement GetItem(string PLU,string commodityName,string price,string indate,string tare,string barcode,string type)
         {
             XElement Item = new XElement("Item");
 
@@ -278,7 +278,7 @@ namespace ZlPos.Bizlogic
             Item.Add(new XElement("StaggerPrices"));
 
             Item.Element("Descriptions").Add(Description(CommodityName: commodityName, ID: "0"));
-            Item.Element("ItemPrices").Add(ItemPrice(price));
+            Item.Element("ItemPrices").Add(ItemPrice(price,type));
             Item.Element("Dates").Add(DateOffset(indate));
             Item.Element("Tares").Add(TareID(tare));
             Item.Element("LabelFormats").Add(LabelFormatID());
@@ -314,14 +314,25 @@ namespace ZlPos.Bizlogic
             return description;
         }
 
-        public XElement ItemPrice(string price,string index = "0", string UnitOfMeasureCode = "KGM", bool PriceOverrideFlag = false, bool DiscountFlag = false, string Currency = "CNY")
+        public XElement ItemPrice(string price,string type,string index = "0", string UnitOfMeasureCode = "KGM", bool PriceOverrideFlag = false, bool DiscountFlag = false, string Currency = "CNY")
         {
+            string Quantity = "";
+            if (type == "0")
+            {
+                UnitOfMeasureCode = "KGM";
+                Quantity = "0";
+            }
+            else
+            {
+                UnitOfMeasureCode = "PCS";
+                Quantity = "1";
+            }
             XElement itemPrice = new XElement("ItemPrice", 
                 new object[] {
                     new XAttribute("Index", index),
                     new XAttribute("UnitOfMeasureCode", UnitOfMeasureCode),
                     new XAttribute("PriceOverrideFlag", PriceOverrideFlag),
-                    new XAttribute("Quantity","0"), //这里有可能会变成坑
+                    new XAttribute("Quantity",Quantity), //这里有可能会变成坑
                     new XAttribute("Currency",Currency)
                 });
             itemPrice.SetValue(price);

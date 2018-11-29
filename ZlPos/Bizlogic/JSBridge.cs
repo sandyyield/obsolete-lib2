@@ -2135,9 +2135,9 @@ namespace ZlPos.Bizlogic
                         if ("barcode".Equals(type))
                         {
 
-                            var commodities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
+                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
                           {
-                                JoinType.Left,c.commoditycode == bc.commoditycode
+                                JoinType.Left,c.spucode == bc.spucode
                                                 && bc.del == "0"
                                                 && bc.shopcode == userEntity.shopcode
                                                 //add 2018年11月15日
@@ -2146,13 +2146,29 @@ namespace ZlPos.Bizlogic
                           })
                           .Where((c, bc) =>
                               c.shopcode == userEntity.shopcode
+                              && c.branchcode == userEntity.branchcode
                               && c.commoditystatus == "0"
                               && c.del == "0"
-                              //&& c.commodityclassify != "3"
-                              && c.commoditylevel == "2"
-                              && SqlFunc.Contains(bc.barcode, keyword)
-                              ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                              && c.updownstatus == "1"
+                              && SqlFunc.Contains(bc.barcode, keyword))
+                              .OrderBy((c, bc) => c.spucode, OrderByType.Asc)
                               .GroupBy((c, bc) => c.spucode)
+                              .Select((c,bc)=>new CommodityEntity
+                              {
+                                  barcode = bc.barcode,
+                                  id = c.id,
+                                  commodityname = c.commodityname,
+                                  unitcode = c.unitcode,
+                                  unitname = c.unitname,
+                                  saleprice = c.saleprice,
+                                  pricing = c.pricing,
+                                  commoditycode = c.commoditycode,
+                                  spucode = c.spucode,
+                                  commoditylevel = c.commoditylevel,
+                                  speccode = c.speccode,
+                                  specvalue = c.specvalue,
+                                  speclevel = c.speclevel
+                              })
                               .ToPageList(pageindex + 1, pagesize, ref total);
 
                             //foreach (var item in commodities)
@@ -2176,11 +2192,11 @@ namespace ZlPos.Bizlogic
                                                 //&& bc.branchcode == userEntity.branchcode
                           })
                           .Where((c, bc) =>
-                              c.shopcode == userEntity.shopcode
+                               c.shopcode == userEntity.shopcode
+                              && c.branchcode == userEntity.branchcode
                               && c.commoditystatus == "0"
                               && c.del == "0"
-                              //&& c.commodityclassify != "3"
-                              && c.commoditylevel == "2"
+                              && c.updownstatus == "1"
                               && SqlFunc.Contains(c.spucode, keyword)
                               ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
                               .GroupBy((c, bc) => c.spucode)
@@ -2198,15 +2214,16 @@ namespace ZlPos.Bizlogic
                              //&& bc.branchcode == userEntity.branchcode
                          })
                          .Where((c, bc) =>
-                             c.shopcode == userEntity.shopcode
-                             && c.commoditystatus == "0"
-                             && c.del == "0"
-                             //&& c.commodityclassify != "3"
-                             && c.commoditylevel == "2"
-                             && SqlFunc.Contains(c.commodityname, keyword)
-                             ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                             .GroupBy((c, bc) => c.spucode)
-                             .ToPageList(pageindex + 1, pagesize, ref total);
+                               c.shopcode == userEntity.shopcode
+                              && c.branchcode == userEntity.branchcode
+                              && c.commoditystatus == "0"
+                              && c.del == "0"
+                              && c.updownstatus == "1"
+                              && SqlFunc.Contains(c.commodityname, keyword)
+                              ).OrderBy((c, bc) => c.spucode, OrderByType.Asc)
+                              .GroupBy((c, bc) => c.spucode)
+                              .ToPageList(pageindex + 1, pagesize, ref total);
+
                         }
                         else if ("mnemonic".Equals(type))
                         {
@@ -2220,15 +2237,16 @@ namespace ZlPos.Bizlogic
                              //&& bc.branchcode == userEntity.branchcode
                          })
                          .Where((c, bc) =>
-                             c.shopcode == userEntity.shopcode
-                             && c.commoditystatus == "0"
-                             && c.del == "0"
-                             //&& c.commodityclassify != "3"
-                             && c.commoditylevel == "2"
-                             && SqlFunc.Contains(c.mnemonic, keyword)
-                             ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                             .GroupBy((c, bc) => c.spucode)
-                             .ToPageList(pageindex + 1, pagesize, ref total);
+                               c.shopcode == userEntity.shopcode
+                              && c.branchcode == userEntity.branchcode
+                              && c.commoditystatus == "0"
+                              && c.del == "0"
+                              && c.updownstatus == "1"
+                              && SqlFunc.Contains(c.mnemonic, keyword)
+                              ).OrderBy((c, bc) => c.spucode, OrderByType.Asc)
+                              .GroupBy((c, bc) => c.spucode)
+                              .ToPageList(pageindex + 1, pagesize, ref total);
+
                         }
                         else if ("saleprice".Equals(type))
                         {
@@ -2236,24 +2254,25 @@ namespace ZlPos.Bizlogic
                             {
                                 keyword = keyword + ".00";
                                 commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
-                         {
-                                JoinType.Left,c.commoditycode == bc.commoditycode
-                                                && bc.del == "0"
-                                                && bc.shopcode == userEntity.shopcode
-                                                //add 2018年11月15日
-                                                && c.branchcode == userEntity.branchcode
-                             //&& bc.branchcode == userEntity.branchcode
-                         })
-                         .Where((c, bc) =>
-                             c.shopcode == userEntity.shopcode
-                             && c.commoditystatus == "0"
-                             && c.del == "0"
-                             //&& c.commodityclassify != "3"
-                             && c.commoditylevel == "2"
-                             && c.saleprice == keyword
-                             ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                             .GroupBy((c, bc) => c.spucode)
-                             .ToPageList(pageindex + 1, pagesize, ref total);
+                                {
+                                    JoinType.Left,c.commoditycode == bc.commoditycode
+                                                    && bc.del == "0"
+                                                    && bc.shopcode == userEntity.shopcode
+                                                    //add 2018年11月15日
+                                                    && c.branchcode == userEntity.branchcode
+                                    //&& bc.branchcode == userEntity.branchcode
+                                 })
+                                  .Where((c, bc) =>
+                                       c.shopcode == userEntity.shopcode
+                                      && c.branchcode == userEntity.branchcode
+                                      && c.commoditystatus == "0"
+                                      && c.del == "0"
+                                      && c.updownstatus == "1"
+                                      && c.saleprice == keyword
+                                      ).OrderBy((c, bc) => c.spucode, OrderByType.Asc)
+                                      .GroupBy((c, bc) => c.spucode)
+                                      .ToPageList(pageindex + 1, pagesize, ref total);
+
                             }
                         }
 
@@ -3700,7 +3719,7 @@ namespace ZlPos.Bizlogic
             {
                 BarcodeScaleConfigEntity barcodeScaleConfigEntity = JsonConvert.DeserializeObject<BarcodeScaleConfigEntity>(scaleConfig);
                 List<BarcodeScaleEntity> scaleList = barcodeScaleConfigEntity.barcodeScaleEntityList;
-                //CacheManager.InsertBarcodeStyle(barcodeScaleConfigEntity.barcodeStyle);
+                CacheManager.InsertBarcodeStyle(barcodeScaleConfigEntity.barcodeStyle);
                 //DbManager dbManager = DBUtils.Instance.DbManager;
                 //if (scaleList != null && scaleList.Count > 0)
                 //{
@@ -3844,7 +3863,7 @@ namespace ZlPos.Bizlogic
 
                 foreach (var pluMessageEntity in pluMessageEntities)
                 {
-                    toledoUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare,pluMessageEntity.barcode);
+                    toledoUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare, pluMessageEntity.barcode,pluMessageEntity.type);
                 }
 
                 if (clear == 1)
@@ -4107,7 +4126,7 @@ namespace ZlPos.Bizlogic
                                         }
                                     }
                                 }
-                                if(commodityEntity.barcode == null)
+                                if (commodityEntity.barcode == null)
                                 {
                                     commodityEntity.barcode = "";
                                 }
