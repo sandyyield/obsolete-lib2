@@ -15,6 +15,31 @@ namespace ZlPos.Dao
         private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
 
+        public static void DeleteTable(string[] tableNameList)
+        {
+            try
+            {
+                using(var db = SugarDao.Instance)
+                {
+                    foreach (var tableName in tableNameList)
+                    {
+                        if (db.DbMaintenance.IsAnyTable(tableName, false))
+                        {
+                            //老数据备份
+                            db.DbMaintenance.BackupTable(tableName, tableName + DateTime.Now);
+                            //删除老表
+                            db.DbMaintenance.DropTable(tableName);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+
+
         /// <summary>
         /// 统一数据表添加字段接口
         /// </summary>
@@ -68,7 +93,7 @@ namespace ZlPos.Dao
                 using (var db = SugarDao.Instance)
                 {
                     //判断表是否存在
-                    if (db.DbMaintenance.IsAnyTable("BarCodeEntity",false))
+                    if (db.DbMaintenance.IsAnyTable("BarCodeEntity", false))
                     {
                         //删除老表
                         db.DbMaintenance.DropTable("BarCodeEntity");
@@ -152,7 +177,7 @@ namespace ZlPos.Dao
             }
         }
 
-        
+
 
         internal static void UpgradingVersion4()
         {

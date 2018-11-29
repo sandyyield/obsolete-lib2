@@ -27,7 +27,7 @@ namespace ZlPos.Utils
 
                     drivePrinter.SetPrinterName();
 
-                    drivePrinter.Print("驱动连接打印机成功\r\n\r\n\r\n");
+                    //drivePrinter.Print("驱动连接打印机成功\r\n\r\n\r\n");
                     drivePrinter.pageWidth = printerConfigEntity.pageWidth;
                     PrinterManager.Instance.Init = true;
                     PrinterManager.Instance.PrinterTypeEnum = Enums.PrinterTypeEnum.drive;

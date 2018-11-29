@@ -1564,13 +1564,15 @@ namespace ZlPos.Bizlogic
                                                                             }
                                                                             )
                                                                             .Where((c, bc) => c.shopcode == userEntity.shopcode
+                                                                            && c.branchcode == userEntity.branchcode
                                                                             && c.commoditystatus == "0"
                                                                             && c.del == "0"
                                                                             && c.commoditylevel == commoditylevel
+                                                                            && c.updownstatus == "1"
                                                                             && (string.IsNullOrEmpty(categorycode) || c.categorycode == categorycode)
                                                                             && (c.commodityname.Contains(keyword) || c.commoditycode.Contains(keyword) || c.mnemonic.Contains(keyword) || SqlFunc.Contains(bc.barcode, keyword))
                                                                             )
-                                                                            .OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
+                                                                            .OrderBy((c, bc) => c.spucode, OrderByType.Asc)
                                                                             .GroupBy((c, bc) => c.id)
                                                                             //.Select()
                                                                             .ToPageList(pageindex + 1, pagesize, ref total);
@@ -2032,10 +2034,12 @@ namespace ZlPos.Bizlogic
                           })
                           .Where((c, bc) =>
                               c.shopcode == userEntity.shopcode
+                              && c.branchcode == userEntity.branchcode
                               && c.commoditystatus == "0"
                               && c.del == "0"
                               //&& c.commodityclassify != "3"
                               && c.commoditylevel == "2"
+                              && c.updownstatus == "1"
                               && (SqlFunc.Contains(c.commodityname, keyword) || SqlFunc.Contains(c.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword))
                               ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
                               .GroupBy((c, bc) => c.id)
@@ -2153,7 +2157,7 @@ namespace ZlPos.Bizlogic
                               && SqlFunc.Contains(bc.barcode, keyword))
                               .OrderBy((c, bc) => c.spucode, OrderByType.Asc)
                               .GroupBy((c, bc) => c.spucode)
-                              .Select((c,bc)=>new CommodityEntity
+                              .Select((c, bc) => new CommodityEntity
                               {
                                   barcode = bc.barcode,
                                   id = c.id,
@@ -2785,6 +2789,7 @@ namespace ZlPos.Bizlogic
                         //Action<PrinterConfigEntity, Action<object>> action = new Action<PrinterConfigEntity, Action<object>>(printerConfigEntity,t);
                         //Task.Factory.StartNew()
                         printerSetter.SetPrinter(printerConfigEntity, CallbackMethod4SetPrinter);
+                        PrintTest(printerConfigEntity);
                     }
                     catch (Exception e)
                     {
@@ -3045,6 +3050,46 @@ namespace ZlPos.Bizlogic
         //        mWebViewHandle?.Invoke(")
         //    });
         //}
+
+        #region PrintTest
+        /// <summary>
+        /// 测试打印出纸
+        /// </summary>
+        public void PrintTest(PrinterConfigEntity printerConfigEntity)
+        {
+
+            if (PrinterManager.Instance.Init)
+            {
+                switch (PrinterManager.Instance.PrinterTypeEnum)
+                {
+                    case Enums.PrinterTypeEnum.usb:
+                        USBPrinter usbPrinter = PrinterManager.Instance.UsbPrinter;
+                        usbPrinter.PrintString("USB打印机连接成功\n\n\n\n\n");
+                        break;
+                    case Enums.PrinterTypeEnum.bluetooth:
+                        BluetoothPrinter bluetoothPrinter = PrinterManager.Instance.BluetoothPrinter;
+                        bluetoothPrinter.PrintString("蓝牙打印机连接成功\n\n\n\n\n");
+                        break;
+                    case Enums.PrinterTypeEnum.port:
+                        //serialPort portPrinter = PrinterManager.Instance.PortPrinter;
+                        break;
+                    case PrinterTypeEnum.LPT:
+                        //LPTPrinter lptPrinter = PrinterManager.Instance.LptPrinter;
+                        break;
+                    //add 2018年10月15日 
+                    case PrinterTypeEnum.drive:
+                        DrivePrinter drivePrinter = PrinterManager.Instance.DrivePrinter;
+                        drivePrinter.Print("驱动连接打印机成功\r\n\r\n\r\n");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+        }
+        #endregion
+
 
         #region Print
         /// <summary>
@@ -3863,7 +3908,7 @@ namespace ZlPos.Bizlogic
 
                 foreach (var pluMessageEntity in pluMessageEntities)
                 {
-                    toledoUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare, pluMessageEntity.barcode,pluMessageEntity.type);
+                    toledoUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare, pluMessageEntity.barcode, pluMessageEntity.type);
                 }
 
                 if (clear == 1)
@@ -4312,6 +4357,33 @@ namespace ZlPos.Bizlogic
         public void OnDesktop()
         {
             frmMain.HideSelf();
+        }
+        #endregion
+
+        #region 
+        public void Finish()
+        {
+            try
+            {
+                browser.GetBrowser().CloseBrowser(true);
+            }
+            catch(Exception e)
+            {
+                logger.Error("finish close:", e);
+            }
+
+            try
+            {
+                if (browser != null)
+                {
+                    browser.Dispose();
+                    Cef.Shutdown();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("finish shutdown:", e);
+            }
         }
         #endregion
 

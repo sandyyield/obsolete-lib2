@@ -41,7 +41,7 @@ namespace ZlPos.Utils
                         PrinterManager.Instance.PrinterTypeEnum = PrinterTypeEnum.LPT;
                         PrinterManager.Instance.PrinterConfigEntity = printerConfigEntity;
 
-                        lptPrinter.PrintString("并口打印机连接成功!\n\n\n\n\n");
+                        lptPrinter.PrintString("并口打印机连接成功!\n\n");
                         responseEntity.code = ResponseCode.SUCCESS;
                         responseEntity.msg = "打印机设置成功";
                     }

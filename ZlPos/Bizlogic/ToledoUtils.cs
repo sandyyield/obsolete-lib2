@@ -151,6 +151,10 @@ namespace ZlPos.Bizlogic
         public void AddData(string PLU, string commodityName, string price, string indate, string tare, string barcode, string type)
         {
             XDocument dataxml = XDocument.Load(TaskPath + "\\Data.xml");
+            if (string.IsNullOrEmpty(tare))
+            {
+                tare = "0";
+            }
             dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare, barcode: barcode, type: type));
             dataxml.Save(TaskPath + "\\Data.xml");
         }

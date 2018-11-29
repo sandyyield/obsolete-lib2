@@ -162,8 +162,11 @@ namespace ZlPos.Dao
                         //add 2018年11月28日
                         UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "barcodeScale" });
                         break;
+                    case 17:
+                        //1119版本为了兼容 需要删库
+                        UpgradingSchema.DeleteTable(new string[] { "CategoryEntity", "CommodityEntity", "MemberEntity", "PayTypeEntity", "AssistantsEntity", "CashierEntity", "SupplierEntity", "BarCodeEntity2", "CommodityPriceEntity", "CommodityInfoVM" });
 
-
+                        break;
 
                 }
                 //生成数据库配置文件
