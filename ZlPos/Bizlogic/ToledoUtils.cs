@@ -119,7 +119,7 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public void BuildTask(string guid)
         {
-            
+
             TaskID = guid;
 
             XDocument TaskXml = new XDocument();
@@ -132,7 +132,7 @@ namespace ZlPos.Bizlogic
 
             CommandID = Guid.NewGuid().ToString();
             XDocument CommandXml = new XDocument();
-            CommandXml.Add(GetCommandX(CommandID: Guid.NewGuid().ToString(),ClearData:ClearData));
+            CommandXml.Add(GetCommandX(CommandID: Guid.NewGuid().ToString(), ClearData: ClearData));
             CommandXml.Save(TaskPath + "\\Command.xml");
 
             //XDocument DataXml = new XDocument();
@@ -148,10 +148,10 @@ namespace ZlPos.Bizlogic
             DataXml.Save(TaskPath + "\\Data.xml");
         }
 
-        public void AddData(string PLU, string commodityName, string price, string indate, string tare,string barcode,string type)
+        public void AddData(string PLU, string commodityName, string price, string indate, string tare, string barcode, string type)
         {
             XDocument dataxml = XDocument.Load(TaskPath + "\\Data.xml");
-            dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare,barcode:barcode,type:type));
+            dataxml.Element("Data").Add(GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare, barcode: barcode, type: type));
             dataxml.Save(TaskPath + "\\Data.xml");
         }
 
@@ -201,7 +201,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="TaskID"></param>
         /// <returns></returns>
-        public XElement GetTaskX(string TaskID,string DataFile = "DeviceList.xml",string OutputFile = "TaskResult.xml")
+        public XElement GetTaskX(string TaskID, string DataFile = "DeviceList.xml", string OutputFile = "TaskResult.xml")
         {
             XElement Task = new XElement("MTTask",
                                 //TOCHANGE
@@ -227,7 +227,7 @@ namespace ZlPos.Bizlogic
         /// <param name="ClearData">标志下发前是否清空数据，即是否先把秤内对应数据清空后再下发，仅在命令控制字为Write或Update时有效</param>
         /// <param name="DataFile">以文件方式调用时，存放命令字数据文件名</param>
         /// <returns></returns>
-        public XElement GetCommandX(string CommandID, string CommandText = "Item", string Control = "Update",bool ClearData = false, string DataFile = "Data.xml")
+        public XElement GetCommandX(string CommandID, string CommandText = "Item", string Control = "Update", bool ClearData = false, string DataFile = "Data.xml")
         {
             //if (string.IsNullOrEmpty(CommandID))
             //{
@@ -235,7 +235,7 @@ namespace ZlPos.Bizlogic
             //}
             XElement Command = new XElement("Commands",
                     new XElement("Command",
-                        new XElement("CommandText",CommandText),
+                        new XElement("CommandText", CommandText),
                         new XElement("CommandID", CommandID),
                         new XElement("Control", Control),
                         new XElement("ClearData", ClearData),
@@ -251,7 +251,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="PLU"></param>
         /// <returns></returns>
-        public XElement GetItem(string PLU,string commodityName,string price,string indate,string tare,string barcode,string type)
+        public XElement GetItem(string PLU, string commodityName, string price, string indate, string tare, string barcode, string type)
         {
             XElement Item = new XElement("Item");
 
@@ -278,7 +278,7 @@ namespace ZlPos.Bizlogic
             Item.Add(new XElement("StaggerPrices"));
 
             Item.Element("Descriptions").Add(Description(CommodityName: commodityName, ID: "0"));
-            Item.Element("ItemPrices").Add(ItemPrice(price,type));
+            Item.Element("ItemPrices").Add(ItemPrice(price, type));
             Item.Element("Dates").Add(DateOffset(indate));
             Item.Element("Tares").Add(TareID(tare));
             Item.Element("LabelFormats").Add(LabelFormatID());
@@ -303,9 +303,9 @@ namespace ZlPos.Bizlogic
             return LabelFormatID;
         }
 
-        public XElement Description(string CommodityName,string ID,string Language = "zho", string Type = "ItemName")
+        public XElement Description(string CommodityName, string ID, string Language = "zho", string Type = "ItemName")
         {
-            XElement description = new XElement("Description", 
+            XElement description = new XElement("Description",
                 new object[] {
                     new XAttribute("Type", Type),
                     new XAttribute("ID", ID),
@@ -314,7 +314,7 @@ namespace ZlPos.Bizlogic
             return description;
         }
 
-        public XElement ItemPrice(string price,string type,string index = "0", string UnitOfMeasureCode = "KGM", bool PriceOverrideFlag = false, bool DiscountFlag = false, string Currency = "CNY")
+        public XElement ItemPrice(string price, string type, string index = "0", string UnitOfMeasureCode = "KGM", bool PriceOverrideFlag = false, bool DiscountFlag = false, string Currency = "CNY")
         {
             string Quantity = "";
             if (type == "0")
@@ -327,7 +327,7 @@ namespace ZlPos.Bizlogic
                 UnitOfMeasureCode = "PCS";
                 Quantity = "1";
             }
-            XElement itemPrice = new XElement("ItemPrice", 
+            XElement itemPrice = new XElement("ItemPrice",
                 new object[] {
                     new XAttribute("Index", index),
                     new XAttribute("UnitOfMeasureCode", UnitOfMeasureCode),
@@ -342,7 +342,7 @@ namespace ZlPos.Bizlogic
         //这里应该设置的是条码格式 按照序号提前送进机器中
         //public XElement BarcodeID(string barcodeStyle)
         //{
-           
+
         //    return new XElement("BarcodeID", barcode);
         //}
 
@@ -370,6 +370,10 @@ namespace ZlPos.Bizlogic
         {
             //保质期 用indate
             XElement DateOffset = new XElement("DateOffset", new object[] { new XAttribute("Type", "SellBy"), new XAttribute("UnitOfOffset", "day"), new XAttribute("PrintFormat", "YYMMDD") });
+            if (string.IsNullOrEmpty(day))
+            {
+                day = "0";
+            }
             DateOffset.SetValue(day);
             return DateOffset;
         }
