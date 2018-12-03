@@ -167,6 +167,10 @@ namespace ZlPos.Dao
                         UpgradingSchema.DeleteTable(new string[] { "CategoryEntity", "CommodityEntity", "MemberEntity", "PayTypeEntity", "AssistantsEntity", "CashierEntity", "SupplierEntity", "BarCodeEntity2", "CommodityPriceEntity", "CommodityInfoVM" });
 
                         break;
+                    case 18:
+                        //紧急修复字段
+                        UpgradingSchema.FixColumns<BillEntity>(new string[] { "cashtocard" });
+                        break;
 
                 }
                 //生成数据库配置文件

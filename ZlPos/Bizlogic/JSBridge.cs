@@ -2313,7 +2313,7 @@ namespace ZlPos.Bizlogic
             List<BarCodeEntity2> barCodes = null;
             if (_LoginUserManager.Login)
             {
-                UserEntity userEntity = _LoginUserManager.UserEntity;
+                  UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
 
@@ -2336,7 +2336,7 @@ namespace ZlPos.Bizlogic
                     string s = "";
                     foreach (var barCodeEntity in barCodes)
                     {
-                        s = s + barCodeEntity + ",";
+                        s = s + barCodeEntity.barcode + ",";
 
                     }
                     result = s.Trim(',');

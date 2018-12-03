@@ -39,6 +39,47 @@ namespace ZlPos.Dao
             }
         }
 
+        public static void FixColumns<T>(string[] newColumns)
+             where T : class, new()
+        {
+            string tableName = typeof(T).Name;
+            try
+            {
+                using (var db = SugarDao.Instance)
+                {
+                    //获取旧表数据
+                    var oldDt = db.Ado.GetDataTable("select * from " + tableName);
+
+                    //新表继承老数据
+                    DataTable newDt = oldDt;
+                    //添加新字段
+                    foreach (string columnsName in newColumns)
+                    {
+                        if (!newDt.Columns.Contains(columnsName))
+                        {
+                            newDt.Columns.Add(columnsName, Type.GetType("System.String"));
+                        }
+                    }
+
+                    //老数据备份
+                    db.DbMaintenance.BackupTable(tableName, tableName + DateTime.Now);
+                    //删除老表
+                    db.DbMaintenance.DropTable(tableName);
+
+                    //创建新表
+                    db.CodeFirst.InitTables(Type.GetType("ZlPos.Models." + tableName));
+                    var ls = ConvertUtils.ToList<T>(newDt).ToArray();
+                    db.Insertable(ls).Where(true, true).ExecuteCommand();
+
+
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Info("UpgradingVersion exception>>>table:" + tableName + ">>" + e.Message + e.StackTrace);
+            }
+        }
+
 
         /// <summary>
         /// 统一数据表添加字段接口

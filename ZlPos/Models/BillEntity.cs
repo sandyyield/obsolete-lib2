@@ -126,7 +126,7 @@ namespace ZlPos.Models
         [SugarColumn(IsNullable = true)]
         public string whichversion { get; set; }
 
-        //add 2018/11/01  //1106版本漏掉了  在1122版本上补上
+        //add 2018/11/01  //1106版本漏掉了  在1122版本上补上 大面积出现问题  直接在1129版新增数据
         [SugarColumn(IsNullable = true)]
         public string cashtocard { get; set; }
 
