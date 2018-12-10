@@ -98,5 +98,17 @@ namespace ZlPos.Utils
         {
             return ContextCache.getBarcodeScale();
         }
+
+
+        
+        public static void InsertPrintModelSetting(string obj)
+        {
+            ContextCache.setPrintModelSetting(obj);
+        }
+
+        public static string GetPrintModelSetting()
+        {
+            return ContextCache.getPrintModelSetting();
+        }
     }
 }

@@ -33,6 +33,7 @@ using System.Linq;
 using System.Drawing.Printing;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Drawing.Imaging;
 
 namespace ZlPos.Bizlogic
 {
@@ -451,7 +452,7 @@ namespace ZlPos.Bizlogic
             try
             {
                 DbManager dbManager = DBUtils.Instance.DbManager;
-                UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
+                 UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
                 if (userVM != null)
                 {
                     logger.Info("保存或更新用户信息,获取到的userVM：" + json);
@@ -1719,6 +1720,62 @@ namespace ZlPos.Bizlogic
 
         #endregion
 
+        #region UpdataCommodity
+        /// <summary>
+        /// 调价
+        /// </summary>
+        /// <param name="s"></param>
+        public void UpdateCommodity(string s)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            UserEntity userEntity = _LoginUserManager.UserEntity;
+            Task.Factory.StartNew(() =>
+            {
+                UpdateCommodityParamsEntity updateCommodityParamsEntity = JsonConvert.DeserializeObject<UpdateCommodityParamsEntity>(s);
+                if (_LoginUserManager.Login)
+                {
+
+                    try
+                    {
+
+                        using (var db = SugarDao.Instance)
+                        {
+                            int count = db.Updateable<CommodityEntity>().UpdateColumns(i => new CommodityEntity { memberprice = updateCommodityParamsEntity.memberprice, saleprice = updateCommodityParamsEntity.saleprice })
+                                                                        .Where(i => i.shopcode == userEntity.shopcode
+                                                                                && i.branchcode == userEntity.branchcode
+                                                                                && i.commoditycode == updateCommodityParamsEntity.commoditycode)
+                                                                                .ExecuteCommand();
+                            if (count >= 1)
+                            {
+                                responseEntity.code = ResponseCode.SUCCESS;
+                                responseEntity.msg = "更新成功";
+                            }
+                            else
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "未找到指定商品";
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = e.StackTrace;
+                        logger.Error("UpdateCommodity err", e);
+                    }
+                }
+                else
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "用户未登录";
+                }
+
+                browser.ExecuteScriptAsync("updateCommodityCallBack('" + JsonConvert.SerializeObject(responseEntity) + "')");
+            });
+        }
+        #endregion
+
+
         #region GetCommodityById
         /// <summary>
         /// 根据商品id查询商品
@@ -2313,7 +2370,7 @@ namespace ZlPos.Bizlogic
             List<BarCodeEntity2> barCodes = null;
             if (_LoginUserManager.Login)
             {
-                  UserEntity userEntity = _LoginUserManager.UserEntity;
+                UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
 
@@ -3087,6 +3144,21 @@ namespace ZlPos.Bizlogic
             }
 
 
+        }
+        #endregion
+
+        #region PrintModelSetting
+
+        public void SavePrintModelSetting(string json)
+        {
+            CacheManager.InsertPrintModelSetting(json);
+        }
+        #endregion
+
+        #region GetPrintModelSetting
+        public string GetPrintModelSetting()
+        {
+            return CacheManager.GetPrintModelSetting();
         }
         #endregion
 
@@ -3942,7 +4014,6 @@ namespace ZlPos.Bizlogic
                 }
 
 
-
             }), new object[] { });
         }
         #endregion
@@ -4118,7 +4189,12 @@ namespace ZlPos.Bizlogic
         #region SyncCommoditytoBarcodeScale_dingjian
         public void SyncCommoditytoBarcodeScale_dingjian(string ss)
         {
+            Task.Factory.StartNew(() =>
+            {
 
+
+
+            });
         }
         #endregion
 
@@ -4360,14 +4436,14 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        #region 
+        #region Finish
         public void Finish()
         {
             try
             {
                 browser.GetBrowser().CloseBrowser(true);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 logger.Error("finish close:", e);
             }
@@ -4412,7 +4488,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        #region
+        #region PrintBarcodeLabel
         /// <summary>
         /// 打印条码标签 (非收银时候用 专门用来打的)
         /// </summary>
@@ -4479,6 +4555,115 @@ namespace ZlPos.Bizlogic
 
                 mWebViewHandle.Invoke("printBarcodeLabelCallBack", responseEntity);
             });
+        }
+        #endregion
+
+
+        //add 2018年12月5日 
+        #region GetDownloadFiles
+        /// <summary>
+        /// 打开下载文件
+        /// </summary>
+        public void GetDownloadFiles()
+        {
+
+            Thread thread = new Thread(() =>
+            {
+                using (OpenFileDialog dialog = new OpenFileDialog())
+                {
+                    dialog.Multiselect = false;//复数文件
+                    dialog.Title = "请选择下载文件";
+                    dialog.Filter = "所有文件(*.*)|*.*";
+                    dialog.InitialDirectory = Application.StartupPath + "\\Downloads";
+                    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string file = dialog.FileName;
+                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                        {
+                            //TODO 打开文件
+                            System.Diagnostics.Process.Start(file);
+
+                        }
+                    }
+                }
+            });
+            thread.TrySetApartmentState(ApartmentState.STA);
+
+            thread.Start();
+
+
+
+        }
+
+        #endregion
+
+
+        #region 
+
+        public void GetBase64()
+        {
+
+            Thread thread = new Thread(() =>
+            {
+                string base64 = "";
+                ResponseEntity responseEntity = new ResponseEntity();
+                using (OpenFileDialog dialog = new OpenFileDialog())
+                {
+                    dialog.Multiselect = false;//复数文件
+                    dialog.Title = "请选择需要上传的图片";
+                    dialog.Filter = "所有文件(*.*)|*.*";
+                    dialog.InitialDirectory = Application.StartupPath + "\\Downloads";
+                    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string file = dialog.FileName;
+                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                        {
+                            FileInfo fileInfo = new FileInfo(file);
+                            if (fileInfo.Length > 2097152)
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "图片过大";
+                            }
+                            else
+                            {
+
+                                System.Drawing.Bitmap bmp1 = new System.Drawing.Bitmap(file);
+                                using (MemoryStream ms = new MemoryStream())
+                                {
+                                    bmp1.Save(ms, ImageFormat.Jpeg);
+                                    byte[] arr = new byte[ms.Length];
+                                    ms.Position = 0;
+                                    ms.Read(arr, 0, (int)ms.Length);
+                                    ms.Close();
+                                    base64 = Convert.ToBase64String(arr);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                    responseEntity.msg = "上传成功";
+                                    responseEntity.data = base64;
+                                }
+                            }
+
+                            //using (MemoryStream ms2 = new MemoryStream(Convert.FromBase64String(base64)))
+                            //{
+                            //    System.Drawing.Bitmap bmp2 = new System.Drawing.Bitmap(ms2);
+                            //    Form form = new Form();
+                            //    PictureBox pictureBox = new PictureBox();
+                            //    pictureBox.Load(bmp2);
+                            //    form.Controls.Add(bmp2);
+
+                            //    form.Show();
+
+
+                            //    //bmp2.Save(filePath + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                            //}
+                        }
+                    }
+                }
+                browser.ExecuteScriptAsync("getBase64CallBack('" + base64 + "')");
+            });
+            thread.TrySetApartmentState(ApartmentState.STA);
+
+            thread.Start();
         }
         #endregion
 

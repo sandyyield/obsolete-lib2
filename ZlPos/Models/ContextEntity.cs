@@ -52,5 +52,9 @@ namespace ZlPos.Models
         //add 2018年11月28日 条码秤的缓存
         [SugarColumn(IsNullable = true)]
         public string barcodeScale { get; set; }
+
+        //add 2018年12月6日 保存小票模板
+        [SugarColumn(IsNullable = true)]
+        public string PrintModelSetting { get; set; }
     }
 }

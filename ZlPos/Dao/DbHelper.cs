@@ -171,6 +171,9 @@ namespace ZlPos.Dao
                         //紧急修复字段
                         UpgradingSchema.FixColumns<BillEntity>(new string[] { "cashtocard" });
                         break;
+                    case 19:
+                        UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "PrintModelSetting" });
+                        break;
 
                 }
                 //生成数据库配置文件

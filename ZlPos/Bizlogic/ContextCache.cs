@@ -376,7 +376,7 @@ namespace ZlPos.Bizlogic
         #endregion
 
 
-        #region 
+        #region BarcodeScale cache
         public static string getBarcodeScale()
         {
             using (var db = SugarDao.Instance)
@@ -407,6 +407,44 @@ namespace ZlPos.Bizlogic
                     contextEntity = new ContextEntity();
                 }
                 contextEntity.barcodeScale = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion
+
+
+
+        #region PrintModelSetting cache
+        public static string getPrintModelSetting()
+        {
+            using (var db = SugarDao.Instance)
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity", false))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.PrintModelSetting;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setPrintModelSetting(string v)
+        {
+            using (var db = SugarDao.Instance)
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.PrintModelSetting = v;
                 DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
             }
         }

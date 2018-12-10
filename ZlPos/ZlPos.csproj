@@ -113,6 +113,7 @@
   <ItemGroup>
     <Compile Include="Bean\BaseData.cs" />
     <Compile Include="Bean\ResposeEntity.cs" />
+    <Compile Include="Bizlogic\AclasUtils.cs" />
     <Compile Include="Bizlogic\AppContext.cs" />
     <Compile Include="Bizlogic\ContextCache.cs" />
     <Compile Include="Bizlogic\JsonUntity.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Core\DataProcessor.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Core\MenuHandler.cs" />
+    <Compile Include="Core\MyDownLoadFile.cs" />
     <Compile Include="Dao\DbHelper.cs" />
     <Compile Include="Dao\UpgradingSchema.cs" />
     <Compile Include="Enums\SyncScaleStatus.cs" />
@@ -159,6 +161,7 @@
     <Compile Include="Models\SyncScaleVM.cs" />
     <Compile Include="Models\TemplatePropertyEntity.cs" />
     <Compile Include="Models\TotalBillVM.cs" />
+    <Compile Include="Models\UpdateCommodityParamsEntity.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\LoadPOSDll.cs" />
     <Compile Include="PrintServices\LPTPrinter.cs" />
@@ -310,6 +313,9 @@
   </ItemGroup>
   <!-- add by sVen 2018年4月16日 -->
   <ItemGroup>
+    <Content Include="Library\Aclas\AclasSDK.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Library\InTheHand.Net.Personal.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

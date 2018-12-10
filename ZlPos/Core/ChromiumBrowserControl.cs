@@ -55,6 +55,10 @@ namespace ZlPos.Core
                 Dock = DockStyle.Fill,
             };
             browser.MenuHandler = new MenuHandler();
+
+            //下载文件
+            browser.DownloadHandler = new MyDownLoadFile();
+
             Controls.Add(browser);
 
             _parentForm = parentForm;
