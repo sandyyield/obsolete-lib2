@@ -29,16 +29,24 @@ namespace ZlPos.Utils
                 usbPrinter.initUSB();
                 for (int i = 0; i < printEntities.Count; i++)
                 {
-                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                    if (!string.IsNullOrEmpty(printEntities[i].isLogo) && printEntities[i].isLogo == "1")
                     {
-                        logger.Info("usb print:" + printEntities[i].content);
-                        //add 2018年9月10日 增加一个换行
-                        usbPrinter.PrintString(printEntities[i].content + "\n");
+                        //打印logo
                     }
                     else
                     {
-                        //usb打印二维码可能会出现问题 所以直接不打印
-                        //usbPrinter.printQRCode(printEntities[i].content);
+
+                        if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                        {
+                            logger.Info("usb print:" + printEntities[i].content);
+                            //add 2018年9月10日 增加一个换行
+                            usbPrinter.PrintString(printEntities[i].content + "\n");
+                        }
+                        else
+                        {
+                            //usb打印二维码可能会出现问题 所以直接不打印
+                            //usbPrinter.printQRCode(printEntities[i].content);
+                        }
                     }
                 }
             }
@@ -75,16 +83,25 @@ namespace ZlPos.Utils
 
                 for (int i = 0; i < printEntities.Count; i++)
                 {
-                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+
+                    if (!string.IsNullOrEmpty(printEntities[i].isLogo) && printEntities[i].isLogo == "1")
                     {
-                        logger.Info("bluetooth print:" + printEntities[i].content);
-                        //add 2018年9月10日 增加换行
-                        bluetoothPrinter.PrintString(printEntities[i].content + "\n");
+                        //打印logo
                     }
                     else
                     {
-                        //usb打印二维码可能会出现问题 所以直接不打印
-                        //usbPrinter.printQRCode(printEntities[i].content);
+                        if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                        {
+                            logger.Info("bluetooth print:" + printEntities[i].content);
+                            //add 2018年9月10日 增加换行
+                            bluetoothPrinter.PrintString(printEntities[i].content + "\n");
+                        }
+                        else
+                        {
+                            //usb打印二维码可能会出现问题 所以直接不打印
+                            //usbPrinter.printQRCode(printEntities[i].content);
+                        }
+
                     }
                 }
             }
@@ -107,16 +124,24 @@ namespace ZlPos.Utils
                 //portPrinter.initUSB();
                 for (int i = 0; i < printEntities.Count; i++)
                 {
-                    //portPrinter.PrintString(printEntities[i].content);
-                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                    if (!string.IsNullOrEmpty(printEntities[i].isLogo) && printEntities[i].isLogo == "1")
                     {
-                        logger.Info("port print:" + printEntities[i].content);
-                        //add 2018年9月10日 增加换行
-                        portPrinter.PrintString(printEntities[i].content + "\n");
+                        //打印logo
                     }
                     else
                     {
-                        portPrinter.PrintQRCode(printEntities[i].content);
+                        //portPrinter.PrintString(printEntities[i].content);
+                        if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                        {
+                            logger.Info("port print:" + printEntities[i].content);
+                            //add 2018年9月10日 增加换行
+                            portPrinter.PrintString(printEntities[i].content + "\n");
+                        }
+                        else
+                        {
+                            portPrinter.PrintQRCode(printEntities[i].content);
+                        }
+
                     }
                 }
             }
@@ -155,15 +180,23 @@ namespace ZlPos.Utils
                 {
                     logger.Info("lpt print:" + printEntities[i].content);
 
-                    if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                    if (!string.IsNullOrEmpty(printEntities[i].isLogo) && printEntities[i].isLogo == "1")
                     {
-                        //add 2018年9月10日 增加换行
-                        sb.Append(printEntities[i].content + "\n");
+                        //打印logo
                     }
                     else
                     {
-                        //并口没有二维码
-                        //portPrinter.PrintQRCode(printEntities[i].content);
+
+                        if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                        {
+                            //add 2018年9月10日 增加换行
+                            sb.Append(printEntities[i].content + "\n");
+                        }
+                        else
+                        {
+                            //并口没有二维码
+                            //portPrinter.PrintQRCode(printEntities[i].content);
+                        }
                     }
                 }
                 lptPrinter.PrintString(sb.ToString() + "\n\n\n\n\n\n\n");
@@ -185,27 +218,36 @@ namespace ZlPos.Utils
             {
                 StringBuilder sb = new StringBuilder();
                 //portPrinter.initUSB();
-                for ( int i = 0; i < printEntities.Count; i++)
+                for (int i = 0; i < printEntities.Count; i++)
                 {
-                    logger.Info("lpt print:" + printEntities[i].content);
-                    //判断如果是头尾 16个(32个英文)中文字符换行
-                    if (!string.IsNullOrEmpty(printEntities[i].needAutoNewLine) && printEntities[i].needAutoNewLine == "1")
+                    logger.Info("device print:" + printEntities[i].content);
+
+                    if (!string.IsNullOrEmpty(printEntities[i].isLogo) && printEntities[i].isLogo == "1")
                     {
-                        string cont = printEntities[i].content.Replace("\\n", "");
-                        sb.Append(ProcessNewlineString(cont) + Environment.NewLine);
+                        //打印logo
                     }
                     else
                     {
-                        if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+
+                        //判断如果是头尾 16个(32个英文)中文字符换行
+                        if (!string.IsNullOrEmpty(printEntities[i].needAutoNewLine) && printEntities[i].needAutoNewLine == "1")
                         {
-                            //add 2018年9月10日 增加换行
                             string cont = printEntities[i].content.Replace("\\n", "");
-                            sb.Append(cont + Environment.NewLine);
+                            sb.Append(ProcessNewlineString(cont) + Environment.NewLine);
                         }
                         else
                         {
-                            //并口没有二维码
-                            //portPrinter.PrintQRCode(printEntities[i].content);
+                            if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                            {
+                                //add 2018年9月10日 增加换行
+                                string cont = printEntities[i].content.Replace("\\n", "");
+                                sb.Append(cont + Environment.NewLine);
+                            }
+                            else
+                            {
+                                //并口没有二维码
+                                //portPrinter.PrintQRCode(printEntities[i].content);
+                            }
                         }
                     }
 

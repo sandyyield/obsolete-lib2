@@ -16,5 +16,10 @@ namespace ZlPos.Models
 
         //add 2018年10月15日
         public string needAutoNewLine { get; set; } //是否需要换行
+
+        //add 2018年12月10日 
+        public string isLogo { get; set; }
+
+        public string layout { get; set; } //0 左对齐  1 居中 2右对齐
     }
 }

@@ -3959,16 +3959,12 @@ namespace ZlPos.Bizlogic
                 //通知前端 任务开始
                 sendMessage(SyncScaleStatus.SOCKET_OPENING, 0);
 
-
-
                 //生成一个临时目录
-
                 string TaskPath = Application.StartupPath + "\\temp\\" + Guid.NewGuid().ToString();
                 if (!Directory.Exists(TaskPath))
                 {
                     Directory.CreateDirectory(TaskPath);
                 }
-
                 string TaskID = Guid.NewGuid().ToString();
                 ToledoUtils toledoUtils = new ToledoUtils();//ip.ToString(),TaskPath);
                 toledoUtils.ip = ip.ToString();
@@ -3982,7 +3978,6 @@ namespace ZlPos.Bizlogic
                 {
                     toledoUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare, pluMessageEntity.barcode, pluMessageEntity.type);
                 }
-
                 if (clear == 1)
                 {
                     toledoUtils.ClearData = true;
@@ -3991,12 +3986,8 @@ namespace ZlPos.Bizlogic
                 {
                     toledoUtils.ClearData = false;
                 }
-
                 //生成任务
                 toledoUtils.BuildTask(TaskID);
-
-
-
                 //执行任务
                 if (!toledoUtils.ExecuteTaskInFile())
                 {
@@ -4189,12 +4180,66 @@ namespace ZlPos.Bizlogic
         #region SyncCommoditytoBarcodeScale_dingjian
         public void SyncCommoditytoBarcodeScale_dingjian(string ss)
         {
-            Task.Factory.StartNew(() =>
+            logger.Info("syncCommoditytoBarcodeScale_dingjiana(" + ss + ")");
+            SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
+            IPAddress ip = IPAddress.Parse(syncScaleVM.ip);
+            List<PluMessageEntity> pluMessageEntities = syncScaleVM.pluMessageEntityList;
+            int clear = syncScaleVM.clean;
+
+
+            Action<string, int> sendMessage = (syncScaleStatus, point) =>
+            {
+                SyncScaleEntity syncScaleEntity = new SyncScaleEntity();
+                syncScaleEntity.status = syncScaleStatus;
+                syncScaleEntity.point = point;
+                Task.Factory.StartNew(() =>
+                {
+                    browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
+                });
+            };
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback((state) =>
             {
 
+                //通知前端 任务开始
+                sendMessage(SyncScaleStatus.SOCKET_OPENING, 0);
+                //生成一个临时目录
+                string TaskPath = Application.StartupPath + "\\temp\\" + Guid.NewGuid().ToString();
+                if (!Directory.Exists(TaskPath))
+                {
+                    Directory.CreateDirectory(TaskPath);
+                }
 
 
-            });
+                AclasUtils aclasUtils = new AclasUtils();
+                aclasUtils.TaskPath = TaskPath;
+                aclasUtils.ip = ip.ToString();
+                //生成一个任务 (init & build guid）
+                string taskid = Guid.NewGuid().ToString();
+                aclasUtils.BuildTask(taskid);
+
+                aclasUtils.GetDeviceInfo();
+
+                if (clear == 1)
+                {
+                    aclasUtils.ClearPLU();
+                }
+
+                aclasUtils.BuildData();
+
+                foreach (var pluMessageEntity in pluMessageEntities)
+                {
+                    aclasUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare, pluMessageEntity.barcode, pluMessageEntity.type);
+                }
+
+
+                aclasUtils.ExecTask();
+
+                //任务结束  释放资源防止内存泄漏
+                aclasUtils.FinalizeSDK();
+
+            }), new object[] { });
+
         }
         #endregion
 
@@ -4659,7 +4704,7 @@ namespace ZlPos.Bizlogic
                         }
                     }
                 }
-                browser.ExecuteScriptAsync("getBase64CallBack('" + base64 + "')");
+                browser.ExecuteScriptAsync("getBase64CallBack('" + JsonConvert.SerializeObject(responseEntity) + "')");
             });
             thread.TrySetApartmentState(ApartmentState.STA);
 

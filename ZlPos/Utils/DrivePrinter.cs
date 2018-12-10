@@ -39,6 +39,7 @@ namespace ZlPos.Utils
                     _PrintDocument = new PrintDocument();
 
                     _PrintDocument.PrintPage += new PrintPageEventHandler(DoPrint);
+                    //_PrintDocument.PrintPage += new PrintPageEventHandler(DoPrint2);
                 }
                 return _DrivePrinter;
             }
@@ -66,6 +67,53 @@ namespace ZlPos.Utils
                 Console.WriteLine("打印出错");
             }
         }
+
+
+        private static void DoPrint2(object sender,PrintPageEventArgs e)
+        {
+            try
+            {
+
+                Graphics g = e.Graphics;
+
+                float linesPerPage = 0; //页面的行号
+
+                float yPosition = 0;   //绘制字符串的纵向位置
+
+                int count = 0; //行计数器
+
+                float leftMargin = e.MarginBounds.Left; //左边距
+
+                float topMargin = e.MarginBounds.Top; //上边距
+
+                string line = null; //行字符串
+
+                Font printFont = new Font("宋体", 9, FontStyle.Regular);//正文文字           
+
+
+                SolidBrush myBrush = new SolidBrush(Color.Black);//刷子
+
+                linesPerPage = e.MarginBounds.Height / printFont.GetHeight(g);//每页可打印的行数
+
+                //逐行的循环打印一页
+
+                while (count < linesPerPage && ((line = _PrintQueue.Dequeue()) != null))
+
+                {
+
+                    yPosition = topMargin + (count * printFont.GetHeight(g));
+
+                    g.DrawString(line, printFont, myBrush, 1, yPosition, new StringFormat());
+
+                    count++;
+
+                }
+            }catch(Exception ex)
+            {
+                Console.WriteLine("drive print err", ex);
+            }
+        }
+
 
         //private void DrawStringWrap(Graphics graphic, Font font, string text, Rectangle recangle)
         //{
@@ -95,5 +143,11 @@ namespace ZlPos.Utils
         {
             Print(v);
         }
+
+        //插队处理
+        public void EnqueuePrint(string base64)
+        {
+
+        } 
     }
 }

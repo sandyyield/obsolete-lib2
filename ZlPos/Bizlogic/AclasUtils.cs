@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 namespace ZlPos.Bizlogic
 {
@@ -141,6 +142,8 @@ namespace ZlPos.Bizlogic
         public string TaskPath { get; set; }
         public string OutputFile { get; set; }
 
+        public bool init { get; set; }
+
         public string TaskID { get; set; }
 
         //查询执行结果用
@@ -150,15 +153,53 @@ namespace ZlPos.Bizlogic
 
         public string filePath { get; set; }
 
+
+
+
         public void BuildTask(string guid)
         {
 
             TaskID = guid;
 
+            //初始化 sdk
+            init = AclasSDK_Initialize();
+
 
         }
 
-        byte tab = 0x09;
+        public void FinalizeSDK()
+        {
+            AclasSDK_Finalize();
+        }
+
+        uint iAddr;
+        TASSDKDeviceInfo DeviceInfo = new TASSDKDeviceInfo();
+        public bool GetDeviceInfo()
+        {
+            if (!string.IsNullOrEmpty(ip))
+            {
+                iAddr = MakeHostToDWord(ip);
+                bool res = AclasSDK_GetDevicesInfo(iAddr, 0, ASSDK_ProtocolType_None, ref DeviceInfo);
+                return res;
+            }
+            return false;
+        }
+
+        public void ExecTask()
+        {
+            TASSDKOnProgressEvent OnProgress = new TASSDKOnProgressEvent(OnProgressEvent);
+            AclasSDK_WaitForTask(AclasSDK_ExecTask(DeviceInfo.Addr, DeviceInfo.Port, DeviceInfo.ProtocolType, ASSDK_ProcType_UP, ASSDK_DataType_PLU, Path.Combine(TaskPath, TaskID + ".txt"), OnProgress, null));
+        }
+
+        public void ClearPLU()
+        {
+            TASSDKOnProgressEvent OnProgress = new TASSDKOnProgressEvent(OnProgressEvent);
+            AclasSDK_WaitForTask(AclasSDK_ExecTaskA(DeviceInfo.Addr, DeviceInfo.Port, DeviceInfo.ProtocolType,
+                ASSDK_ProcType_Del, ASSDK_DataType_PLU, "*", OnProgress, null));
+        }
+
+
+        byte[] tab = new byte[] { 0x09 };
 
         byte[] newLine = new byte[] { 0x0d, 0x0a };
 
@@ -169,30 +210,39 @@ namespace ZlPos.Bizlogic
             //DataXml.Add(new XElement("Data"));//, GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare)));
             //DataXml.Save(TaskPath + "\\Data.xml");
 
-            filePath = Path.Combine(TaskPath, TaskID + ".dls");
+            filePath = Path.Combine(TaskPath, TaskID + ".txt");
 
             try
             {
                 using (var fs = new FileStream(filePath, FileMode.CreateNew))
                 {
-                    using (var sw = new StreamWriter(fs))
-                    {
+                    fs.Write(Encoding.Default.GetBytes("ID"), 0, Encoding.Default.GetBytes("ID").Length);//sw.Write("ID"); //PLU
 
-                        sw.Write("ID" //PLU
-                            + tab + "ItemCode"      //barcode  str android  据说这两个
-                            + tab + "DepartmentID" //直接写死20 int 
-                                                   //+ tab + "GroupID"   //此字段对触控称是必须的，对普通按键式标签称可不包含此字段 故这里先注释
-                            + tab + "Name1"  //commodityName str
-                            + tab + "Price"     //price float
-                            + tab + "UnitID"    //4-kg 记重  ; 10-pcs 计数 int
-                            + tab + "BarcodeType1"  // 定死46 int
-                            + tab + "ValidDate"     //indate  int
-                            + tab + "Flag1"         //写死 0x3c byte
-                            + tab + "Flag2"         //写死 0xf0 byte
-                            + tab + "TareValue"     // 皮重
-                            );
-                        sw.Write(newLine);
-                    }
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("ItemCode"), 0, Encoding.Default.GetBytes("ItemCode").Length);//sw.Write("ItemCode")      //barcode  str android  据说这两个
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("DepartmentID"), 0, Encoding.Default.GetBytes("DepartmentID").Length);// "DepartmentID" //直接写死20 int 
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("Name1"), 0, Encoding.Default.GetBytes("Name1").Length);//+ "Name1"  //commodityName str
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("Price"), 0, Encoding.Default.GetBytes("Price").Length);//+ "Price"     //price float
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("UnitID"), 0, Encoding.Default.GetBytes("UnitID").Length);//+ "UnitID"    //4-kg 记重  ; 10-pcs 计数 int
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("BarcodeType1"), 0, Encoding.Default.GetBytes("BarcodeType1").Length);//+ "BarcodeType1"  // 定死46 int
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("ValidDate"), 0, Encoding.Default.GetBytes("ValidDate").Length);//+ "ValidDate"     //indate  int
+                    fs.Write(tab, 0, 1);
+                    //fs.Write(Encoding.Default.GetBytes("Flag1"), 0, Encoding.Default.GetBytes("Flag1").Length);//+ "Flag1"         //写死 0x3c byte
+                    //fs.Write(tab, 0, 1);
+                    //fs.Write(Encoding.Default.GetBytes("Flag2"), 0, Encoding.Default.GetBytes("Flag2").Length);//+ "Flag2"         //写死 0xf0 byte
+                    //fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("TareValue"), 0, Encoding.Default.GetBytes("TareValue").Length);//+ "TareValue"     // 皮重
+                                                                                                                       //);
+                    fs.Write(newLine, 0, newLine.Length);
+
+
+
                 }
             }
             catch (Exception e)
@@ -207,19 +257,133 @@ namespace ZlPos.Bizlogic
             {
                 tare = "0";
             }
+
+            string UnitID = "4";
+            if (type == "0")
+            {
+                UnitID = "4";//"KGM";
+            }
+            else
+            {
+                UnitID = "10";//"PCS";
+            }
+
             try
             {
                 using (var fs = new FileStream(filePath, FileMode.Append))
                 {
-                    using(var sw = new StreamWriter(fs))
-                    {
-                        //sw.Write(barcode)
-                    }
+
+                    //顶尖ID和itemcode最好一样 待验证
+                    fs.Write(Encoding.Default.GetBytes(barcode), 0, Encoding.Default.GetBytes(barcode).Length); //barcode //PLU
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes(barcode), 0, Encoding.Default.GetBytes(barcode).Length);//+ barcode     //itemcode  str android  据说这两个
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("20"), 0, Encoding.Default.GetBytes("20").Length);//+ 20 //直接写死20 int 
+                                                                                                         //+ tab + "GroupID"   //此字段对触控称是必须的，对普通按键式标签称可不包含此字段 故这里先注释
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes(commodityName), 0, Encoding.Default.GetBytes(commodityName).Length);//+ commodityName  //commodityName str
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes(price), 0, Encoding.Default.GetBytes(price).Length);//+ Convert.ToDouble(price)    //price float
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes(UnitID), 0, Encoding.Default.GetBytes(UnitID).Length);//+ UnitID    //4-kg 记重  ; 10-pcs 计数 int
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes("46"), 0, Encoding.Default.GetBytes("46").Length);//+ 46  // 定死46 int
+                    fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes(indate), 0, Encoding.Default.GetBytes(indate).Length);//+ Convert.ToInt32(indate)    //indate  int
+                    fs.Write(tab, 0, 1);
+                    //fs.Write(new byte[] { 0x3c }, 0, 1);//+ 0x3c        //写死 0x3c byte
+                    //fs.Write(tab, 0, 1);
+                    //fs.Write(new byte[] { 0xf0 }, 0, 1);//+ 0xf0         //写死 0xf0 byte
+                    //fs.Write(tab, 0, 1);
+                    fs.Write(Encoding.Default.GetBytes(tare), 0, Encoding.Default.GetBytes(tare).Length);//+ Convert.ToInt32(tare)     // 皮重
+                    fs.Write(newLine, 0, newLine.Length);
+                    //using (var sw = new StreamWriter(fs))
+                    //{
+                    //    //顶尖ID和itemcode最好一样
+                    //    sw.Write(barcode //PLU
+                    //        + tab 
+                    //        + barcode     //itemcode  str android  据说这两个
+                    //        + tab
+                    //        + 20 //直接写死20 int 
+                    //                   //+ tab + "GroupID"   //此字段对触控称是必须的，对普通按键式标签称可不包含此字段 故这里先注释
+                    //        + tab 
+                    //        + commodityName  //commodityName str
+                    //        + tab 
+                    //        + Convert.ToDouble(price)    //price float
+                    //        + tab
+                    //        + UnitID    //4-kg 记重  ; 10-pcs 计数 int
+                    //        + tab 
+                    //        + 46  // 定死46 int
+                    //        + tab
+                    //        + Convert.ToInt32(indate)    //indate  int
+                    //        + tab 
+                    //        + 0x3c        //写死 0x3c byte
+                    //        + tab 
+                    //        + 0xf0         //写死 0xf0 byte
+                    //        + tab 
+                    //        + Convert.ToInt32(tare)     // 皮重
+                    //        );
+                    //    sw.Write(newLine);
+                    //}
                 }
             }
             catch (Exception e)
             {
                 logger.Error("AddData err", e);
+            }
+        }
+
+
+
+        public uint MakeHostToDWord(string sHost)
+        {
+            int i;
+            string[] Segment;
+            uint result;
+            result = 0;
+
+            Segment = sHost.Split('.');
+            if (Segment.Length != 4)
+                return result;
+            for (i = 0; i < (Segment.Length); i++)
+            {
+                if ((Convert.ToUInt32(Segment[i]) >= 0) && (Convert.ToUInt32(Segment[i]) <= 255))
+                {
+                    result = result + Convert.ToUInt32(Convert.ToUInt32(Segment[i]) << ((3 - i) * 8));
+                }
+                else
+                    return result;
+            }
+            return result;
+        }
+
+        public static void OnProgressEvent(UInt32 nErrorCode, UInt32 Index, UInt32 Total, IntPtr lpUserData)
+        {
+            const string sInfoProgress = "Progress: {0}/{1}";
+            const string sInfoComplete = "Complete, Total: {0}";
+            const string sInfoStop = "Proc Stop!";
+            const string sInfoFailed = "Proc Failed!";
+
+            switch (nErrorCode)
+            {
+                case ASSDK_Err_Success:
+                    {
+                        MessageBox.Show(string.Format(sInfoComplete, Total));
+                        break;
+                    }
+                case ASSDK_Err_Progress:
+                    {
+                        //MessageBox.Show(string.Format(sInfoProgress, Index, Total));                        
+                        break;
+                    }
+                case ASSDK_Err_Terminate:
+                    {
+                        MessageBox.Show(sInfoStop);
+                        break;
+                    }
+                default:
+                    MessageBox.Show(sInfoFailed);
+                    break;
             }
         }
     }
