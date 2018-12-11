@@ -176,6 +176,8 @@ namespace ZlPos.Bizlogic
         TASSDKDeviceInfo DeviceInfo = new TASSDKDeviceInfo();
         public bool GetDeviceInfo()
         {
+
+
             if (!string.IsNullOrEmpty(ip))
             {
                 iAddr = MakeHostToDWord(ip);
@@ -187,8 +189,39 @@ namespace ZlPos.Bizlogic
 
         public void ExecTask()
         {
-            TASSDKOnProgressEvent OnProgress = new TASSDKOnProgressEvent(OnProgressEvent);
-            AclasSDK_WaitForTask(AclasSDK_ExecTask(DeviceInfo.Addr, DeviceInfo.Port, DeviceInfo.ProtocolType, ASSDK_ProcType_UP, ASSDK_DataType_PLU, Path.Combine(TaskPath, TaskID + ".txt"), OnProgress, null));
+            string path = Path.Combine(TaskPath, TaskID + ".txt");
+            //path = @"E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\temp\79a91b17-636b-4946-8aa3-f07db3365306\646ad392-898e-4077-b77c-763a54b51860.txt";
+
+            uint iAddr;
+            uint DataType;
+
+            // 数据类型。
+            // ASSDK_DataType_PLU = $0000; PLU
+            // ASSDK_DataType_HotKey = $0003; 热键
+            DataType = Convert.ToUInt32(ASSDK_DataType_PLU);
+
+            iAddr = MakeHostToDWord(ip);
+
+            if (AclasSDK_GetDevicesInfo(iAddr, 0, ASSDK_ProtocolType_None, ref DeviceInfo))
+            {
+                TASSDKOnProgressEvent OnProgress = new TASSDKOnProgressEvent(OnProgressEvent);
+
+                AclasSDK_WaitForTask(AclasSDK_ExecTaskA(DeviceInfo.Addr, DeviceInfo.Port, DeviceInfo.ProtocolType,
+                    ASSDK_ProcType_Down, DataType, path, OnProgress, null));
+
+                // clear PLU
+                //AclasSDK_WaitForTask(AclasSDK_ExecTaskA(DeviceInfo.Addr, DeviceInfo.Port, DeviceInfo.ProtocolType,
+                //    ASSDK_ProcType_Del, ASSDK_DataType_PLU, "*", OnProgress, null));              
+            }
+
+
+            //TASSDKOnProgressEvent OnProgress = new TASSDKOnProgressEvent(OnProgressEvent);
+            //string path = Path.Combine(TaskPath, TaskID + ".txt");
+            //path = @"E:\GitSource\Repos\CouldPos\ZlPos\bin\x86\Debug\temp\79a91b17-636b-4946-8aa3-f07db3365306\646ad392-898e-4077-b77c-763a54b51860.txt";
+            ////判断一下文件是否占用
+            //isShare(path);
+
+            //AclasSDK_WaitForTask(AclasSDK_ExecTask(DeviceInfo.Addr, DeviceInfo.Port, DeviceInfo.ProtocolType, ASSDK_ProcType_Down, 0, path, OnProgress, null));
         }
 
         public void ClearPLU()
@@ -274,11 +307,12 @@ namespace ZlPos.Bizlogic
                 {
 
                     //顶尖ID和itemcode最好一样 待验证
-                    fs.Write(Encoding.Default.GetBytes(barcode), 0, Encoding.Default.GetBytes(barcode).Length); //barcode //PLU
+                    fs.Write(Encoding.Default.GetBytes(PLU), 0, Encoding.Default.GetBytes(PLU).Length); //barcode //PLU
                     fs.Write(tab, 0, 1);
+                    barcode = GetLastStr(barcode, 6);
                     fs.Write(Encoding.Default.GetBytes(barcode), 0, Encoding.Default.GetBytes(barcode).Length);//+ barcode     //itemcode  str android  据说这两个
                     fs.Write(tab, 0, 1);
-                    fs.Write(Encoding.Default.GetBytes("20"), 0, Encoding.Default.GetBytes("20").Length);//+ 20 //直接写死20 int 
+                    fs.Write(Encoding.Default.GetBytes("29"), 0, Encoding.Default.GetBytes("29").Length);//+ 20 //直接写死20 int 
                                                                                                          //+ tab + "GroupID"   //此字段对触控称是必须的，对普通按键式标签称可不包含此字段 故这里先注释
                     fs.Write(tab, 0, 1);
                     fs.Write(Encoding.Default.GetBytes(commodityName), 0, Encoding.Default.GetBytes(commodityName).Length);//+ commodityName  //commodityName str
@@ -325,6 +359,7 @@ namespace ZlPos.Bizlogic
                     //        );
                     //    sw.Write(newLine);
                     //}
+
                 }
             }
             catch (Exception e)
@@ -364,27 +399,53 @@ namespace ZlPos.Bizlogic
             const string sInfoStop = "Proc Stop!";
             const string sInfoFailed = "Proc Failed!";
 
+            logger.Info("AclasUtils OnProgressEvent info:");
             switch (nErrorCode)
             {
                 case ASSDK_Err_Success:
                     {
-                        MessageBox.Show(string.Format(sInfoComplete, Total));
+                        //MessageBox.Show(string.Format(sInfoComplete, Total));
+                        logger.Info("nErrorCode & msg:" + nErrorCode + ";" + string.Format(sInfoComplete, Total));
                         break;
                     }
                 case ASSDK_Err_Progress:
                     {
-                        //MessageBox.Show(string.Format(sInfoProgress, Index, Total));                        
+                        //MessageBox.Show(string.Format(sInfoProgress, Index, Total)); 
+                        logger.Info("nErrorCode & msg:" + nErrorCode + ";" + string.Format(sInfoComplete, string.Format(sInfoProgress, Index, Total)));
                         break;
                     }
                 case ASSDK_Err_Terminate:
                     {
-                        MessageBox.Show(sInfoStop);
+                        //MessageBox.Show(sInfoStop);
+                        logger.Info("sInfoStop!----nErrorCode:" + nErrorCode);
                         break;
                     }
                 default:
-                    MessageBox.Show(sInfoFailed);
+                    //MessageBox.Show(sInfoFailed);
+                    logger.Error("  Proc Failed!: nErrorCode:" + nErrorCode);
                     break;
             }
         }
+
+        #region 获取后几位数 public string GetLastStr(string str,int num)
+        /// <summary>
+        /// 获取后几位数
+        /// </summary>
+        /// <param name="str">要截取的字符串</param>
+        /// <param name="num">返回的具体位数</param>
+        /// <returns>返回结果的字符串</returns>
+        private string GetLastStr(string str, int num)
+        {
+            int count = 0;
+            if (str.Length > num)
+            {
+                count = str.Length - num;
+                str = str.Substring(count, num);
+            }
+            return str;
+        }
+        #endregion
+
+
     }
 }

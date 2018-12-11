@@ -452,7 +452,7 @@ namespace ZlPos.Bizlogic
             try
             {
                 DbManager dbManager = DBUtils.Instance.DbManager;
-                 UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
+                UserVM userVM = JsonConvert.DeserializeObject<UserVM>(json);
                 if (userVM != null)
                 {
                     logger.Info("保存或更新用户信息,获取到的userVM：" + json);
@@ -4222,11 +4222,14 @@ namespace ZlPos.Bizlogic
 
                 if (clear == 1)
                 {
+                    sendMessage(SyncScaleStatus.PLU_CLEANING, 0);
                     aclasUtils.ClearPLU();
+                    sendMessage(SyncScaleStatus.PLU_CLEANED, 0);
                 }
 
                 aclasUtils.BuildData();
 
+                sendMessage(SyncScaleStatus.PLU_SYNCING, pluMessageEntities.Count);
                 foreach (var pluMessageEntity in pluMessageEntities)
                 {
                     aclasUtils.AddData(pluMessageEntity.plu, pluMessageEntity.commodityName, pluMessageEntity.price, pluMessageEntity.indate, pluMessageEntity.tare, pluMessageEntity.barcode, pluMessageEntity.type);
@@ -4237,6 +4240,8 @@ namespace ZlPos.Bizlogic
 
                 //任务结束  释放资源防止内存泄漏
                 aclasUtils.FinalizeSDK();
+
+                sendMessage(SyncScaleStatus.PLU_SYNCED, 0);
 
             }), new object[] { });
 
