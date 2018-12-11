@@ -4708,6 +4708,11 @@ namespace ZlPos.Bizlogic
                             //}
                         }
                     }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "图片未上传";
+                    }
                 }
                 browser.ExecuteScriptAsync("getBase64CallBack('" + JsonConvert.SerializeObject(responseEntity) + "')");
             });
