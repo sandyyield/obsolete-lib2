@@ -33,6 +33,22 @@ namespace ZlPos.Forms
             //如果存在进程 则激活
             ThreadPool.RegisterWaitForSingleObject(Program.ProgramStarted, OnProgramStarted, null, -1, false);
 
+            #region 把chromium初始化代码放到这里
+            //logger.Info("Initiallize chromium core..");
+            CefSettings cefSettings = new CefSettings();
+            //禁用调试日志
+            cefSettings.LogSeverity = LogSeverity.Disable;
+
+            cefSettings.CachePath = Application.StartupPath + "\\CachePath";
+
+            //add 2018年11月28日 关闭GPU加速  尝试解决屏闪问题
+            cefSettings.CefCommandLineArgs.Add("disable-gpu", "1");
+
+            //依赖性检查
+            Cef.Initialize(cefSettings, true, true);
+            #endregion 
+
+
             //hostApp = new HostApp();
 
             ////2018年9月8日 执行一次性程序 执行把这三天的billentity ticketstatue 改为cached

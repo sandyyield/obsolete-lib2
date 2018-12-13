@@ -10,5 +10,6 @@ namespace ZlPos.Models
         public string commoditycode { get; set; }
         public string memberprice { get; set; }
         public string saleprice { get; set; }
+        public string spucode { get; set; }
     }
 }

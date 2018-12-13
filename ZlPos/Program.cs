@@ -129,19 +129,19 @@ namespace ZlPos
                 #endregion
 
 
-                logger.Info("Initiallize chromium core..");
+            //    logger.Info("Initiallize chromium core..");
 
-            CefSettings cefSettings = new CefSettings();
-            //禁用调试日志
-            cefSettings.LogSeverity = LogSeverity.Disable;
+            //CefSettings cefSettings = new CefSettings();
+            ////禁用调试日志
+            //cefSettings.LogSeverity = LogSeverity.Disable;
 
-            cefSettings.CachePath = Application.StartupPath + "\\CachePath";
+            //cefSettings.CachePath = Application.StartupPath + "\\CachePath";
 
-            //add 2018年11月28日 关闭GPU加速  尝试解决屏闪问题
-            cefSettings.CefCommandLineArgs.Add("disable-gpu", "1");
+            ////add 2018年11月28日 关闭GPU加速  尝试解决屏闪问题
+            //cefSettings.CefCommandLineArgs.Add("disable-gpu", "1");
 
-            //依赖性检查
-            Cef.Initialize(cefSettings, true, true);
+            ////依赖性检查
+            //Cef.Initialize(cefSettings, true, true);
 
             TaskScheduler.UnobservedTaskException += (s, e) =>
             {

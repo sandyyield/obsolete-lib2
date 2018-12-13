@@ -1745,10 +1745,23 @@ namespace ZlPos.Bizlogic
                                                                                 && i.branchcode == userEntity.branchcode
                                                                                 && i.commoditycode == updateCommodityParamsEntity.commoditycode)
                                                                                 .ExecuteCommand();
+                            var spucommodity = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                  && i.branchcode == userEntity.branchcode
+                                                                                  && i.spucode == updateCommodityParamsEntity.spucode
+                                                                                  && i.del == "0"
+                                                                                  && i.commoditylevel == "2"
+                                                                                    ).First();
+                            spucommodity.memberprice = updateCommodityParamsEntity.memberprice;
+                            spucommodity.saleprice = updateCommodityParamsEntity.saleprice;
+                            db.Updateable(spucommodity).ExecuteCommand();
+
+                            CommodityCacheManager.Instance.cleanCache();
+
                             if (count >= 1)
                             {
                                 responseEntity.code = ResponseCode.SUCCESS;
                                 responseEntity.msg = "更新成功";
+                                //CommodityCacheManager.Instance.cleanCache();
                             }
                             else
                             {
@@ -3303,6 +3316,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+
         #region PrintQRCode
         public void PrintQRCode(string code)
         {
@@ -4661,7 +4675,13 @@ namespace ZlPos.Bizlogic
                 {
                     dialog.Multiselect = false;//复数文件
                     dialog.Title = "请选择需要上传的图片";
-                    dialog.Filter = "所有文件(*.*)|*.*";
+                    dialog.Filter = "All Image Files|*.bmp;*.ico;*.gif;*.jpeg;*.jpg;*.png;*.tif;*.tiff|"
+                                    + "Windows Bitmap(*.bmp)|*.bmp|"
+                                    + "Windows Icon(*.ico)|*.ico|"
+                                    + "Graphics Interchange Format (*.gif)|(*.gif)|"
+                                    + "JPEG File Interchange Format (*.jpg)|*.jpg;*.jpeg|"
+                                    + "Portable Network Graphics (*.png)|*.png|"
+                                    + "Tag Image File Format (*.tif)|*.tif;*.tiff";
                     dialog.InitialDirectory = Application.StartupPath + "\\Downloads";
                     if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {

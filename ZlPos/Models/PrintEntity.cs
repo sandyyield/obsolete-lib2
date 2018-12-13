@@ -21,5 +21,7 @@ namespace ZlPos.Models
         public string isLogo { get; set; }
 
         public string layout { get; set; } //0 左对齐  1 居中 2右对齐
+
+        public string isModelDrivePrint { get; set; } //1为本地模板驱动打印
     }
 }

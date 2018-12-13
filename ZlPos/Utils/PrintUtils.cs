@@ -214,6 +214,7 @@ namespace ZlPos.Utils
             //content = content.Replace("\\r", " ");
             //content = content.Replace("\\n", "\n");
             List<PrintEntity> printEntities = JsonConvert.DeserializeObject<List<PrintEntity>>(content);
+
             if (printEntities != null && printEntities.Count > 0)
             {
                 StringBuilder sb = new StringBuilder();
@@ -222,34 +223,66 @@ namespace ZlPos.Utils
                 {
                     logger.Info("device print:" + printEntities[i].content);
 
-                    if (!string.IsNullOrEmpty(printEntities[i].isLogo) && printEntities[i].isLogo == "1")
+                    if ("1".Equals(printEntities[i].isModelDrivePrint))
                     {
-                        //打印logo
-                    }
-                    else
-                    {
-
-                        //判断如果是头尾 16个(32个英文)中文字符换行
-                        if (!string.IsNullOrEmpty(printEntities[i].needAutoNewLine) && printEntities[i].needAutoNewLine == "1")
+                        logger.Info("isModelDrivePrint");
+                        if ("1".Equals(printEntities[i].isLogo))
                         {
-                            string cont = printEntities[i].content.Replace("\\n", "");
-                            sb.Append(ProcessNewlineString(cont) + Environment.NewLine);
+                            //打印logo
                         }
                         else
                         {
-                            if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                            if ("1".Equals(printEntities[i].needAutoNewLine))
                             {
-                                //add 2018年9月10日 增加换行
-                                string cont = printEntities[i].content.Replace("\\n", "");
-                                sb.Append(cont + Environment.NewLine);
+                                sb.Append(printEntities[i].content + Environment.NewLine);
                             }
                             else
                             {
-                                //并口没有二维码
-                                //portPrinter.PrintQRCode(printEntities[i].content);
+                                if ("1".Equals(printEntities[i].isQRCode))
+                                {
+                                    //portPrinter.PrintQRCode(printEntities[i].content);
+                                }
+                                else
+                                {
+                                    //add 2018年9月10日 增加换行
+                                    string cont = printEntities[i].content.Replace("\\n", "");
+                                    sb.Append(cont + Environment.NewLine);
+                                }
                             }
                         }
                     }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(printEntities[i].isLogo) && printEntities[i].isLogo == "1")
+                        {
+                            //打印logo
+                        }
+                        else
+                        {
+
+                            //判断如果是头尾 16个(32个英文)中文字符换行
+                            if (!string.IsNullOrEmpty(printEntities[i].needAutoNewLine) && printEntities[i].needAutoNewLine == "1")
+                            {
+                                string cont = printEntities[i].content.Replace("\\n", "");
+                                sb.Append(ProcessNewlineString(cont) + Environment.NewLine);
+                            }
+                            else
+                            {
+                                if (string.IsNullOrEmpty(printEntities[i].isQRCode) || printEntities[i].isQRCode == "0")
+                                {
+                                    //add 2018年9月10日 增加换行
+                                    string cont = printEntities[i].content.Replace("\\n", "");
+                                    sb.Append(cont + Environment.NewLine);
+                                }
+                                else
+                                {
+                                    //并口没有二维码
+                                    //portPrinter.PrintQRCode(printEntities[i].content);
+                                }
+                            }
+                        }
+                    }
+
 
 
                 }
