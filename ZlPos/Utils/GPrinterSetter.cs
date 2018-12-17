@@ -15,7 +15,7 @@ namespace ZlPos.Utils
         private static ILog logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private ResponseEntity responseEntity;
 
-        public void setPrinter(PrinterConfigEntity printerConfigEntity, Action<ResponseEntity> p)
+        public void setPrinter(PrinterConfigEntity printerConfigEntity, Action<object> p)
         {
             if(printerConfigEntity != null)
             {
@@ -41,6 +41,10 @@ namespace ZlPos.Utils
                     case "port":
                         break;
                     case "bluetooth":
+                        break;
+                    case "drive":
+                        DriveBQPrinterSetter driveBQPrinterSetter = new DriveBQPrinterSetter();
+                        driveBQPrinterSetter.SetDrivePrinterSetter(printerConfigEntity, p);
                         break;
                     default:
                         responseEntity.code = ResponseCode.Failed;

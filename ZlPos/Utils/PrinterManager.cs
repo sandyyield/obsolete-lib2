@@ -25,6 +25,10 @@ namespace ZlPos.Utils
         //add 2018年10月15日 驱动打印机
         private DrivePrinter drivePrinter;
 
+        //add 2018年12月15日 增加标签打印机
+        private DrivePrinterBQ driveBQPrinter;
+        private DrivePrinterBJQ driveBJQPrinter;
+
         private PrinterConfigEntity printerConfigEntity;
 
         //private ArrayList<UsbDevice> usbDeviceArrayList;
@@ -70,5 +74,9 @@ namespace ZlPos.Utils
         internal serialPort PortPrinter { get => portPrinter; set => portPrinter = value; }
         public LPTPrinter LptPrinter { get => lptPrinter; set => lptPrinter = value; }
         public DrivePrinter DrivePrinter { get => drivePrinter; set => drivePrinter = value; }
+        internal DrivePrinterBQ DriveBQPrinter { get => driveBQPrinter; set => driveBQPrinter = value; }
+        internal DrivePrinterBJQ DriveBJQPrinter { get => driveBJQPrinter; set => driveBJQPrinter = value; }
+        //public DrivePrinterBQ DriveBQPrinter { get => driveBQPrinter; set => driveBQPrinter = value; }
+        //public DrivePrinterBJQ DriveBJQPrinter { get => driveBJQPrinter; set => driveBJQPrinter = value; }
     }
 }

@@ -20,6 +20,7 @@ using ZlPos.Models;
 using ZlPos.Bean;
 using ZlPos.Config;
 using ZlPos.Forms;
+using Newtonsoft.Json;
 
 namespace ZlPos.Core
 {
@@ -110,10 +111,14 @@ namespace ZlPos.Core
             try
             {
                 PrinterConfigEntity printerConfigEntity;
+                string bqStr = string.Empty;
+                string bjqStr = string.Empty;
                 //先从数据库取出上次缓存的配置
                 using (var db = SugarDao.Instance)
                 {
                     printerConfigEntity = db.Queryable<PrinterConfigEntity>().First();
+                    bqStr = CacheManager.GetGprint() as string;//contextEntity.gprint;
+                    bjqStr = CacheManager.GetBJQprint() as string;
                 }
                 if (printerConfigEntity != null)
                 {
@@ -124,6 +129,21 @@ namespace ZlPos.Core
                     //printerSetter.SetPrinter(printerConfigEntity, ()=> "haha");
                     printerSetter.SetPrinter(printerConfigEntity, CallbackMethod4InitPrinter);
                 }
+                if (!string.IsNullOrEmpty(bqStr))
+                {
+                    PrinterConfigEntity bqPrinter = JsonConvert.DeserializeObject<PrinterConfigEntity>(bqStr);
+
+                    GPrinterSetter BQprinterSetter = new GPrinterSetter();
+                    BQprinterSetter.setPrinter(bqPrinter, p: (result) => { });
+                }
+                if (!string.IsNullOrEmpty(bjqStr))
+                {
+                    PrinterConfigEntity bjqPrinter = JsonConvert.DeserializeObject<PrinterConfigEntity>(bjqStr);
+
+                    BJQPrinterSetter BJQprinterSetter = new BJQPrinterSetter();
+                    BJQprinterSetter.setPrinter(bjqPrinter, p: (result) => { });
+                }
+
             }
             catch (Exception e)
             {

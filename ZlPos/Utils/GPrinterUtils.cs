@@ -559,5 +559,15 @@ namespace ZlPos.Utils
 
             return;
         }
+
+        internal void BQPrintTempletDrive(string s, string width, string height, DrivePrinterBQ driveBQPrinter)
+        {
+            driveBQPrinter.PrintString(s);
+        }
+
+        internal void BJQPrintTempletDrive(string s, string width, string height, DrivePrinterBJQ driveBJQPrinter)
+        {
+             driveBJQPrinter.PrintString(s);
+        }
     }
 }

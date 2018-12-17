@@ -2560,31 +2560,32 @@ namespace ZlPos.Bizlogic
                     printerSetter.setPrinter(printerConfigEntity,
                                                 p: (result) =>
                                                 {
-                                                    mWebViewHandle.Invoke("setBJQPrinterCallBack", result);
+                                                    CacheManager.InsertBJQprint(json);
+                                                    mWebViewHandle.Invoke("setBJQPrinterCallBack", result as ResponseEntity);
                                                     //保存缓存
-                                                    if (result.code == ResponseCode.SUCCESS)
-                                                    {
-                                                        //添加缓存
+                                                    //if (result.code == ResponseCode.SUCCESS)
+                                                    //{
+                                                    //    //添加缓存
 
-                                                        CacheManager.InsertBJQprint(json);
-                                                        if (BJQPrinterManager.Instance.Init)
-                                                        {
-                                                            switch (BJQPrinterManager.Instance.PrinterTypeEnum)
-                                                            {
-                                                                case "usb":
-                                                                    GPrinterUtils.Instance.printUSBTest();
-                                                                    break;
-                                                                case "port":
-                                                                    break;
-                                                                case "bluetooth":
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        mWebViewHandle.Invoke("setGPrinterCallBack", result);
-                                                    }
+                                                    //    CacheManager.InsertBJQprint(json);
+                                                    //    if (BJQPrinterManager.Instance.Init)
+                                                    //    {
+                                                    //        switch (BJQPrinterManager.Instance.PrinterTypeEnum)
+                                                    //        {
+                                                    //            case "usb":
+                                                    //                GPrinterUtils.Instance.printUSBTest();
+                                                    //                break;
+                                                    //            case "port":
+                                                    //                break;
+                                                    //            case "bluetooth":
+                                                    //                break;
+                                                    //        }
+                                                    //    }
+                                                    //}
+                                                    //else
+                                                    //{
+                                                    //    mWebViewHandle.Invoke("setGPrinterCallBack", result);
+                                                    //}
                                                 });
                 }
                 catch (Exception e)
@@ -2615,9 +2616,9 @@ namespace ZlPos.Bizlogic
                     printerSetter.setPrinter(printerConfigEntity,
                                                 p: (result) =>
                                                 {
-                                                    mWebViewHandle.Invoke("setGPrinterCallBack", result);
+                                                    mWebViewHandle.Invoke("setGPrinterCallBack", result as ResponseEntity);
                                                     //保存缓存
-                                                    if (result.code == ResponseCode.SUCCESS)
+                                                    if ((result as ResponseEntity).code == ResponseCode.SUCCESS)
                                                     {
                                                         //添加缓存
 
@@ -2633,12 +2634,14 @@ namespace ZlPos.Bizlogic
                                                                     break;
                                                                 case "bluetooth":
                                                                     break;
+                                                                case "drive":
+                                                                    break;
                                                             }
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        mWebViewHandle.Invoke("setGPrinterCallBack", result);
+                                                        mWebViewHandle.Invoke("setGPrinterCallBack", result as ResponseEntity);
                                                     }
                                                 });
                 }
@@ -2981,12 +2984,28 @@ namespace ZlPos.Bizlogic
                                 {
                                     case "SPBQ":
                                     case "DDBQ":
-                                        GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
-                                        responseEntity.code = ResponseCode.SUCCESS;
+                                        if (!string.IsNullOrEmpty(CacheManager.GetGprint() as string))
+                                        {
+                                            GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
+                                            responseEntity.code = ResponseCode.SUCCESS;
+                                        }
+                                        else
+                                        {
+                                            responseEntity.code = ResponseCode.Failed;
+                                            responseEntity.msg = "请设置标签打印机";
+                                        }
                                         break;
                                     case "BJQ":
-                                        GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
-                                        responseEntity.code = ResponseCode.SUCCESS;
+                                        if (!string.IsNullOrEmpty(CacheManager.GetBJQprint() as string))
+                                        {
+                                            GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
+                                            responseEntity.code = ResponseCode.SUCCESS;
+                                        }
+                                        else
+                                        {
+                                            responseEntity.code = ResponseCode.Failed;
+                                            responseEntity.msg = "请设置标价签打印机";
+                                        }
                                         break;
                                     default:
                                         logger.Error("非法打印机类型");
@@ -3022,6 +3041,73 @@ namespace ZlPos.Bizlogic
                 }
 
                 mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+            });
+
+        }
+        #endregion
+
+        #region PrintTempletDrive
+        /// <summary>
+        /// 标签 标价签模板打印
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="printerType"></param>
+        public void PrintTempletDrive(string s, string printerType, string width, string height)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
+                {
+                    logger.Info("PrintTempletDrive json or printertype is null.");
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "打印参数或打印类型为空";
+                    mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+                }
+                try
+                {
+                    switch (printerType)
+                    {
+                        case "SPBQ":
+                        case "DDBQ":
+                            if (!string.IsNullOrEmpty(CacheManager.GetGprint() as string))
+                            {
+                                GPrinterUtils.Instance.BQPrintTempletDrive(s, width, height, PrinterManager.Instance.DriveBQPrinter);
+                                responseEntity.code = ResponseCode.SUCCESS;
+                            }
+                            else
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "请设置标签打印机";
+                            }
+                            break;
+                        case "BJQ":
+                            if (!string.IsNullOrEmpty(CacheManager.GetBJQprint() as string))
+                            {
+                                GPrinterUtils.Instance.BJQPrintTempletDrive(s, width, height, PrinterManager.Instance.DriveBJQPrinter);
+                                responseEntity.code = ResponseCode.SUCCESS;
+                            }
+                            else
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "请设置标价签打印机";
+                            }
+                            break;
+                        default:
+                            logger.Error("非法打印机类型");
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "非法打印机类型";
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("PrintTemplet err >> ", e);
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = e.Message;
+                }
+
+                mWebViewHandle.Invoke("printTempletDriveCallBack", responseEntity);
             });
 
         }
