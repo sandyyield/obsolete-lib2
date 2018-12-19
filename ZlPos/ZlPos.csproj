@@ -130,6 +130,7 @@
     <Compile Include="Bizlogic\InternetHelper.cs" />
     <Compile Include="Bizlogic\RegHelper.cs" />
     <Compile Include="Bizlogic\ToledoUtils.cs" />
+    <Compile Include="Bizlogic\UpdateBiz.cs" />
     <Compile Include="Core\DataProcessor.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Core\MenuHandler.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Models\SyncScaleVM.cs" />
     <Compile Include="Models\TemplatePropertyEntity.cs" />
     <Compile Include="Models\TotalBillVM.cs" />
+    <Compile Include="Models\UpdateEntity.cs" />
     <Compile Include="Models\UpdateCommodityParamsEntity.cs" />
     <Compile Include="PrintServices\BluetoothPrinter.cs" />
     <Compile Include="PrintServices\LoadPOSDll.cs" />

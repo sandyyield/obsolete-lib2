@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -41,7 +42,7 @@ namespace ZlPos.Forms
 
             cefSettings.CachePath = Application.StartupPath + "\\CachePath";
 
-            //add 2018年11月28日 关闭GPU加速  尝试解决屏闪问题
+            //关闭GPU加速  尝试解决屏闪问题
             cefSettings.CefCommandLineArgs.Add("disable-gpu", "1");
 
             //依赖性检查
@@ -272,6 +273,26 @@ namespace ZlPos.Forms
                 };
                 this.Invoke(action);
             }
+        }
+
+        const int WM_USER = 0x400;
+        /// <summary>
+        /// windows消息队列信息处理
+        /// </summary>
+        /// <param name="m"></param>
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_USER + 0x7)//0x407
+            {//接收到关闭信息，且参数为Marshal.StringToHGlobalAnsi("CloseZlPos")时，意味着自动更新程序要求关闭此主应用，开始更新。
+                if (m.LParam != null && m.LParam == Marshal.StringToHGlobalAnsi("CloseZlPos"))
+                {
+                    hostApp.Finish();
+                    
+                    return;
+                }
+            }
+            
+            base.WndProc(ref m);
         }
 
     }

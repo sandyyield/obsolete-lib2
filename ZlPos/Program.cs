@@ -74,28 +74,77 @@ namespace ZlPos
             //}
             #endregion
 
-            #region "升级"
-            var updater = FSLib.App.SimpleUpdater.Updater.Instance;
-            //当检查发生错误时,这个事件会触发
-            updater.Error += (s, e) =>
+            #region"判断是否开启debug模式"
+            if (args.Length > 0)
             {
-                var updater1 = s as FSLib.App.SimpleUpdater.Updater;
-                logger.Info("update error!");
+                if ("DEBUG".Equals(args[0]))
+                {
+                    AppContext.Instance.Debug = true;
+                }
+            }
+            #endregion
+
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                //设置所有未觉察异常被觉察
+                e.SetObserved();
             };
-            //没有找到更新的事件
-            updater.NoUpdatesFound += (s, e) => { logger.Info("没有找到更新"); };
-            //找到更新的事件.但在此实例中,找到更新会自动进行处理,所以这里并不需要操作
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            #region "老升级 保留一下  防止出现意外情况可以临时用一用"
+            //var updater = FSLib.App.SimpleUpdater.Updater.Instance;
+            //这里其实就是创建了更新客户端
+            var updater = FSLib.App.SimpleUpdater.Updater.CreateUpdaterInstance(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
+            updater.UsingAssembly(System.Reflection.Assembly.GetExecutingAssembly());
+
             updater.UpdatesFound += (s, e) =>
             {
-                logger.Info("已找到更新");
+                logger.Info("找到更新" + updater.Context.UpdateInfo.AppVersion);
             };
+
+            //阻塞主进程更新
+            updater.EnsureNoUpdate();
+
+            //updater.UpdateCancelled
+            //updater.EnsureNoUpdate(()=>
+            //{
+            //    logger.Info("找到更新");
+            //    return true;
+            //},null,new Form());
+            //updater.EnsureNoUpdate<Form>(() =>
+            //{
+            //    //MessageBox.Show("找到更新");
+            //    //return true;
+            //    return true;
+            //});
+
+            //updater.EnsureNoUpdate(() => {
+            //    MessageBox.Show("已经找到更新");
+            //    return false;
+            //});
+            //当检查发生错误时,这个事件会触发
+            //updater.Error += (s, e) =>
+            //{
+            //    var updater1 = s as FSLib.App.SimpleUpdater.Updater;
+            //    logger.Info("update error!");
+            //};
+            ////没有找到更新的事件
+            //updater.NoUpdatesFound += (s, e) => { logger.Info("没有找到更新"); };
+            ////找到更新的事件.但在此实例中,找到更新会自动进行处理,所以这里并不需要操作
+            //updater.UpdatesFound += (s, e) =>
+            //{
+            //    logger.Info("已找到更新");
+            //    MessageBox.Show("发现新版本" + updater.Context.UpdateInfo.AppVersion);
+            //    updater.StartExternalUpdater();
+            //};
 
             /* 
 			 * 1.注册程序集。当程序集被注册的时候，任何程序集中实现了 FSLib.App.SimpleUpdater.Defination.IUpdateNotify 接口的都将会被自动实例化并调用
 			 *   通过此方法可以实现自己的事件捕捉以及处理类
 			 *   此例中， 类 CustomConnect 将会被实例化并调用
 			 */
-            updater.UsingAssembly(System.Reflection.Assembly.GetExecutingAssembly());
             /*
 			 * 2.自定义界面UI。此调用将会替换掉默认的更新界面（此例中将会把更新界面替换为 MainForm）
 			 *   和上面的使用方法类似，但可实现完全自定义的效果
@@ -118,41 +167,6 @@ namespace ZlPos
 
             #endregion
 
-            #region"判断是否开启debug模式"
-            if (args.Length > 0)
-            {
-                if ("DEBUG".Equals(args[0]))
-                {
-                    AppContext.Instance.Debug = true;
-                }
-            }
-                #endregion
-
-
-            //    logger.Info("Initiallize chromium core..");
-
-            //CefSettings cefSettings = new CefSettings();
-            ////禁用调试日志
-            //cefSettings.LogSeverity = LogSeverity.Disable;
-
-            //cefSettings.CachePath = Application.StartupPath + "\\CachePath";
-
-            ////add 2018年11月28日 关闭GPU加速  尝试解决屏闪问题
-            //cefSettings.CefCommandLineArgs.Add("disable-gpu", "1");
-
-            ////依赖性检查
-            //Cef.Initialize(cefSettings, true, true);
-
-            TaskScheduler.UnobservedTaskException += (s, e) =>
-            {
-                //设置所有未觉察异常被觉察
-                e.SetObserved();
-            };
-
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            
 
             logger.Info("Start run " + AppContext.Instance.AppName + " services");
             Application.Run(new PosForm());

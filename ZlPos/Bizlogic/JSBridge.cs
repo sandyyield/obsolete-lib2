@@ -77,8 +77,8 @@ namespace ZlPos.Bizlogic
 
         private DataProcessor _DataProcessor = DataProcessor.Instance;
 
-
-
+        //标识当前环境
+        private string _Env = "";
 
         /// <summary>
         /// 委托方式托管回调
@@ -161,7 +161,13 @@ namespace ZlPos.Bizlogic
         //这个接口后面用于环境适配
         public string GetEnv()
         {
-            return "";
+            browser.ExecuteScriptAsync("setEnvir()");
+            return _Env;
+        }
+
+        public void SetEnv(string s)
+        {
+            _Env = s;
         }
 
         #region GetVersionInfo
@@ -2464,10 +2470,88 @@ namespace ZlPos.Bizlogic
 
         //public void SetSecondScreenWebView()
 
+        public string GetEnvUrlHead()
+        {
+            string url = "";
+            switch (_Env.ToLower())
+            {
+                case "pro":
+                    url = "https://ls.zhonglunnet.com";
+                    break;
+                case "sit":
+                    url = "http://possit.cnzhonglunnet.com";
+                    break;
+                case "pre":
+                    url = "http://pospre.cnzhonglunnet.com";
+                    break;
+                case "dev":
+                    url = "http://posdev.cnzhonglunnet.com";
+                    break;
+            case "zhang":
+                    url = "http://192.168.102.189:8089/mt/pos/";
+                    break;
+                default:
+                    break;
+            }
+            return url;
+        }
+        
         #region VersionUpdate
         public void VersionUpdate()
         {
-            FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
+            string shopcode = ContextCache.GetShopcode();
+            try
+            {
+                //debug 
+                _Env = "pre";
+
+                UpdateEntity updateEntity;
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(GetEnvUrlHead() + "/version/entry/getNewest?appcode=pos_ls_windows&shopcode=" + shopcode);
+                request.KeepAlive = false;
+                request.Method = "GET";
+                request.ContentType = "application/json;characterSet:UTF-8";
+
+                using (var streamResponse = request.GetResponse().GetResponseStream())
+                {
+                    using (var sw = new StreamReader(streamResponse, Encoding.UTF8))
+                    {
+                        string json = sw.ReadToEnd();
+                        updateEntity = JsonConvert.DeserializeObject<UpdateEntity>(json);
+                    }
+                }
+                if (updateEntity != null)
+                {
+                    UpdateBiz.SoftUpdate(System.Reflection.Assembly.GetExecutingAssembly().ToString());
+                    //FSLib.App.SimpleUpdater.Updater.Instance.("http://041001.zhonglunnet.com/windows/CloudPos_WINXP/{0}", AppContext.Instance.XmlFile);
+
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppVersion = updateEntity.versionno;
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.Desc = updateEntity.versiondesc;
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.Package = updateEntity.packagename;
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.PackageSize = long.Parse(updateEntity.packagesize);
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.MD5 = updateEntity.packagekey;
+
+                    //TODO....
+                    FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateDownloadUrl = string.Format("http://041001.zhonglunnet.com/windows/CloudPos_WINXP/{0}",AppContext.Instance.XmlFile);
+
+                    FSLib.App.SimpleUpdater.Updater.Instance.BeginCheckUpdateInProcess();
+
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfoFileName = updateEntity.appname;
+                    //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple("sdf")
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfoFileUrl = updateEntity.appname;
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
+                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                logger.Error("VersionUpdate err", e);
+            }
+
+            FSLib.App.SimpleUpdater.Updater.Instance.EnsureNoUpdate();
         }
 
         #endregion
