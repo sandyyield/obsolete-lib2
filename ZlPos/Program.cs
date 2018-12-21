@@ -94,10 +94,11 @@ namespace ZlPos
             Application.SetCompatibleTextRenderingDefault(false);
 
             #region "老升级 保留一下  防止出现意外情况可以临时用一用"
-            //var updater = FSLib.App.SimpleUpdater.Updater.Instance;
+            var updater = FSLib.App.SimpleUpdater.Updater.Instance;
             //这里其实就是创建了更新客户端
-            var updater = FSLib.App.SimpleUpdater.Updater.CreateUpdaterInstance(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
+            //var updater = FSLib.App.SimpleUpdater.Updater.CreateUpdaterInstance(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
             updater.UsingAssembly(System.Reflection.Assembly.GetExecutingAssembly());
+            updater.Context.UpdateDownloadUrl = string.Format(AppContext.Instance.UpdateUrl, AppContext.Instance.XmlFile);
 
             updater.UpdatesFound += (s, e) =>
             {

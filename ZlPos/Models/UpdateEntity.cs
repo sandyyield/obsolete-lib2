@@ -5,14 +5,14 @@ using System.Text;
 
 namespace ZlPos.Models
 {
-    public class UpdateEntity
+    public class Data
     {
         /// <summary>
         /// 
         /// </summary>
         public string appcode { get; set; }
         /// <summary>
-        /// 
+        /// 中仑零售
         /// </summary>
         public string appname { get; set; }
         /// <summary>
@@ -20,7 +20,7 @@ namespace ZlPos.Models
         /// </summary>
         public string versionno { get; set; }
         /// <summary>
-        /// 
+        /// 68windows升级
         /// </summary>
         public string versiondesc { get; set; }
         /// <summary>
@@ -58,10 +58,28 @@ namespace ZlPos.Models
         /// <summary>
         /// 
         /// </summary>
-        public string creattime { get; set; }
+        public string createtime { get; set; }
+    }
+
+    public class UpdateEntity
+    {
         /// <summary>
         /// 
         /// </summary>
-        public string remark { get; set; }
+        public Data data { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string success { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public int errorCode { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string errorMsg { get; set; }
     }
+
+
 }

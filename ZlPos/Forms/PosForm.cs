@@ -34,6 +34,10 @@ namespace ZlPos.Forms
             //如果存在进程 则激活
             ThreadPool.RegisterWaitForSingleObject(Program.ProgramStarted, OnProgramStarted, null, -1, false);
 
+            //允许UI跨现线程
+            Control.CheckForIllegalCrossThreadCalls = false;
+
+
             #region 把chromium初始化代码放到这里
             //logger.Info("Initiallize chromium core..");
             CefSettings cefSettings = new CefSettings();

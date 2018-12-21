@@ -34,6 +34,7 @@ using System.Drawing.Printing;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Xml.Linq;
 
 namespace ZlPos.Bizlogic
 {
@@ -2487,7 +2488,7 @@ namespace ZlPos.Bizlogic
                 case "dev":
                     url = "http://posdev.cnzhonglunnet.com";
                     break;
-            case "zhang":
+                case "zhang":
                     url = "http://192.168.102.189:8089/mt/pos/";
                     break;
                 default:
@@ -2495,7 +2496,8 @@ namespace ZlPos.Bizlogic
             }
             return url;
         }
-        
+
+        private int cout = 0;
         #region VersionUpdate
         public void VersionUpdate()
         {
@@ -2503,7 +2505,8 @@ namespace ZlPos.Bizlogic
             try
             {
                 //debug 
-                _Env = "pre";
+                //_Env = "pre";
+                //shopcode = "125806668";
 
                 UpdateEntity updateEntity;
                 HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(GetEnvUrlHead() + "/version/entry/getNewest?appcode=pos_ls_windows&shopcode=" + shopcode);
@@ -2519,9 +2522,83 @@ namespace ZlPos.Bizlogic
                         updateEntity = JsonConvert.DeserializeObject<UpdateEntity>(json);
                     }
                 }
-                if (updateEntity != null)
+                if (updateEntity.data != null)
                 {
-                    UpdateBiz.SoftUpdate(System.Reflection.Assembly.GetExecutingAssembly().ToString());
+                    var updater = FSLib.App.SimpleUpdater.Updater.Instance;
+
+                    if (!string.IsNullOrEmpty(updateEntity.data.packageurl))
+                    {
+                        updater.Context.UpdateDownloadUrl = updateEntity.data.packageurl;
+                        //updater.BeginCheckUpdateInProcess();
+                        updater.EnsureNoUpdate();
+                    }
+
+
+                    return;
+                    //if (!Directory.Exists(Application.StartupPath + "\\update\\"))
+                    //{
+                    //    Directory.CreateDirectory(Application.StartupPath + "\\update\\");
+                    //}
+
+                    //string fileName = Application.StartupPath + "\\update\\" + Guid.NewGuid().ToString() + ".xml";
+
+                    //if (!File.Exists(fileName))
+                    //{
+                    //    File.Create(fileName).Close();
+                    //}
+                    //XElement UpdateInfo = new XElement("UpdateInfo");
+
+                    //UpdateInfo.Add(new XElement("AppName", "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe"));//
+                    //UpdateInfo.Add(new XElement("AppVersion", "3.0.1.38"));//
+                    //UpdateInfo.Add(new XElement("Desc", "asdfjasdljkffasjdf"));//
+                    //UpdateInfo.Add(new XElement("Package", "212f7bf2a19414d2a92899b09c0eed53b.zip"));//
+                    //UpdateInfo.Add(new XElement("MD5", "3F23986A52FD12C7AE7AF01F8A16A6C6"));//
+                    //UpdateInfo.Add(new XElement("PackageSize", long.Parse("91623476")));//
+                    ////以下为不变属性
+                    //UpdateInfo.Add(new XElement("PublishUrl", "http://www.zhonglunnet.com/"));
+                    //UpdateInfo.Add(new XElement("FileExecuteAfter", "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe"));
+                    //UpdateInfo.Add(new XElement("ExecuteArgumentAfter", "/S"));
+                    //UpdateInfo.Add(new XElement("ExecuteTimeout", "0"));
+                    //UpdateInfo.Add(new XElement("TreatErrorAsNotUpdated", "false"));
+                    //UpdateInfo.Add(new XElement("PromptUserBeforeAutomaticUpgrade", "true"));
+                    //UpdateInfo.Add(new XElement("AutoCloseSucceedWindow", "true"));
+                    //UpdateInfo.Add(new XElement("DeleteMethod", "None"));
+                    //UpdateInfo.Add(new XElement("ForceUpdate", "false"));
+                    //UpdateInfo.Add(new XElement("Packages"));
+                    //UpdateInfo.Add(new XElement("HideBeforeExecuteWindow", "false"));
+                    //UpdateInfo.Add(new XElement("HideAfterExecuteWindow", "true"));
+                    //UpdateInfo.Add(new XElement("MustUpdate", "false"));
+                    //UpdateInfo.Add(new XElement("AutoExitCurrentProcess", "false"));
+                    //UpdateInfo.Add(new XElement("AutoEndProcessesWithinAppDir", "true"));
+                    //UpdateInfo.Add(new XElement("AutoKillProcesses", "true"));
+                    //UpdateInfo.Add(new XElement("RequreAdminstrorPrivilege", "false"));
+
+
+                    //XDocument DataXml = new XDocument();
+                    //DataXml.Add(UpdateInfo);//, GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare)));
+                    //DataXml.Save(fileName);
+
+                    //var updater = FSLib.App.SimpleUpdater.Updater.Instance;
+                    //updater.Context.UpdateDownloadUrl = fileName.Replace(@"\", @"/");
+                    //updater.BeginCheckUpdateInProcess();
+                    //return;
+
+
+                    //updater.Context.UpdateInfo.AppName = "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe";
+                    //updater.Context.UpdateInfo.AppVersion = "3.0.1.38";
+                    //updater.Context.UpdateInfo.Desc = "asdfjasdljkffasjdf";
+                    //updater.Context.UpdateInfo.Package = "212f7bf2a19414d2a92899b09c0eed53b.zip";
+                    //updater.Context.UpdateInfo.PackageSize = long.Parse("91623476");
+                    //updater.Context.UpdateInfo.MD5 = "3F23986A52FD12C7AE7AF01F8A16A6C6";
+
+                    //updater.Context.UpdateInfoFileName = fileName;
+
+                    //updater.BeginCheckUpdateInProcess();
+
+                    //updater.Context.UpdateDownloadUrl = string.Format("http://zhonglunnet041001.oss-cn-shanghai.aliyuncs.com/windows/TestUpdate/{0}", "c3fa6023-4414-47e6-8737-45ee9a26297a.xml");
+                    //updater.BeginCheckUpdateInProcess();
+
+                    //UpdateBiz.SoftUpdate(System.Reflection.Assembly.GetExecutingAssembly().ToString());
                     //FSLib.App.SimpleUpdater.Updater.Instance.("http://041001.zhonglunnet.com/windows/CloudPos_WINXP/{0}", AppContext.Instance.XmlFile);
 
                     //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
@@ -2532,9 +2609,10 @@ namespace ZlPos.Bizlogic
                     //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.MD5 = updateEntity.packagekey;
 
                     //TODO....
-                    FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateDownloadUrl = string.Format("http://041001.zhonglunnet.com/windows/CloudPos_WINXP/{0}",AppContext.Instance.XmlFile);
 
-                    FSLib.App.SimpleUpdater.Updater.Instance.BeginCheckUpdateInProcess();
+
+                    //Control.CheckForIllegalCrossThreadCalls = true;
+
 
                     //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfoFileName = updateEntity.appname;
                     //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple("sdf")
@@ -2553,7 +2631,7 @@ namespace ZlPos.Bizlogic
 
             FSLib.App.SimpleUpdater.Updater.Instance.EnsureNoUpdate();
         }
-
+        
         #endregion
 
 
