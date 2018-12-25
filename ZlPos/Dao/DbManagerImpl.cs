@@ -22,9 +22,9 @@ namespace ZlPos.Dao
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dataArr"></param>
-        public void BulkSaveOrUpdate<T>(List<T> dataArr) where T : class, new()
+        public void BulkSaveOrUpdate<T>(List<T> dataArr,string primaryKey = "id") where T : class, new()
         {
-            BulkSaveOrUpdate(dataArr.ToArray());
+            BulkSaveOrUpdate(dataArr.ToArray(),primaryKey);
 
             #region old code
             //try
@@ -220,7 +220,7 @@ namespace ZlPos.Dao
             }
         }
 
-
+        [Obsolete]
         public void SaveOrUpdateCommodityEntities(CommodityEntity[] commoditys)
         {
             try
@@ -450,7 +450,7 @@ namespace ZlPos.Dao
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
-        public void BulkSaveOrUpdate<T>(T[] array) where T : class, new()
+        public void BulkSaveOrUpdate<T>(T[] array,string primaryKey = "id") where T : class, new()
         {
             try
             {
@@ -500,13 +500,13 @@ namespace ZlPos.Dao
                             DataTable dt3 = query1.CopyToDataTable();
 
                             var dataFilter = from r in dt2.AsEnumerable()
-                                             select r.Field<string>("id");
+                                             select r.Field<string>(primaryKey);
 
                             DataTable dtUpdate = dt3.Clone();
                             DataTable dtInsert = dt3.Clone();
                             foreach (DataRow item in dt3.Rows)
                             {
-                                if (dataFilter.Contains(item["id"]))
+                                if (dataFilter.Contains(item[primaryKey]))
                                 {
                                     dtUpdate.Rows.Add(item.ItemArray);
                                 }
@@ -539,14 +539,14 @@ namespace ZlPos.Dao
 
                         else
                         {
-                            logger.Info("BulkSaveOrUpdateCommodityPriceEntityList：Array error");
+                            logger.Info("BulkSaveOrUpdate<T>：Array error");
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                logger.Error("BulkSaveOrUpdateCommodityPriceEntityList:" + e.Message + e.StackTrace);
+                logger.Error("BulkSaveOrUpdate<T>:" + e.Message + e.StackTrace);
             }
         }
 

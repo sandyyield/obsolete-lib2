@@ -156,5 +156,55 @@ namespace ZlPos.Models
         //add 2018年11月21日
         [SugarColumn(IsNullable = true)]
         public string mnemonic { get; set; }
+
+        //add: 2018/12/20
+        [SugarColumn(IsNullable = true)]
+        public string skucode { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category1code { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category2code { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category3code { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category4code { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category1name { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category2name { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category3name { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string category4name { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string speccode01 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specname01 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specvalue01 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string speccode02 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specname02 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specvalue02 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string speccode03 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specname03 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string specvalue03 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string memberpricelv1 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string memberpricelv2 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string memberpricelv3 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string memberpricelv4 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string memberpricelv5 { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string memberpricelv6 { get; set; }
     }
 }

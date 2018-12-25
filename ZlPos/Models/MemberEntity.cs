@@ -46,5 +46,9 @@ namespace ZlPos.Models
         // add: 2018/5/15
         [SugarColumn(IsNullable = true)]
         public String membermodel { get; set; }
+
+        //add: 2018年12月25日
+        [SugarColumn(IsNullable = true)]
+        public string levelcode { get; set; }
     }
 }

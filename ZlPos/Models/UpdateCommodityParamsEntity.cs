@@ -5,6 +5,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
+    [Obsolete]
     public class UpdateCommodityParamsEntity
     {
         public string commoditycode { get; set; }

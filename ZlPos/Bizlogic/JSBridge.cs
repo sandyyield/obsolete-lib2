@@ -35,6 +35,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Drawing.Imaging;
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace ZlPos.Bizlogic
 {
@@ -389,7 +390,7 @@ namespace ZlPos.Bizlogic
                             using (var db = SugarDao.Instance)
                             {
                                 List<UserEntity> userList;
-                                if (!(String.IsNullOrEmpty(loginEntity.account)))
+                                if (!(string.IsNullOrEmpty(loginEntity.account)))
                                 {
                                     userList = db.Queryable<UserEntity>().Where(it => it.account == loginEntity.account
                                                                                 && it.password == loginEntity.password).ToList();
@@ -529,14 +530,12 @@ namespace ZlPos.Bizlogic
                             commodityInfoVM.branchcode = branchcode;
 
                             List<CategoryEntity> categoryEntities = commodityInfoVM.categorys;
-                            List<CommodityEntity> commoditys = commodityInfoVM.commoditys;
                             List<MemberEntity> memberEntities = commodityInfoVM.memberlevels;
                             List<PayTypeEntity> paytypes = commodityInfoVM.paytypes;
                             List<AssistantsEntity> assistants = commodityInfoVM.assistants;
                             List<CashierEntity> users = commodityInfoVM.users;
                             List<SupplierEntity> suppliers = commodityInfoVM.suppliers;
                             // add: 2018/2/27
-                            List<BarCodeEntity2> barCodes = commodityInfoVM.barcodes;
                             // edit 2018年11月19日 调价相关全部取消
                             //List<CommodityPriceEntity> commodityPriceEntityList = commodityInfoVM.commoditypricelist;
 
@@ -546,16 +545,16 @@ namespace ZlPos.Bizlogic
                             {
                                 dbManager.BulkSaveOrUpdate(categoryEntities);
                             }
-                            //保存商品信息
-                            if (commoditys != null)
-                            {
-                                //这里是数据的大头
-                                dbManager.BulkSaveOrUpdate(commoditys.ToArray());
+                            ////保存商品信息
+                            //if (commoditys != null)
+                            //{
+                            //    //这里是数据的大头
+                            //    dbManager.BulkSaveOrUpdate(commoditys.ToArray());
 
-                                //后台数据主键设置不统一  还要兼容android数据库不能自定义字段  只能写死的方式更新提升速度
-                                //dbManager.SaveOrUpdateCommodityEntities(commoditys.ToArray());
+                            //    //后台数据主键设置不统一  还要兼容android数据库不能自定义字段  只能写死的方式更新提升速度
+                            //    //dbManager.SaveOrUpdateCommodityEntities(commoditys.ToArray());
 
-                            }
+                            //}
                             //保存会员等级信息
                             if (memberEntities != null)
                             {
@@ -581,12 +580,12 @@ namespace ZlPos.Bizlogic
                             {
                                 dbManager.BulkSaveOrUpdate(suppliers);
                             }
-                            // add: 2018/2/27
-                            //保存条码表信息
-                            if (barCodes != null)
-                            {
-                                dbManager.BulkSaveOrUpdate(barCodes.ToArray());
-                            }
+                            //// add: 2018/2/27
+                            ////保存条码表信息
+                            //if (barCodes != null)
+                            //{
+                            //    dbManager.BulkSaveOrUpdate(barCodes.ToArray());
+                            //}
                             //edit 2018年11月19日
                             ////保存调价表信息
                             //if (commodityPriceEntityList != null)
@@ -640,11 +639,10 @@ namespace ZlPos.Bizlogic
                 UserEntity userEntity = _LoginUserManager.UserEntity;
                 try
                 {
-                    List<CommodityEntity> commodityEntities = null;
                     List<CategoryEntity> categoryEntities = null;
                     List<MemberEntity> memberEntities = null;
                     List<PayTypeEntity> payTypeEntities = null;
-                    List<AssistantsEntity> assistantsEntities = null;
+                    //List<AssistantsEntity> assistantsEntities = null;
                     List<CashierEntity> cashierEntities = null;
                     List<SupplierEntity> supplierEntities = null;
                     List<CommodityInfoVM> commodityInfoVMList = null;
@@ -670,9 +668,9 @@ namespace ZlPos.Bizlogic
                         //                                                && it.branchcode == userEntity.branchcode
                         //                                                && it.del == "0").ToList();
 
-                        //固定精确到shopcode + branchcode
-                        assistantsEntities = db.Queryable<AssistantsEntity>().Where(it => it.shopcode == userEntity.shopcode
-                                                                                && it.branchcode == userEntity.branchcode).ToList();
+                        ////固定精确到shopcode + branchcode
+                        //assistantsEntities = db.Queryable<AssistantsEntity>().Where(it => it.shopcode == userEntity.shopcode
+                        //                                                        && it.branchcode == userEntity.branchcode).ToList();
 
                         cashierEntities = db.Queryable<CashierEntity>().Where(it => it.shopcode == userEntity.shopcode
                                                                             && it.branchcode == userEntity.branchcode).ToList();
@@ -700,10 +698,6 @@ namespace ZlPos.Bizlogic
                             CommodityInfoVM infoVM = commodityInfoVMList[commodityInfoVMList.Count - 1];//如有多条，取最新的一条
                             commodityInfoVM = infoVM;
                         }
-                        if (commodityEntities == null)
-                        {
-                            commodityEntities = new List<CommodityEntity>();
-                        }
                         if (categoryEntities == null)
                         {
                             categoryEntities = new List<CategoryEntity>();
@@ -716,10 +710,10 @@ namespace ZlPos.Bizlogic
                         {
                             payTypeEntities = new List<PayTypeEntity>();
                         }
-                        if (assistantsEntities == null)
-                        {
-                            assistantsEntities = new List<AssistantsEntity>();
-                        }
+                        //if (assistantsEntities == null)
+                        //{
+                        //    assistantsEntities = new List<AssistantsEntity>();
+                        //}
                         if (cashierEntities == null)
                         {
                             cashierEntities = new List<CashierEntity>();
@@ -739,10 +733,10 @@ namespace ZlPos.Bizlogic
                         //}
 
                         commodityInfoVM.categorys = categoryEntities;
-                        commodityInfoVM.commoditys = commodityEntities;
+                        //commodityInfoVM.commoditys = commodityEntities;
                         commodityInfoVM.memberlevels = memberEntities;
                         commodityInfoVM.paytypes = payTypeEntities;
-                        commodityInfoVM.assistants = assistantsEntities;
+                        //commodityInfoVM.assistants = assistantsEntities;
                         commodityInfoVM.users = cashierEntities;
                         commodityInfoVM.suppliers = supplierEntities;
                         //commodityInfoVM.barcodes = barCodes;
@@ -878,7 +872,8 @@ namespace ZlPos.Bizlogic
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = "参数不能为空";
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
-                    mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                    //mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                    ExecuteCallback("saveOneSaleBillCallBack", responseEntity);
                 }
                 DbManager dbManager = DBUtils.Instance.DbManager;
 
@@ -889,7 +884,8 @@ namespace ZlPos.Bizlogic
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = "参数格式错误";
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
-                    mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                    //mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
+                    ExecuteCallback("saveOneSaleBillCallBack", responseEntity);
                 }
                 try
                 {
@@ -993,9 +989,9 @@ namespace ZlPos.Bizlogic
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.msg = "保存单据成功";
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
-                mWebViewHandle?.Invoke("saveOneSaleBillCallBack", responseEntity);
+                //mWebViewHandle?.Invoke("saveOneSaleBillCallBack", responseEntity);
+                ExecuteCallback("saveOneSaleBillCallBack", responseEntity);
             });
-            //return;
         }
         #endregion
 
@@ -1156,7 +1152,8 @@ namespace ZlPos.Bizlogic
                     logger.Error("getAllSaleBillByParams : json 解析异常", e);
                 }
                 string finalAllBills = JsonConvert.SerializeObject(billAndCountEntity);
-                browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + finalAllBills + "')");
+                //browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + finalAllBills + "')");
+                ExecuteCallback("getAllSaleBillByParamsCallBack", billAndCountEntity);
             });
         }
         #endregion
@@ -1533,6 +1530,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        [Obsolete("Use GetSPUList/GetSPUList")]
         #region GetCommodityList
         /// <summary>
         /// 根据相应条件获取商品信息
@@ -1641,7 +1639,8 @@ namespace ZlPos.Bizlogic
                 }
                 CommodityAndCountEntity commodityAndCountEntity = new CommodityAndCountEntity();
                 commodityAndCountEntity.count = total;
-                commodityAndCountEntity.commodityEntities = commodityEntities;//_DataProcessor.PaginationData(commodityEntities, pageindex, pagesize) as List<CommodityEntity>;
+                //修改了CommodityAndCountEntity.commodityEntities类型为List<SPUEntity>
+                //commodityAndCountEntity.commodityEntities = commodityEntities;//_DataProcessor.PaginationData(commodityEntities, pageindex, pagesize) as List<CommodityEntity>;
                 responseEntity.code = ResponseCode.SUCCESS;
                 responseEntity.data = commodityAndCountEntity;
                 mWebViewHandle.Invoke("getCommodityListCallBack", responseEntity);
@@ -1664,17 +1663,28 @@ namespace ZlPos.Bizlogic
                     try
                     {
                         DbManager dbManager = DBUtils.Instance.DbManager;
-                        List<CommodityEntity> commodities = JsonConvert.DeserializeObject<List<CommodityEntity>>(commodityListString);
-                        if (commodities != null)
+
+                        List<SKUEntity> skuCacheLst = new List<SKUEntity>();
+                        List<SPUEntity> spuLst = JsonConvert.DeserializeObject<List<SPUEntity>>(commodityListString);
+                        foreach (var item in spuLst)
                         {
-                            dbManager.BulkSaveOrUpdate(commodities);
+                            skuCacheLst.AddRange(item.recskulist);
+                        }
+                        if (spuLst != null)
+                        {
+                            dbManager.BulkSaveOrUpdate(spuLst, "uid");
+                        }
+
+                        if (skuCacheLst != null)
+                        {
+                            dbManager.BulkSaveOrUpdate(skuCacheLst, "uid");
                         }
                         logger.Info("保存和更新商品信息接口：信息保存成功");
                         responseEntity.code = ResponseCode.SUCCESS;
                     }
                     catch (Exception e)
                     {
-                        logger.Error("保存和更新商品信息接口：json解析异常or保存数据库操作异常");
+                        logger.Error("保存和更新商品信息接口：json解析异常or保存数据库操作异常", e);
                         responseEntity.code = ResponseCode.Failed;
                     }
                 }
@@ -1702,10 +1712,10 @@ namespace ZlPos.Bizlogic
                     try
                     {
                         DbManager dbManager = DBUtils.Instance.DbManager;
-                        List<BarCodeEntity2> barCodeEntityList = JsonConvert.DeserializeObject<List<BarCodeEntity2>>(barcodeListString);
+                        List<BarCodeEntity> barCodeEntityList = JsonConvert.DeserializeObject<List<BarCodeEntity>>(barcodeListString);
                         if (barCodeEntityList != null)
                         {
-                            dbManager.BulkSaveOrUpdate(barCodeEntityList);
+                            dbManager.BulkSaveOrUpdate(barCodeEntityList, "uid");
                         }
                         responseEntity.code = ResponseCode.SUCCESS;
                         responseEntity.msg = "保存barcode列表成功";
@@ -1738,37 +1748,52 @@ namespace ZlPos.Bizlogic
             UserEntity userEntity = _LoginUserManager.UserEntity;
             Task.Factory.StartNew(() =>
             {
-                UpdateCommodityParamsEntity updateCommodityParamsEntity = JsonConvert.DeserializeObject<UpdateCommodityParamsEntity>(s);
+                dynamic dyc = JsonConvert.DeserializeObject(s);
+                string memberprice = dyc.memberprice;
+                string saleprice = dyc.saleprice;
+                string spucode = dyc.spucode;
                 if (_LoginUserManager.Login)
                 {
-
                     try
                     {
 
                         using (var db = SugarDao.Instance)
                         {
-                            int count = db.Updateable<CommodityEntity>().UpdateColumns(i => new CommodityEntity { memberprice = updateCommodityParamsEntity.memberprice, saleprice = updateCommodityParamsEntity.saleprice })
-                                                                        .Where(i => i.shopcode == userEntity.shopcode
-                                                                                && i.branchcode == userEntity.branchcode
-                                                                                && i.commoditycode == updateCommodityParamsEntity.commoditycode)
-                                                                                .ExecuteCommand();
-                            var spucommodity = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                  && i.branchcode == userEntity.branchcode
-                                                                                  && i.spucode == updateCommodityParamsEntity.spucode
-                                                                                  && i.del == "0"
-                                                                                  && i.commoditylevel == "2"
-                                                                                    ).First();
-                            spucommodity.memberprice = updateCommodityParamsEntity.memberprice;
-                            spucommodity.saleprice = updateCommodityParamsEntity.saleprice;
-                            db.Updateable(spucommodity).ExecuteCommand();
+                            int count1 = db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                            {
+                                memberpricelv1 = memberprice,
+                                memberpricelv2 = memberprice,
+                                memberpricelv3 = memberprice,
+                                memberpricelv4 = memberprice,
+                                memberpricelv5 = memberprice,
+                                memberpricelv6 = memberprice,
+                                saleprice = saleprice
+                            })
+                             .Where(i => i.shopcode == userEntity.shopcode
+                            && i.branchcode == userEntity.branchcode
+                            && i.spucode == spucode)
+                            .ExecuteCommand();
 
-                            CommodityCacheManager.Instance.cleanCache();
+                            int count2 = db.Updateable<SKUEntity>().UpdateColumns(i => new SKUEntity
+                            {
+                                memberpricelv1 = memberprice,
+                                memberpricelv2 = memberprice,
+                                memberpricelv3 = memberprice,
+                                memberpricelv4 = memberprice,
+                                memberpricelv5 = memberprice,
+                                memberpricelv6 = memberprice,
+                                saleprice = saleprice
+                            })
+                             .Where(i => i.shopcode == userEntity.shopcode
+                            && i.branchcode == userEntity.branchcode
+                            && i.spucode == spucode)
+                            .ExecuteCommand();
 
-                            if (count >= 1)
+                            if (count1 >= 1 && count2 >= 0)
                             {
                                 responseEntity.code = ResponseCode.SUCCESS;
                                 responseEntity.msg = "更新成功";
-                                //CommodityCacheManager.Instance.cleanCache();
+                                CommodityCacheManager.Instance.cleanCache();
                             }
                             else
                             {
@@ -1789,24 +1814,23 @@ namespace ZlPos.Bizlogic
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = "用户未登录";
                 }
-
-                browser.ExecuteScriptAsync("updateCommodityCallBack('" + JsonConvert.SerializeObject(responseEntity) + "')");
+                ExecuteCallback("updateCommodityCallBack", responseEntity);
             });
         }
         #endregion
 
-
+        [Obsolete("use getCommodityBySPUCode")]
         #region GetCommodityById
         /// <summary>
         /// 根据商品id查询商品
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetCommodityById(string id)
+        public string GetCommodityById(string uid)
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            List<CommodityEntity> commodityEntities = null;
+            SPUEntity spuEntity = null;
             if (_LoginUserManager.Login)
             {
                 UserEntity userEntity = _LoginUserManager.UserEntity;
@@ -1814,26 +1838,92 @@ namespace ZlPos.Bizlogic
                 {
                     using (var db = SugarDao.Instance)
                     {
-                        commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                        //待优化
+                        spuEntity = db.Queryable<SPUEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                     //add 2018年11月15日
                                                                                     && i.branchcode == userEntity.branchcode
                                                                                     && i.commoditystatus == "0"
                                                                                     && i.del == "0"
                                                                                     && i.updownstatus == "1"
-                                                                                    && i.id == id).ToList();
+                                                                                    && i.uid == uid).First();
+                        List<SKUEntity> skuEntityList = db.Queryable<SKUEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                        && i.branchcode == userEntity.branchcode
+                                                                                        && i.del == "0"
+                                                                                        && i.spucode == spuEntity.spucode).ToList();
+                        //spuEntity.recskulist = skuEntityList;
                     }
                 }
                 catch (Exception e)
                 {
-                    logger.Info(e.Message + e.StackTrace);
+                    logger.Error("GetCommodityById", e);
                 }
             }
-            if (commodityEntities == null)
+            string json = "";
+            if (spuEntity != null)
             {
-                commodityEntities = new List<CommodityEntity>();
+                json = JsonConvert.SerializeObject(spuEntity);
             }
 
-            return JsonConvert.SerializeObject(commodityEntities);
+            return json;
+        }
+        #endregion
+
+        #region GetCommodityBySPUCode
+        /// <summary>
+        /// 通过SPUCODE查找整个商品信息
+        /// </summary>
+        /// <param name="spuCode"></param>
+        /// <returns></returns>
+        public string GetCommodityBySPUCode(string spuCode)
+        {
+            ResponseEntity responseEntity = new ResponseEntity();
+            DbManager dbManager = DBUtils.Instance.DbManager;
+            SPUEntity spuEntity = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using (var db = SugarDao.Instance)
+                    {
+                        var spulst = db.Queryable<ViewModelSPUEntity>().Where(i => i.shopcode == userEntity.shopcode
+                            && i.branchcode == userEntity.branchcode
+                            && i.commoditystatus == "0"
+                            && i.del == "0"
+                            && i.updownstatus == "1"
+                            && i.spucode == spuCode
+                        )
+                        .First();
+
+                        if (spulst != null)
+                        {
+                            return JsonConvert.SerializeObject(spulst);
+                        }
+                        //var spulst = db.Queryable<SPUEntity, SKUEntity>((spu, sku) => new object[] {
+                        //    JoinType.Left,spu.spucode == sku.spucode
+                        //})
+                        //.Where((spu, sku) => spu.shopcode == userEntity.shopcode
+                        //    //add 2018年11月15日
+                        //    && spu.branchcode == userEntity.branchcode
+                        //    && spu.commoditystatus == "0"
+                        //    && spu.del == "0"
+                        //    && spu.updownstatus == "1"
+                        //    && spu.spucode == spuCode
+                        //)
+                        //.Select(spu => new
+                        //{
+                        //    recskulist = SqlFunc.Subqueryable<SKUEntity>().Where(i => i.spucode == spuCode).Select()
+                        //})
+                        //.First();
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("GetCommodityBySPUCode", e);
+
+                }
+            }
+            return "";
         }
         #endregion
 
@@ -1847,8 +1937,8 @@ namespace ZlPos.Bizlogic
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            List<CommodityEntity> commodityEntities = new List<CommodityEntity>();
-            List<BarCodeEntity2> barCodeEntities = null;
+            List<SKUEntity> skuEntities = new List<SKUEntity>();
+            List<BarCodeEntity> barCodeEntities = null;
             if (_LoginUserManager.Login)
             {
                 UserEntity userEntity = _LoginUserManager.UserEntity;
@@ -1856,7 +1946,7 @@ namespace ZlPos.Bizlogic
                 {
                     using (var db = SugarDao.Instance)
                     {
-                        barCodeEntities = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == userEntity.shopcode
+                        barCodeEntities = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                             //add 2018年11月15日
                                                                                             //&& i.branchcode == userEntity.branchcode
                                                                                             //&& i.barcodes.Contains(barcode)).First();
@@ -1866,16 +1956,16 @@ namespace ZlPos.Bizlogic
                         {
                             foreach (var item in barCodeEntities)
                             {
-                                var commodityEntities1 = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                var skuEntityList = db.Queryable<SKUEntity>().Where(i => i.shopcode == userEntity.shopcode
                                                                                         //add 2018年11月15日
                                                                                         && i.branchcode == userEntity.branchcode
                                                                                         && i.commoditystatus == "0"
                                                                                         && i.del == "0"
                                                                                         && i.updownstatus == "1"
-                                                                                        && i.commoditycode == item.commoditycode).ToList();
-                                if (commodityEntities1 != null)
+                                                                                        && i.skucode == item.skucode).ToList();
+                                if (skuEntityList != null)
                                 {
-                                    commodityEntities.AddRange(commodityEntities1);
+                                    skuEntities.AddRange(skuEntityList);
                                 }
                             }
                             //commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
@@ -1892,15 +1982,16 @@ namespace ZlPos.Bizlogic
                     logger.Info(e.Message + e.StackTrace);
                 }
             }
-            if (commodityEntities == null)
+            if (skuEntities == null)
             {
-                commodityEntities = new List<CommodityEntity>();
+                skuEntities = new List<SKUEntity>();
             }
 
-            return JsonConvert.SerializeObject(commodityEntities);
+            return JsonConvert.SerializeObject(skuEntities);
         }
         #endregion
 
+        [Obsolete("过时")]
         #region GetCommodityByCommoditycode
         /// <summary>
         /// 根据商品code,查询商品
@@ -1949,13 +2040,14 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public string GetCommodityByCategoryCode(string categoryCode, int pageindex, int pagesize)
+        public string GetCommodityByCategoryCode(int level, string categoryCode, int pageindex, int pagesize)
         {
             logger.Info("getCommodityByCategory\n" + "categoryCode:" + categoryCode + "\tpageindex:" + pageindex + "\tpagesize:" + pagesize);
+            string key = level + "_" + categoryCode;
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
             CommodityCacheManager commodityCacheManager = CommodityCacheManager.Instance;
-            List<CommodityEntity> commodityEntities = null;
+            List<SPUEntity> spuEntityList = null;
             if (_LoginUserManager.Login)
             {
                 if (commodityCacheManager != null
@@ -1963,7 +2055,7 @@ namespace ZlPos.Bizlogic
                         && !(commodityCacheManager.CommodityMap.Count == 0)
                         && commodityCacheManager.CommodityMap.ContainsKey(categoryCode))
                 {
-                    commodityEntities = commodityCacheManager.CommodityMap[categoryCode];
+                    spuEntityList = commodityCacheManager.CommodityMap[categoryCode];
                 }
                 else
                 {
@@ -1972,67 +2064,73 @@ namespace ZlPos.Bizlogic
                     {
                         using (var db = SugarDao.Instance)
                         {
-                            ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
-                                                                            it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
-
-                            commodityEntities = db.Queryable<CommodityEntity>().Where(i => i.shopcode == userEntity.shopcode
-                                                                                //add 2018年11月15日
-                                                                                && i.branchcode == userEntity.branchcode
-                                                                                && i.commoditystatus == "0"
-                                                                                && i.del == "0"
-                                                                                && i.categorycode == categoryCode
-                                                                                //&& i.commodityclassify != "3"
-                                                                                && i.updownstatus == "1"
-                                                                                && i.commoditylevel == "2")
-                                                                                .OrderBy(i => i.commoditycode, SqlSugar.OrderByType.Asc)
-                                                                                .ToList();
-
+                            spuEntityList = db.Queryable<SPUEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                                     && i.branchcode == userEntity.branchcode
+                                                                                     && i.commoditystatus == "0"
+                                                                                     && i.del == "0"
+                                                                                     && i.updownstatus == "1")
+                                                                                    .WhereIF(level == 1, i => i.category1code == categoryCode)
+                                                                                    .WhereIF(level == 2, i => i.category2code == categoryCode)
+                                                                                    .WhereIF(level == 3, i => i.category3code == categoryCode)
+                                                                                    .WhereIF(level == 4, i => i.category4code == categoryCode)
+                                                                                    .OrderBy(i => i.spucode, SqlSugar.OrderByType.Asc)
+                                                                                    .ToPageList(pageindex, pagesize);
                         }
 
                     }
-                    catch (Exception db)
+                    catch (Exception e)
                     {
-                        logger.Error(db.StackTrace);
+                        logger.Error("GetCommodityByCategoryCode err", e);
                     }
                     if (commodityCacheManager.CommodityMap != null)
                     {
-                        commodityCacheManager.CommodityMap.Add(categoryCode, commodityEntities);
+                        commodityCacheManager.CommodityMap.Add(categoryCode, spuEntityList);
                     }
                 }
             }
-            return JsonConvert.SerializeObject(_DataProcessor.PaginationData(commodityEntities, pageindex, pagesize));
-            //List<CommodityEntity> selectCommodityList = null;
-            //if (commodityEntities != null && commodityEntities.Count > 0 && pageindex != -1)
-            //{
-            //    if (commodityEntities.Count > (pageindex * pagesize + pagesize))
-            //    {
-            //        selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, pagesize);
-            //    }
-            //    else
-            //    {
-            //        if (commodityEntities.Count - pageindex * pagesize >= 0)
-            //        {
-            //            if (commodityEntities.Count <= (pageindex * pagesize + pageindex * pagesize + pagesize))
-            //            {
-            //                selectCommodityList = commodityEntities.GetRange(pageindex * pagesize, commodityEntities.Count - pageindex * pagesize);
-            //            }
-
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    selectCommodityList = commodityEntities;
-            //}
-            //if (selectCommodityList == null)
-            //{
-            //    selectCommodityList = new List<CommodityEntity>();
-            //}
-            //return JsonConvert.SerializeObject(selectCommodityList);
-
+            return JsonConvert.SerializeObject(spuEntityList);
         }
         #endregion
 
+        #region GetAllCommodity
+        /// <summary>
+        /// 分页获取所有商品
+        /// </summary>
+        /// <param name="pageindex"></param>
+        /// <param name="pagesize"></param>
+        /// <returns></returns>
+        public string GetAllCommodity(int pageindex, int pagesize)
+        {
+            List<ViewModelSPUEntity> sPUEntities = new List<ViewModelSPUEntity>();
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+
+                    using (var db = SugarDao.Instance)
+                    {
+                        sPUEntities = db.Queryable<ViewModelSPUEntity>().Where(
+                                                                i => i.shopcode == userEntity.shopcode
+                                                                && i.branchcode == userEntity.branchcode
+                                                                && i.commoditystatus == "0"
+                                                                && i.del == "0"
+                                                                && i.updownstatus == "1")
+                                                                .OrderBy(i => i.spucode, OrderByType.Asc)
+                                                                .ToPageList(pageindex, pagesize);
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("GetAllCommodity err", e);
+                }
+            }
+            return JsonConvert.SerializeObject(sPUEntities);
+        }
+        #endregion
+
+        [Obsolete("过时接口")]
         #region GetCommodityByMnemonic
         /// <summary>
         /// 根据商品mnemonic不区分大小写模糊查询商品
@@ -2078,6 +2176,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        [Obsolete("Use getAllCommodity")]
         #region GetCommodityByKeyword
         /// <summary>
         /// 根据商品名称,商品条码,助记码（大小写兼容）查询商品
@@ -2145,6 +2244,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        [Obsolete("过时")]
         #region GetSKUCommodityBySPUCode
         /// <summary>
         /// 服装版根据spucode查询所有SKU商品
@@ -2186,7 +2286,7 @@ namespace ZlPos.Bizlogic
         #endregion
 
         //add 2018年11月22日
-        #region SearchCommodity
+        #region SearchCommodity 
         /// <summary>
         /// 精确查询
         /// </summary>
@@ -2199,7 +2299,7 @@ namespace ZlPos.Bizlogic
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            List<CommodityEntity> commodityEntities = new List<CommodityEntity>();
+            List<SPUEntity> spuEntityList = new List<SPUEntity>();
             if (_LoginUserManager.Login)
             {
                 UserEntity userEntity = _LoginUserManager.UserEntity;
@@ -2208,49 +2308,38 @@ namespace ZlPos.Bizlogic
                     using (var db = SugarDao.Instance)
                     {
                         var total = 0;
-                        ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
-                                                                            it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
+                        //ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
+                        //                                                    it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
 
 
 
                         if ("barcode".Equals(type))
                         {
 
-                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
-                          {
-                                JoinType.Left,c.spucode == bc.spucode
+                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
+                            {
+                                JoinType.Left,spu.spucode == bc.spucode
                                                 && bc.del == "0"
                                                 && bc.shopcode == userEntity.shopcode
-                                                //add 2018年11月15日
-                                                && c.branchcode == userEntity.branchcode
-                                                //&& bc.branchcode == userEntity.branchcode
-                          })
-                          .Where((c, bc) =>
-                              c.shopcode == userEntity.shopcode
-                              && c.branchcode == userEntity.branchcode
-                              && c.commoditystatus == "0"
-                              && c.del == "0"
-                              && c.updownstatus == "1"
-                              && SqlFunc.Contains(bc.barcode, keyword))
-                              .OrderBy((c, bc) => c.spucode, OrderByType.Asc)
-                              .GroupBy((c, bc) => c.spucode)
-                              .Select((c, bc) => new CommodityEntity
-                              {
-                                  barcode = bc.barcode,
-                                  id = c.id,
-                                  commodityname = c.commodityname,
-                                  unitcode = c.unitcode,
-                                  unitname = c.unitname,
-                                  saleprice = c.saleprice,
-                                  pricing = c.pricing,
-                                  commoditycode = c.commoditycode,
-                                  spucode = c.spucode,
-                                  commoditylevel = c.commoditylevel,
-                                  speccode = c.speccode,
-                                  specvalue = c.specvalue,
-                                  speclevel = c.speclevel
-                              })
-                              .ToPageList(pageindex + 1, pagesize, ref total);
+                            })
+                            .Where((spu, bc) =>
+                                spu.shopcode == userEntity.shopcode
+                                && spu.branchcode == userEntity.branchcode
+                                && spu.commoditystatus == "0"
+                                && spu.del == "0"
+                                && spu.updownstatus == "1"
+                                && SqlFunc.Contains(bc.barcode, keyword))
+                                .OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                                .GroupBy((spu, bc) => spu.spucode)
+                                .Select((spu, bc) => new SPUEntity
+                                {
+                                    uid = spu.uid,
+                                    commodityname = spu.commodityname,
+                                    commoditypic = spu.commoditypic,
+                                    saleprice = spu.saleprice,
+                                    spucode = spu.spucode,
+                                })
+                                .ToPageList(pageindex + 1, pagesize, ref total);
 
                             //foreach (var item in commodities)
                             //{
@@ -2263,96 +2352,117 @@ namespace ZlPos.Bizlogic
                         }
                         else if ("spucode".Equals(type))
                         {
-                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
-                          {
-                                JoinType.Left,c.commoditycode == bc.commoditycode
+                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
+                            {
+                                JoinType.Left,spu.spucode == bc.spucode
                                                 && bc.del == "0"
                                                 && bc.shopcode == userEntity.shopcode
-                                                //add 2018年11月15日
-                                                && c.branchcode == userEntity.branchcode
-                                                //&& bc.branchcode == userEntity.branchcode
-                          })
-                          .Where((c, bc) =>
-                               c.shopcode == userEntity.shopcode
-                              && c.branchcode == userEntity.branchcode
-                              && c.commoditystatus == "0"
-                              && c.del == "0"
-                              && c.updownstatus == "1"
-                              && SqlFunc.Contains(c.spucode, keyword)
-                              ).OrderBy((c, bc) => c.commoditycode, OrderByType.Asc)
-                              .GroupBy((c, bc) => c.spucode)
+                            })
+                            .Where((spu, bc) =>
+                                spu.shopcode == userEntity.shopcode
+                                && spu.branchcode == userEntity.branchcode
+                                && spu.commoditystatus == "0"
+                                && spu.del == "0"
+                                && spu.updownstatus == "1"
+                                && SqlFunc.Contains(spu.spucode, keyword)
+                              ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                              .GroupBy((spu, bc) => spu.spucode)
+                              .Select((spu, bc) => new SPUEntity
+                              {
+                                  uid = spu.uid,
+                                  commodityname = spu.commodityname,
+                                  commoditypic = spu.commoditypic,
+                                  saleprice = spu.saleprice,
+                                  spucode = spu.spucode,
+                              })
                               .ToPageList(pageindex + 1, pagesize, ref total);
                         }
                         else if ("commodityname".Equals(type))
                         {
-                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
-                         {
-                                JoinType.Left,c.commoditycode == bc.commoditycode
+                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
+                            {
+                                JoinType.Left,spu.spucode == bc.spucode
                                                 && bc.del == "0"
                                                 && bc.shopcode == userEntity.shopcode
-                                                //add 2018年11月15日
-                                                && c.branchcode == userEntity.branchcode
-                             //&& bc.branchcode == userEntity.branchcode
-                         })
-                         .Where((c, bc) =>
-                               c.shopcode == userEntity.shopcode
-                              && c.branchcode == userEntity.branchcode
-                              && c.commoditystatus == "0"
-                              && c.del == "0"
-                              && c.updownstatus == "1"
-                              && SqlFunc.Contains(c.commodityname, keyword)
-                              ).OrderBy((c, bc) => c.spucode, OrderByType.Asc)
-                              .GroupBy((c, bc) => c.spucode)
+                            })
+                            .Where((spu, bc) =>
+                                spu.shopcode == userEntity.shopcode
+                                && spu.branchcode == userEntity.branchcode
+                                && spu.commoditystatus == "0"
+                                && spu.del == "0"
+                                && spu.updownstatus == "1"
+                                && SqlFunc.Contains(spu.commodityname, keyword)
+                              ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                              .GroupBy((spu, bc) => spu.spucode)
+                              .Select((spu, bc) => new SPUEntity
+                              {
+                                  uid = spu.uid,
+                                  commodityname = spu.commodityname,
+                                  commoditypic = spu.commoditypic,
+                                  saleprice = spu.saleprice,
+                                  spucode = spu.spucode,
+                              })
                               .ToPageList(pageindex + 1, pagesize, ref total);
-
                         }
                         else if ("mnemonic".Equals(type))
                         {
-                            commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
-                         {
-                                JoinType.Left,c.commoditycode == bc.commoditycode
+
+                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
+                            {
+                                JoinType.Left,spu.spucode == bc.spucode
                                                 && bc.del == "0"
                                                 && bc.shopcode == userEntity.shopcode
-                                                //add 2018年11月15日
-                                                && c.branchcode == userEntity.branchcode
-                             //&& bc.branchcode == userEntity.branchcode
-                         })
-                         .Where((c, bc) =>
-                               c.shopcode == userEntity.shopcode
-                              && c.branchcode == userEntity.branchcode
-                              && c.commoditystatus == "0"
-                              && c.del == "0"
-                              && c.updownstatus == "1"
-                              && SqlFunc.Contains(c.mnemonic, keyword)
-                              ).OrderBy((c, bc) => c.spucode, OrderByType.Asc)
-                              .GroupBy((c, bc) => c.spucode)
+                            })
+                            .Where((spu, bc) =>
+                                spu.shopcode == userEntity.shopcode
+                                && spu.branchcode == userEntity.branchcode
+                                && spu.commoditystatus == "0"
+                                && spu.del == "0"
+                                && spu.updownstatus == "1"
+                                && SqlFunc.Contains(spu.mnemonic, keyword)
+                              ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                              .GroupBy((spu, bc) => spu.spucode)
+                              .Select((spu, bc) => new SPUEntity
+                              {
+                                  uid = spu.uid,
+                                  commodityname = spu.commodityname,
+                                  commoditypic = spu.commoditypic,
+                                  saleprice = spu.saleprice,
+                                  spucode = spu.spucode,
+                              })
                               .ToPageList(pageindex + 1, pagesize, ref total);
-
                         }
                         else if ("saleprice".Equals(type))
                         {
                             if (!keyword.Contains("."))
                             {
                                 keyword = keyword + ".00";
-                                commodityEntities = db.Queryable<CommodityEntity, BarCodeEntity2>((c, bc) => new object[]
+
+                                spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
                                 {
-                                    JoinType.Left,c.commoditycode == bc.commoditycode
+                                    JoinType.Left,spu.spucode == bc.spucode
                                                     && bc.del == "0"
                                                     && bc.shopcode == userEntity.shopcode
-                                                    //add 2018年11月15日
-                                                    && c.branchcode == userEntity.branchcode
-                                    //&& bc.branchcode == userEntity.branchcode
-                                 })
-                                  .Where((c, bc) =>
-                                       c.shopcode == userEntity.shopcode
-                                      && c.branchcode == userEntity.branchcode
-                                      && c.commoditystatus == "0"
-                                      && c.del == "0"
-                                      && c.updownstatus == "1"
-                                      && c.saleprice == keyword
-                                      ).OrderBy((c, bc) => c.spucode, OrderByType.Asc)
-                                      .GroupBy((c, bc) => c.spucode)
-                                      .ToPageList(pageindex + 1, pagesize, ref total);
+                                })
+                                .Where((spu, bc) =>
+                                    spu.shopcode == userEntity.shopcode
+                                    && spu.branchcode == userEntity.branchcode
+                                    && spu.commoditystatus == "0"
+                                    && spu.del == "0"
+                                    && spu.updownstatus == "1"
+                                    && spu.saleprice == keyword
+                                  ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                                  .GroupBy((spu, bc) => spu.spucode)
+                                  .Select((spu, bc) => new SPUEntity
+                                  {
+                                      uid = spu.uid,
+                                      commodityname = spu.commodityname,
+                                      commoditypic = spu.commoditypic,
+                                      saleprice = spu.saleprice,
+                                      spucode = spu.spucode,
+                                  })
+                                  .ToPageList(pageindex + 1, pagesize, ref total);
+
 
                             }
                         }
@@ -2364,20 +2474,197 @@ namespace ZlPos.Bizlogic
                     logger.Error(e.StackTrace);
                 }
             }
-            if (commodityEntities == null)
+            if (spuEntityList == null)
             {
-                commodityEntities = new List<CommodityEntity>();
+                spuEntityList = new List<SPUEntity>();
             }
             //if (commodityEntities.Count > 50)
             //{
             //    commodityEntities = commodityEntities.GetRange(0, 50);
             //}
 
-            return JsonConvert.SerializeObject(commodityEntities);
+            return JsonConvert.SerializeObject(spuEntityList);
         }
         #endregion
 
-        //add 2018年11月19日 
+
+        #region GetSPUList
+        /// <summary>
+        /// 商品档案
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="keyword"></param>
+        /// <param name="categorycode"></param>
+        /// <param name="pageindex"></param>
+        /// <param name="pagesize"></param>
+        public void GetSPUList(int level, string keyword, string categorycode, int pageindex, int pagesize)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                int total = 0;
+                if (_LoginUserManager.Login)
+                {
+                    UserEntity userEntity = _LoginUserManager.UserEntity;
+                    try
+                    {
+                        using (var db = SugarDao.Instance)
+                        {
+                            var lst = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
+                                        {
+                                            JoinType.Left,spu.spucode == bc.spucode
+                                                            && bc.del == "0"
+                                                            && bc.shopcode == userEntity.shopcode,
+                                        })
+                                        .Where((spu, bc) =>
+                                            spu.shopcode == userEntity.shopcode
+                                            && spu.branchcode == userEntity.branchcode
+                                            && spu.commoditystatus == "0"
+                                            && spu.del == "0"
+                                            && spu.updownstatus == "1"
+                                            //&& SqlFunc.Contains(spu key, categorycode)
+                                            //&& SqlFunc.Contains(pInfo.GetValue(spu,null).ToString(),categorycode)
+                                            && (SqlFunc.Contains(spu.commodityname, keyword) || SqlFunc.Contains(spu.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword)))
+                                            .WhereIF(level == 1, (spu, bc) => SqlFunc.Contains(spu.category1code, categorycode))
+                                            .WhereIF(level == 2, (spu, bc) => SqlFunc.Contains(spu.category2code, categorycode))
+                                            .WhereIF(level == 3, (spu, bc) => SqlFunc.Contains(spu.category3code, categorycode))
+                                            .WhereIF(level == 4, (spu, bc) => SqlFunc.Contains(spu.category4code, categorycode))
+                                            .OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                                            .GroupBy((spu, bc) => spu.spucode)
+                                            .Select((spu, bc) => new //SPUEntity
+                                            {
+                                                uid = spu.uid,
+                                                spucode = spu.spucode,
+                                                barcode = bc.barcode,
+                                                commodityname = spu.commodityname,
+                                                speclevel = spu.speclevel,
+                                                categoryname = spu.categoryname,
+                                                unitname = spu.unitname,
+                                                saleprice = spu.saleprice,
+                                                //spec = spu.spec,
+                                                pricing = spu.pricing,
+                                                specvalues01 = spu.specvalues01,
+                                                specvalues02 = spu.specvalues02,
+                                                specvalues03 = spu.specvalues03,
+                                                spec = spu.speccode01 + "_" + spu.speccode02 + "_" + spu.speccode03
+                                            })
+                                            .ToPageList(pageindex + 1, pagesize, ref total);
+                            responseEntity.code = ResponseCode.SUCCESS;
+                            responseEntity.data = new { count = total, commodityEntities = lst };
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("getSPUList err", e);
+                        responseEntity.code = ResponseCode.Failed;
+                    }
+                    ExecuteCallback("getSPUListCallBack", responseEntity);
+                }
+            });
+        }
+        #endregion
+
+        #region GetSKUList 
+        /// <summary>
+        /// 商品档案
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="keyword"></param>
+        /// <param name="categorycode"></param>
+        /// <param name="pageindex"></param>
+        /// <param name="pagesize"></param>
+        public void GetSKUList(int level, string keyword, string categorycode, int pageindex, int pagesize)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                int total = 0;
+                if (_LoginUserManager.Login)
+                {
+                    UserEntity userEntity = _LoginUserManager.UserEntity;
+                    try
+                    {
+                        using (var db = SugarDao.Instance)
+                        {
+                            var lst = db.Queryable<SKUEntity, BarCodeEntity, SPUEntity>((sku, bc, spu) => new object[]
+                                         {
+                                            JoinType.Left,sku.skucode == bc.skucode
+                                                            && bc.del == "0"
+                                                            && bc.shopcode == userEntity.shopcode,
+                                            JoinType.Left,sku.spucode == spu.spucode
+                                         })
+                                        .Where((sku, bc, spu) =>
+                                            sku.shopcode == userEntity.shopcode
+                                            && sku.branchcode == userEntity.branchcode
+                                            && sku.commoditystatus == "0"
+                                            && sku.del == "0"
+                                            && sku.updownstatus == "1"
+                                            && (SqlFunc.Contains(sku.commodityname, keyword) || SqlFunc.Contains(sku.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword)))
+                                            .WhereIF(level == 1, (sku, bc, spu) => SqlFunc.Contains(sku.category1code, categorycode))
+                                            .WhereIF(level == 2, (sku, bc, spu) => SqlFunc.Contains(sku.category2code, categorycode))
+                                            .WhereIF(level == 3, (sku, bc, spu) => SqlFunc.Contains(sku.category3code, categorycode))
+                                            .WhereIF(level == 4, (sku, bc, spu) => SqlFunc.Contains(sku.category4code, categorycode))
+                                            .OrderBy((sku, bc) => sku.skucode, OrderByType.Asc)
+                                            .GroupBy((sku, bc) => sku.skucode)
+                                            .Select((sku, bc, spu) => new //SPUEntity
+                                            {
+                                                spucode = sku.spucode,
+                                                saleprice = sku.saleprice,
+                                                pricing = spu.pricing,
+                                                uid = sku.uid,
+                                                specvalue01 = sku.specvalue01,
+                                                specvalue02 = sku.specvalue02,
+                                                specvalue03 = sku.specvalue03,
+
+                                                barcode = bc.barcode,
+
+                                                commodityname = spu.commodityname,
+                                                speclevel = spu.speclevel,
+                                                categoryname = spu.categoryname,
+                                                unitname = spu.unitname,
+
+                                                spec = sku.specvalue01 + "_" + sku.specvalue02 + "_" + sku.specvalue03
+                                            })
+                                            .ToPageList(pageindex + 1, pagesize, ref total);
+
+                            //foreach (var item in lst)
+                            //{
+                            //    item.spec = (string.IsNullOrEmpty(item.specvalue01) ? "" : item.specvalue01 + "_") +
+                            //                (string.IsNullOrEmpty(item.specvalue02) ? "" : item.specvalue02 + "_") +
+                            //                item.specvalue03;
+                            //}
+                            //lst.spec = (string.isnullorempty(lst.specvalue01) ? "" : lst.specvalue01 + "_") +
+                            //            (string.isnullorempty(lst.specvalue02) ? "" : lst.specvalue02 + "_") +
+                            //            data.specvalue03;
+                            responseEntity.code = ResponseCode.SUCCESS;
+                            responseEntity.data = new { count = total, commodityEntities = lst };
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("GetSKUList err", e);
+                        responseEntity.code = ResponseCode.Failed;
+                    }
+                    ExecuteCallback("getSKUListCallBack", responseEntity);
+                }
+            });
+        }
+
+        public static void ForeachPropertyValues(Object o)
+        {
+            if (o == null)
+            {
+                o = new { };
+            }
+            PropertyInfo[] p1 = o.GetType().GetProperties();
+            foreach (PropertyInfo pi in p1)
+            {
+                Console.WriteLine(pi.Name + ":" + pi.GetValue(o, null));
+            }
+        }
+        #endregion
+
+        //add 2018年11月19日 改为新接口getBarcodesBySPUCode
         #region GetBarcodesByCommodityCode
         /// <summary>
         /// 商品添加购物车使用 根据commoditycode获取对应的barcode列表
@@ -2406,6 +2693,52 @@ namespace ZlPos.Bizlogic
                 catch (Exception e)
                 {
                     logger.Error("GetBarcodesByCommodityCode err", e);
+                }
+
+                if (barCodes != null && barCodes.Count > 0)
+                {
+                    string s = "";
+                    foreach (var barCodeEntity in barCodes)
+                    {
+                        s = s + barCodeEntity.barcode + ",";
+
+                    }
+                    result = s.Trim(',');
+                }
+            }
+            return result;
+
+        }
+        #endregion
+
+        #region GetBarcodesBySPUCode
+        /// <summary>
+        /// 商品添加购物车使用 根据commoditycode获取对应的barcode列表
+        /// </summary>
+        /// <param name="commodityCode"></param>
+        /// <returns></returns>
+        public string GetBarcodesBySPUCode(string spucode)
+        {
+            string result = "";
+            List<BarCodeEntity> barCodes = null;
+            if (_LoginUserManager.Login)
+            {
+                UserEntity userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+
+                    using (var db = SugarDao.Instance)
+                    {
+                        barCodes = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                //&& i.branchcode == userEntity.branchcode
+                                                                && i.del == "0"
+                                                                && i.spucode == spucode)
+                                                                .ToList();
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("GetBarcodesBySPUCode err", e);
                 }
 
                 if (barCodes != null && barCodes.Count > 0)
@@ -2501,137 +2834,141 @@ namespace ZlPos.Bizlogic
         #region VersionUpdate
         public void VersionUpdate()
         {
-            string shopcode = ContextCache.GetShopcode();
-            try
+            //网络通畅则检测更新
+            if ("5.1".Equals(OSVer) ? InternetHelper.IsConnectInternetXP() : InternetHelper.IsConnectInternet())
             {
-                //debug 
-                //_Env = "pre";
-                //shopcode = "125806668";
-
-                UpdateEntity updateEntity;
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(GetEnvUrlHead() + "/version/entry/getNewest?appcode=pos_ls_windows&shopcode=" + shopcode);
-                request.KeepAlive = false;
-                request.Method = "GET";
-                request.ContentType = "application/json;characterSet:UTF-8";
-
-                using (var streamResponse = request.GetResponse().GetResponseStream())
+                string shopcode = ContextCache.GetShopcode();
+                try
                 {
-                    using (var sw = new StreamReader(streamResponse, Encoding.UTF8))
+                    //debug 
+                    //_Env = "pre";
+                    //shopcode = "125806668";
+
+                    UpdateEntity updateEntity;
+                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(GetEnvUrlHead() + "/version/entry/getNewest?appcode=pos_ls_windows&shopcode=" + shopcode);
+                    request.KeepAlive = false;
+                    request.Method = "GET";
+                    request.ContentType = "application/json;characterSet:UTF-8";
+
+                    using (var streamResponse = request.GetResponse().GetResponseStream())
                     {
-                        string json = sw.ReadToEnd();
-                        updateEntity = JsonConvert.DeserializeObject<UpdateEntity>(json);
+                        using (var sw = new StreamReader(streamResponse, Encoding.UTF8))
+                        {
+                            string json = sw.ReadToEnd();
+                            updateEntity = JsonConvert.DeserializeObject<UpdateEntity>(json);
+                        }
                     }
-                }
-                if (updateEntity.data != null)
-                {
-                    var updater = FSLib.App.SimpleUpdater.Updater.Instance;
-
-                    if (!string.IsNullOrEmpty(updateEntity.data.packageurl))
+                    if (updateEntity.data != null)
                     {
-                        updater.Context.UpdateDownloadUrl = updateEntity.data.packageurl;
+                        var updater = FSLib.App.SimpleUpdater.Updater.Instance;
+
+                        if (!string.IsNullOrEmpty(updateEntity.data.packageurl))
+                        {
+                            updater.Context.UpdateDownloadUrl = updateEntity.data.packageurl;
+                            //updater.BeginCheckUpdateInProcess();
+                            updater.EnsureNoUpdate();
+                        }
+
+
+                        return;
+                        //if (!Directory.Exists(Application.StartupPath + "\\update\\"))
+                        //{
+                        //    Directory.CreateDirectory(Application.StartupPath + "\\update\\");
+                        //}
+
+                        //string fileName = Application.StartupPath + "\\update\\" + Guid.NewGuid().ToString() + ".xml";
+
+                        //if (!File.Exists(fileName))
+                        //{
+                        //    File.Create(fileName).Close();
+                        //}
+                        //XElement UpdateInfo = new XElement("UpdateInfo");
+
+                        //UpdateInfo.Add(new XElement("AppName", "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe"));//
+                        //UpdateInfo.Add(new XElement("AppVersion", "3.0.1.38"));//
+                        //UpdateInfo.Add(new XElement("Desc", "asdfjasdljkffasjdf"));//
+                        //UpdateInfo.Add(new XElement("Package", "212f7bf2a19414d2a92899b09c0eed53b.zip"));//
+                        //UpdateInfo.Add(new XElement("MD5", "3F23986A52FD12C7AE7AF01F8A16A6C6"));//
+                        //UpdateInfo.Add(new XElement("PackageSize", long.Parse("91623476")));//
+                        ////以下为不变属性
+                        //UpdateInfo.Add(new XElement("PublishUrl", "http://www.zhonglunnet.com/"));
+                        //UpdateInfo.Add(new XElement("FileExecuteAfter", "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe"));
+                        //UpdateInfo.Add(new XElement("ExecuteArgumentAfter", "/S"));
+                        //UpdateInfo.Add(new XElement("ExecuteTimeout", "0"));
+                        //UpdateInfo.Add(new XElement("TreatErrorAsNotUpdated", "false"));
+                        //UpdateInfo.Add(new XElement("PromptUserBeforeAutomaticUpgrade", "true"));
+                        //UpdateInfo.Add(new XElement("AutoCloseSucceedWindow", "true"));
+                        //UpdateInfo.Add(new XElement("DeleteMethod", "None"));
+                        //UpdateInfo.Add(new XElement("ForceUpdate", "false"));
+                        //UpdateInfo.Add(new XElement("Packages"));
+                        //UpdateInfo.Add(new XElement("HideBeforeExecuteWindow", "false"));
+                        //UpdateInfo.Add(new XElement("HideAfterExecuteWindow", "true"));
+                        //UpdateInfo.Add(new XElement("MustUpdate", "false"));
+                        //UpdateInfo.Add(new XElement("AutoExitCurrentProcess", "false"));
+                        //UpdateInfo.Add(new XElement("AutoEndProcessesWithinAppDir", "true"));
+                        //UpdateInfo.Add(new XElement("AutoKillProcesses", "true"));
+                        //UpdateInfo.Add(new XElement("RequreAdminstrorPrivilege", "false"));
+
+
+                        //XDocument DataXml = new XDocument();
+                        //DataXml.Add(UpdateInfo);//, GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare)));
+                        //DataXml.Save(fileName);
+
+                        //var updater = FSLib.App.SimpleUpdater.Updater.Instance;
+                        //updater.Context.UpdateDownloadUrl = fileName.Replace(@"\", @"/");
                         //updater.BeginCheckUpdateInProcess();
-                        updater.EnsureNoUpdate();
+                        //return;
+
+
+                        //updater.Context.UpdateInfo.AppName = "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe";
+                        //updater.Context.UpdateInfo.AppVersion = "3.0.1.38";
+                        //updater.Context.UpdateInfo.Desc = "asdfjasdljkffasjdf";
+                        //updater.Context.UpdateInfo.Package = "212f7bf2a19414d2a92899b09c0eed53b.zip";
+                        //updater.Context.UpdateInfo.PackageSize = long.Parse("91623476");
+                        //updater.Context.UpdateInfo.MD5 = "3F23986A52FD12C7AE7AF01F8A16A6C6";
+
+                        //updater.Context.UpdateInfoFileName = fileName;
+
+                        //updater.BeginCheckUpdateInProcess();
+
+                        //updater.Context.UpdateDownloadUrl = string.Format("http://zhonglunnet041001.oss-cn-shanghai.aliyuncs.com/windows/TestUpdate/{0}", "c3fa6023-4414-47e6-8737-45ee9a26297a.xml");
+                        //updater.BeginCheckUpdateInProcess();
+
+                        //UpdateBiz.SoftUpdate(System.Reflection.Assembly.GetExecutingAssembly().ToString());
+                        //FSLib.App.SimpleUpdater.Updater.Instance.("http://041001.zhonglunnet.com/windows/CloudPos_WINXP/{0}", AppContext.Instance.XmlFile);
+
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppVersion = updateEntity.versionno;
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.Desc = updateEntity.versiondesc;
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.Package = updateEntity.packagename;
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.PackageSize = long.Parse(updateEntity.packagesize);
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.MD5 = updateEntity.packagekey;
+
+                        //TODO....
+
+
+                        //Control.CheckForIllegalCrossThreadCalls = true;
+
+
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfoFileName = updateEntity.appname;
+                        //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple("sdf")
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfoFileUrl = updateEntity.appname;
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
+                        //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
                     }
 
 
-                    return;
-                    //if (!Directory.Exists(Application.StartupPath + "\\update\\"))
-                    //{
-                    //    Directory.CreateDirectory(Application.StartupPath + "\\update\\");
-                    //}
 
-                    //string fileName = Application.StartupPath + "\\update\\" + Guid.NewGuid().ToString() + ".xml";
-
-                    //if (!File.Exists(fileName))
-                    //{
-                    //    File.Create(fileName).Close();
-                    //}
-                    //XElement UpdateInfo = new XElement("UpdateInfo");
-
-                    //UpdateInfo.Add(new XElement("AppName", "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe"));//
-                    //UpdateInfo.Add(new XElement("AppVersion", "3.0.1.38"));//
-                    //UpdateInfo.Add(new XElement("Desc", "asdfjasdljkffasjdf"));//
-                    //UpdateInfo.Add(new XElement("Package", "212f7bf2a19414d2a92899b09c0eed53b.zip"));//
-                    //UpdateInfo.Add(new XElement("MD5", "3F23986A52FD12C7AE7AF01F8A16A6C6"));//
-                    //UpdateInfo.Add(new XElement("PackageSize", long.Parse("91623476")));//
-                    ////以下为不变属性
-                    //UpdateInfo.Add(new XElement("PublishUrl", "http://www.zhonglunnet.com/"));
-                    //UpdateInfo.Add(new XElement("FileExecuteAfter", "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe"));
-                    //UpdateInfo.Add(new XElement("ExecuteArgumentAfter", "/S"));
-                    //UpdateInfo.Add(new XElement("ExecuteTimeout", "0"));
-                    //UpdateInfo.Add(new XElement("TreatErrorAsNotUpdated", "false"));
-                    //UpdateInfo.Add(new XElement("PromptUserBeforeAutomaticUpgrade", "true"));
-                    //UpdateInfo.Add(new XElement("AutoCloseSucceedWindow", "true"));
-                    //UpdateInfo.Add(new XElement("DeleteMethod", "None"));
-                    //UpdateInfo.Add(new XElement("ForceUpdate", "false"));
-                    //UpdateInfo.Add(new XElement("Packages"));
-                    //UpdateInfo.Add(new XElement("HideBeforeExecuteWindow", "false"));
-                    //UpdateInfo.Add(new XElement("HideAfterExecuteWindow", "true"));
-                    //UpdateInfo.Add(new XElement("MustUpdate", "false"));
-                    //UpdateInfo.Add(new XElement("AutoExitCurrentProcess", "false"));
-                    //UpdateInfo.Add(new XElement("AutoEndProcessesWithinAppDir", "true"));
-                    //UpdateInfo.Add(new XElement("AutoKillProcesses", "true"));
-                    //UpdateInfo.Add(new XElement("RequreAdminstrorPrivilege", "false"));
-
-
-                    //XDocument DataXml = new XDocument();
-                    //DataXml.Add(UpdateInfo);//, GetItem(PLU: PLU, commodityName: commodityName, price: price, indate: indate, tare: tare)));
-                    //DataXml.Save(fileName);
-
-                    //var updater = FSLib.App.SimpleUpdater.Updater.Instance;
-                    //updater.Context.UpdateDownloadUrl = fileName.Replace(@"\", @"/");
-                    //updater.BeginCheckUpdateInProcess();
-                    //return;
-
-
-                    //updater.Context.UpdateInfo.AppName = "HLY_SY_CloudPos_V3.0.1.32_WIN_PRO_201812140301.exe";
-                    //updater.Context.UpdateInfo.AppVersion = "3.0.1.38";
-                    //updater.Context.UpdateInfo.Desc = "asdfjasdljkffasjdf";
-                    //updater.Context.UpdateInfo.Package = "212f7bf2a19414d2a92899b09c0eed53b.zip";
-                    //updater.Context.UpdateInfo.PackageSize = long.Parse("91623476");
-                    //updater.Context.UpdateInfo.MD5 = "3F23986A52FD12C7AE7AF01F8A16A6C6";
-
-                    //updater.Context.UpdateInfoFileName = fileName;
-
-                    //updater.BeginCheckUpdateInProcess();
-
-                    //updater.Context.UpdateDownloadUrl = string.Format("http://zhonglunnet041001.oss-cn-shanghai.aliyuncs.com/windows/TestUpdate/{0}", "c3fa6023-4414-47e6-8737-45ee9a26297a.xml");
-                    //updater.BeginCheckUpdateInProcess();
-
-                    //UpdateBiz.SoftUpdate(System.Reflection.Assembly.GetExecutingAssembly().ToString());
-                    //FSLib.App.SimpleUpdater.Updater.Instance.("http://041001.zhonglunnet.com/windows/CloudPos_WINXP/{0}", AppContext.Instance.XmlFile);
-
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppVersion = updateEntity.versionno;
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.Desc = updateEntity.versiondesc;
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.Package = updateEntity.packagename;
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.PackageSize = long.Parse(updateEntity.packagesize);
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.MD5 = updateEntity.packagekey;
-
-                    //TODO....
-
-
-                    //Control.CheckForIllegalCrossThreadCalls = true;
-
-
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfoFileName = updateEntity.appname;
-                    //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple("sdf")
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfoFileUrl = updateEntity.appname;
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
-                    //FSLib.App.SimpleUpdater.Updater.Instance.Context.UpdateInfo.AppName = updateEntity.appname;
                 }
-
-
+                catch (Exception e)
+                {
+                    logger.Error("VersionUpdate err", e);
+                }
+                FSLib.App.SimpleUpdater.Updater.Instance.EnsureNoUpdate();
             }
-            catch (Exception e)
-            {
-                logger.Error("VersionUpdate err", e);
-            }
-
-            FSLib.App.SimpleUpdater.Updater.Instance.EnsureNoUpdate();
         }
-        
+
         #endregion
 
 
@@ -4520,8 +4857,7 @@ namespace ZlPos.Bizlogic
             {
                 //ResponseEntity responseEntity = new ResponseEntity();
                 DbManager dbManager = DBUtils.Instance.DbManager;
-                List<CommodityEntity> commodityEntityList = null;
-                List<BarCodeEntity2> barCodeEntityList = null;
+                //List<SKUEntity> commodityEntityList = null;
                 //List<CommodityPriceEntity> commodityPriceEntityList = null;
                 //List<PluMessageEntity> pluMessageEntityList = null;
                 try
@@ -4530,42 +4866,35 @@ namespace ZlPos.Bizlogic
                     string branchcode = _LoginUserManager.UserEntity.branchcode;
                     using (var db = SugarDao.Instance)
                     {
-                        commodityEntityList = db.Queryable<CommodityEntity>().Where(i => i.shopcode == shopcode
-                                                                                //2018年11月15日
-                                                                                && i.branchcode == branchcode
-                                                                                && i.commoditystatus == "0"
-                                                                                && i.del == "0"
-                                                                                && i.commoditylevel == "1"
-                                                                                && i.updownstatus == "1"
-                                                                                && (i.pricing == "1" || i.pricing == "2")).ToList();
-                        //pluMessageEntityList = db.Queryable<PluMessageEntity>().Where(i => i.shopCode == shopcode).ToList();
-                        barCodeEntityList = db.Queryable<BarCodeEntity2>().Where(i => i.shopcode == shopcode
-                                                                                //2018年11月15日
-                                                                                //&& i.branchcode == branchcode
-                                                                                && i.del == "0").ToList();
-
-                        //手动拼一下barcode吧
-                        if (commodityEntityList != null)
+                        var lst = db.Queryable<SKUEntity, BarCodeEntity, SPUEntity>((sku, bc, spu) => new object[]{
+                            JoinType.Left,sku.skucode == bc.skucode && bc.del == "0" && bc.shopcode == shopcode,
+                            JoinType.Left,sku.spucode == spu.spucode
+                        })
+                        .Where((sku, bc, spu) =>
+                            sku.shopcode == shopcode
+                            && sku.branchcode == branchcode
+                            && sku.commoditystatus == "0"
+                            && sku.updownstatus == "1"
+                            && sku.del == "0"
+                            && (sku.pricing == "1" || sku.pricing == "2")
+                        )
+                        .GroupBy((sku, bc, spu) => sku.skucode)
+                        .Select((sku, bc, spu) => new
                         {
-                            foreach (var commodityEntity in commodityEntityList)
-                            {
-                                if (barCodeEntityList != null)
-                                {
-                                    foreach (var barCodeEntity in barCodeEntityList)
-                                    {
-                                        if (commodityEntity.commoditycode.Equals(barCodeEntity.commoditycode))
-                                        {
-                                            commodityEntity.barcode = barCodeEntity.barcode;
-                                        }
-                                    }
-                                }
-                                if (commodityEntity.barcode == null)
-                                {
-                                    commodityEntity.barcode = "";
-                                }
-                            }
-                        }
-
+                            spucode = sku.spucode,
+                            barcode = bc.barcode,
+                            commodityname = spu.commodityname,
+                            speclevel = spu.speclevel,
+                            categoryname = spu.categoryname,
+                            saleprice = sku.saleprice,
+                            pricing = spu.pricing,
+                            uid = sku.uid,
+                            plu = spu.plu,
+                            validtime = spu.validtime
+                        })
+                        .ToList();
+                        ExecuteCallback("getWeightCommodityCallBack", lst);
+                        return;
                     }
                 }
                 catch (Exception e)
@@ -4576,7 +4905,8 @@ namespace ZlPos.Bizlogic
 
                 //responseEntity.data = commodityEntityList;
                 //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
-                browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
+                //browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
+                ExecuteCallback<List<SKUEntity>>("getWeightCommodityCallBack", null);
             });
             return;
             //return JsonConvert.SerializeObject(commodityEntityList);
@@ -4615,7 +4945,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        #region Method of BarcodeScale
+        #region Method of BarcodeScale(Private)
         /// <summary>
         /// 将单条商品信息转换成条码秤PLU码
         /// </summary>
@@ -4990,13 +5320,96 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region SaveOperationLogs
+        /// <summary>
+        /// 保存操作日志信息
+        /// </summary>
+        /// <param name="operation"></param>
+        public void SaveOperationLogs(string operation)
+        {
+            try
+            {
+                var log = JsonConvert.DeserializeObject<OperationLogEntity>(operation);
+                DBUtils.Instance.DbManager.SaveOrUpdate(log);
+            }
+            catch (Exception e)
+            {
+                logger.Error("保存操作日志出错", e);
+            }
+        }
+        #endregion
+
+        #region GetOperationLogs
+        /// <summary>
+        /// 获取未上传操作日志信息
+        /// </summary>
+        public string GetOperationLogs()
+        {
+            string result = "";
+            try
+            {
+                using (var db = SugarDao.Instance)
+                {
+                    List<OperationLogEntity> operationLogEntities = db.Queryable<OperationLogEntity>().Where(i => i.isUpload == false).ToList();
+                    if (operationLogEntities != null && operationLogEntities.Count > 0)
+                    {
+                        result = JsonConvert.SerializeObject(operationLogEntities);
+                    }
+                    else
+                    {
+                        logger.Info("暂无未上传日志信息");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("GetOperationLogs err", e);
+            }
+            return result;
+        }
+        #endregion
+
+        #region UpdataOperationLogs
+        /// <summary>
+        /// 更新已上传日志信息
+        /// </summary>
+        public void UpdataOperationLogs(string operationString)
+        {
+            if (!string.IsNullOrEmpty(operationString))
+            {
+                var lst = JsonConvert.DeserializeObject<List<OperationLogEntity>>(operationString);
+                foreach (var item in lst)
+                {
+                    item.isUpload = true;
+                }
+                DBUtils.Instance.DbManager.BulkSaveOrUpdate(lst);
+            }
+        }
+        #endregion
+
         /// <summary>
         /// 获取数据库缓存数据大小
         /// </summary>
         /// <returns></returns>
         public long GetDBSize()
         {
-            return 1l;
+            long size = 0;
+            try
+            {
+
+                string path = Path.Combine(Application.StartupPath, "DataBase\\zlCloudPos.db");
+                var fileInfo = new FileInfo(path);
+
+                size = new FileInfo(path).Length;
+            }
+            catch (Exception e)
+            {
+                logger.Error("GetDBSize err", e);
+            }
+
+
+
+            return size;
         }
 
         /// <summary>
@@ -5005,7 +5418,25 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public long GetSDSize()
         {
-            return 1l;
+            long size = 0;
+            try
+            {
+                string str_HardDiskName = Application.StartupPath.Split(':')[0];
+                str_HardDiskName = str_HardDiskName + ":\\";
+                System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
+                foreach (System.IO.DriveInfo drive in drives)
+                {
+                    if (drive.Name == str_HardDiskName)
+                    {
+                        size = drive.TotalSize;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("GetSDSize err", e);
+            }
+            return size;
         }
 
         /// <summary>
@@ -5014,7 +5445,25 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public long GetSDAvaliableSize()
         {
-            return 1l;
+            long size = 0;
+            try
+            {
+                string str_HardDiskName = Application.StartupPath.Split(':')[0];
+                str_HardDiskName = str_HardDiskName + ":\\";
+                System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
+                foreach (System.IO.DriveInfo drive in drives)
+                {
+                    if (drive.Name == str_HardDiskName)
+                    {
+                        size = drive.TotalFreeSpace;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("GetSDSize err", e);
+            }
+            return size;
         }
 
         //？？？这里解决一下
@@ -5087,6 +5536,18 @@ namespace ZlPos.Bizlogic
 
 
         #region CallBack Methods
+
+        /// <summary>
+        /// 统一封装回调
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="CallbackMethod"></param>
+        /// <param name="state"></param>
+        private void ExecuteCallback<T>(string CallbackMethod, T state)
+        {
+            browser.ExecuteScriptAsync(CallbackMethod + "('" + JsonConvert.SerializeObject(state) + "')");
+        }
+
         /// <summary>
         /// 多线程方式回调
         /// </summary>

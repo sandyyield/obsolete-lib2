@@ -5,6 +5,7 @@ using System.Text;
 
 namespace ZlPos.Models
 {
+    [Obsolete]
     class VersionVM
     {
         public ResultBean result { get; set; }

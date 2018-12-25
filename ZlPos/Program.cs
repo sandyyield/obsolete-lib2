@@ -93,6 +93,9 @@ namespace ZlPos
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            ////网络通畅则检测更新
+            //if ("5.1".Equals(Environment.OSVersion.Version.Major + "." + Environment.OSVersion.Version.Minor) ? InternetHelper.IsConnectInternetXP() : InternetHelper.IsConnectInternet())
+            //{
             #region "老升级 保留一下  防止出现意外情况可以临时用一用"
             var updater = FSLib.App.SimpleUpdater.Updater.Instance;
             //这里其实就是创建了更新客户端
@@ -106,7 +109,8 @@ namespace ZlPos
             };
 
             //阻塞主进程更新
-            updater.EnsureNoUpdate();
+            updater.BeginCheckUpdateInProcess();
+            //updater.EnsureNoUpdate();
 
             //updater.UpdateCancelled
             //updater.EnsureNoUpdate(()=>
@@ -142,15 +146,15 @@ namespace ZlPos
             //};
 
             /* 
-			 * 1.注册程序集。当程序集被注册的时候，任何程序集中实现了 FSLib.App.SimpleUpdater.Defination.IUpdateNotify 接口的都将会被自动实例化并调用
-			 *   通过此方法可以实现自己的事件捕捉以及处理类
-			 *   此例中， 类 CustomConnect 将会被实例化并调用
-			 */
+             * 1.注册程序集。当程序集被注册的时候，任何程序集中实现了 FSLib.App.SimpleUpdater.Defination.IUpdateNotify 接口的都将会被自动实例化并调用
+             *   通过此方法可以实现自己的事件捕捉以及处理类
+             *   此例中， 类 CustomConnect 将会被实例化并调用
+             */
             /*
-			 * 2.自定义界面UI。此调用将会替换掉默认的更新界面（此例中将会把更新界面替换为 MainForm）
-			 *   和上面的使用方法类似，但可实现完全自定义的效果
-			 *   要用来替换的界面必须是基于 FSLib.App.SimpleUpdater.Dialogs.AbstractUpdateBase 派生的子类
-			 */
+             * 2.自定义界面UI。此调用将会替换掉默认的更新界面（此例中将会把更新界面替换为 MainForm）
+             *   和上面的使用方法类似，但可实现完全自定义的效果
+             *   要用来替换的界面必须是基于 FSLib.App.SimpleUpdater.Dialogs.AbstractUpdateBase 派生的子类
+             */
             //updater.UsingFormUI<UpdateDialog>();
 
             //开始检查更新-这是最简单的模式.请现在 assemblyInfo.cs 中配置更新地址,参见对应的文件.
@@ -167,6 +171,7 @@ namespace ZlPos
             //FSLib.App.SimpleUpdater.Updater.CheckUpdateSimple("升级网址");
 
             #endregion
+            //}
 
 
             logger.Info("Start run " + AppContext.Instance.AppName + " services");

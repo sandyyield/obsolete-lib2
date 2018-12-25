@@ -149,7 +149,7 @@ namespace ZlPos.Dao
                         break;
                     case 15:
                         UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "SPBQTemplet", "DDBQTemplet", "BJQTemplet" });
-                        UpgradingSchema.UpgradingVersion<BillEntity>(new string[] { "cashtocard","molinmoney" });
+                        UpgradingSchema.UpgradingVersion<BillEntity>(new string[] { "cashtocard", "molinmoney" });
                         UpgradingSchema.UpgradingVersion<DisCountDetailEntity>(new string[] { "saleactivitytypecode", "activitycode" });
                         UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "molinmoney" });
                         break;
@@ -173,6 +173,14 @@ namespace ZlPos.Dao
                         break;
                     case 19:
                         UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "PrintModelSetting" });
+                        break;
+                    case 20:
+                        UpgradingSchema.UpgradingVersion<BillCommodityEntity>(new string[] { "skucode", "category1code", "category2code", "category3code", "category4code", "category1name", "category2name", "category3name", "category4name", "speccode01", "specname01", "specvalue01", "speccode02", "specname02", "specvalue02", "speccode03", "specname03", "specvalue03", "memberpricelv1", "memberpricelv2", "memberpricelv3", "memberpricelv4", "memberpricelv5", "memberpricelv6" });
+                        UpgradingSchema.UpgradingVersion<BillEntity>(new string[] { "consumecreditmoney" });
+                        UpgradingSchema.UpgradingVersion<MemberEntity>(new string[] { "levelcode" });
+                        //变化大的直接删表吧
+                        UpgradingSchema.DeleteTable(new string[] { "BarCodeEntity", "CategoryEntity", "CommodityInfoVM" });
+
                         break;
 
                 }
