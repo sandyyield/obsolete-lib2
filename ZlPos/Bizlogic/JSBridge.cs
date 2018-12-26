@@ -2099,7 +2099,7 @@ namespace ZlPos.Bizlogic
         /// <param name="pageindex"></param>
         /// <param name="pagesize"></param>
         /// <returns></returns>
-        public string GetAllCommodity(int pageindex, int pagesize)
+        public object GetAllCommodity(int pageindex, int pagesize)
         {
             List<ViewModelSPUEntity> sPUEntities = new List<ViewModelSPUEntity>();
             if (_LoginUserManager.Login)
@@ -2118,7 +2118,6 @@ namespace ZlPos.Bizlogic
                                                                 && i.updownstatus == "1")
                                                                 .OrderBy(i => i.spucode, OrderByType.Asc)
                                                                 .ToPageList(pageindex, pagesize);
-
                     }
                 }
                 catch (Exception e)
@@ -2126,7 +2125,8 @@ namespace ZlPos.Bizlogic
                     logger.Error("GetAllCommodity err", e);
                 }
             }
-            return JsonConvert.SerializeObject(sPUEntities);
+            return sPUEntities;
+            //return JsonConvert.SerializeObject(sPUEntities??new List<ViewModelSPUEntity>());
         }
         #endregion
 
@@ -2830,8 +2830,10 @@ namespace ZlPos.Bizlogic
             return url;
         }
 
-        private int cout = 0;
         #region VersionUpdate
+        /// <summary>
+        /// 版本升级接口
+        /// </summary>
         public void VersionUpdate()
         {
             //网络通畅则检测更新
