@@ -2099,7 +2099,7 @@ namespace ZlPos.Bizlogic
         /// <param name="pageindex"></param>
         /// <param name="pagesize"></param>
         /// <returns></returns>
-        public object GetAllCommodity(int pageindex, int pagesize)
+        public string GetAllCommodity(int pageindex, int pagesize)
         {
             List<ViewModelSPUEntity> sPUEntities = new List<ViewModelSPUEntity>();
             if (_LoginUserManager.Login)
@@ -2125,8 +2125,7 @@ namespace ZlPos.Bizlogic
                     logger.Error("GetAllCommodity err", e);
                 }
             }
-            return sPUEntities;
-            //return JsonConvert.SerializeObject(sPUEntities??new List<ViewModelSPUEntity>());
+            return JsonConvert.SerializeObject(sPUEntities??new List<ViewModelSPUEntity>());
         }
         #endregion
 
