@@ -5183,18 +5183,7 @@ namespace ZlPos.Bizlogic
         /// 保存操作日志信息
         /// </summary>
         /// <param name="operation"></param>
-        public void SaveOperationLogs(string operation)
-        {
-            try
-            {
-                var log = JsonConvert.DeserializeObject<OperationLogEntity>(operation);
-                DBUtils.Instance.DbManager.SaveOrUpdate(log);
-            }
-            catch (Exception e)
-            {
-                logger.Error("保存操作日志出错", e);
-            }
-        }
+        public void SaveOperationLogs(string operation) => DBUtils.Instance.DbManager.SaveOrUpdate(JsonConvert.DeserializeObject<OperationLogEntity>(operation));
         #endregion
 
         #region GetOperationLogs
@@ -5203,27 +5192,19 @@ namespace ZlPos.Bizlogic
         /// </summary>
         public string GetOperationLogs()
         {
-            string result = "";
             try
             {
                 using (var db = SugarDao.Instance)
                 {
-                    List<OperationLogEntity> operationLogEntities = db.Queryable<OperationLogEntity>().Where(i => i.isUpload == false).ToList();
-                    if (operationLogEntities != null && operationLogEntities.Count > 0)
-                    {
-                        result = JsonConvert.SerializeObject(operationLogEntities);
-                    }
-                    else
-                    {
-                        logger.Info("暂无未上传日志信息");
-                    }
+                    var lst = db.Queryable<OperationLogEntity>().Where(i => i.isUpload == "0").ToList();
+                    return lst.Any() ? JsonConvert.SerializeObject(lst) : "";
                 }
             }
             catch (Exception e)
             {
                 logger.Error("GetOperationLogs err", e);
             }
-            return result;
+            return "";
         }
         #endregion
 
@@ -5231,15 +5212,12 @@ namespace ZlPos.Bizlogic
         /// <summary>
         /// 更新已上传日志信息
         /// </summary>
-        public void UpdataOperationLogs(string operationString)
+        public void UpdataOperationLogs(string operationString) 
         {
             if (!string.IsNullOrEmpty(operationString))
             {
                 var lst = JsonConvert.DeserializeObject<List<OperationLogEntity>>(operationString);
-                foreach (var item in lst)
-                {
-                    item.isUpload = true;
-                }
+                lst.ForEach(i => i.isUpload = "1");
                 DBUtils.Instance.DbManager.BulkSaveOrUpdate(lst);
             }
         }
