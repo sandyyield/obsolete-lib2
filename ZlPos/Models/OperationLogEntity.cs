@@ -9,7 +9,7 @@ namespace ZlPos.Models
     public class OperationLogEntity
     {
         [SugarColumn(IsNullable = true,IsPrimaryKey = true,IsIdentity = true)]
-        public int id { get; set; }
+        public string id { get; set; }
         [SugarColumn(IsNullable = true)]
         public string shopcode { get; set; }
         [SugarColumn(IsNullable = true)]
@@ -34,6 +34,12 @@ namespace ZlPos.Models
         public string source { get; set; }
         [SugarColumn(IsNullable = true)]
         public bool isUpload { get; set; }
+
+        //add 2018年12月26日
+        [SugarColumn(IsNullable = true)]
+        public string IP { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string operatename { get; set; }
 
     }
 }

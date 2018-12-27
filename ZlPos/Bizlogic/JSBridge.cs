@@ -155,10 +155,17 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        public string GetDeviceModel()
-        {
-            return "WINDOWS";
-        }
+        #region GetIPAddress
+        /// <summary>
+        /// 获取本机IP地址
+        /// </summary>
+        /// <returns></returns>
+        public string GetIPAddress() => (from r in Dns.GetHostEntry(Dns.GetHostName()).AddressList
+                                         where r.AddressFamily == AddressFamily.InterNetwork
+                                         select r).First().ToString();
+        #endregion 
+
+        public string GetDeviceModel() => "WINDOWS";
 
         //这个接口后面用于环境适配
         public string GetEnv()
@@ -260,15 +267,15 @@ namespace ZlPos.Bizlogic
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.Failed;
-                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                    ExecuteCallback("networkChangeCallBack", responseEntity);
+                                    i = 1;
+                                    continue;
                                 }
                                 //即当前网络发生变化时
                                 if (isConnectInternet != _NetworkStatus)
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.Failed;
-                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
-
                                 }
                             }
                             else
@@ -279,15 +286,18 @@ namespace ZlPos.Bizlogic
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.SUCCESS;
-                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+                                    ExecuteCallback("networkChangeCallBack", responseEntity);
+                                    i = 1;
+                                    continue;
                                 }
                                 if (isConnectInternet != _NetworkStatus)
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.SUCCESS;
-                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
                                 }
+
                             }
+                            ExecuteCallback("networkChangeCallBack", responseEntity);
                         }
                         catch (Exception e)
                         {
@@ -1070,17 +1080,19 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 string result = "[]";
-                BillAndCountEntity billAndCountEntity = new BillAndCountEntity();
+                //BillAndCountEntity billAndCountEntity = new BillAndCountEntity();
                 try
                 {
-                    QueryBillEntity queryBillEntity = JsonConvert.DeserializeObject<QueryBillEntity>(s);
+                    //QueryBillEntity queryBillEntity = JsonConvert.DeserializeObject<QueryBillEntity>(s);
+                    dynamic queryBillEntity = JsonConvert.DeserializeObject(s);
                     if (queryBillEntity != null)
                     {
                         string start = queryBillEntity.starttime;
                         string end = queryBillEntity.endtime;
                         if (string.IsNullOrEmpty(start) && string.IsNullOrEmpty(end))
                         {
-                            browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + result + "')");
+                            //browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + result + "')");
+                            ExecuteCallback("getAllSaleBillByParamsCallBack", result);
                             return;
                         }
                         DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
@@ -1100,14 +1112,18 @@ namespace ZlPos.Bizlogic
                                 var totalCount = 0;
                                 using (var db = SugarDao.Instance)
                                 {
+                                    string cashierid = queryBillEntity.cashierid;
+                                    string ticketcode = queryBillEntity.ticketcode;
+                                    int pageindex = queryBillEntity.pageindex;
+                                    int pagesize = queryBillEntity.pagesize;
                                     List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
-                                                                                                    && i.cashierid == queryBillEntity.cashierid
+                                                                                                    && i.cashierid == cashierid
                                                                                                     && i.insertTime <= endDateTime
                                                                                                     && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
                                                                                                     && i.shopcode == shopcode
                                                                                                     && i.branchcode == branchCode
-                                                                                                    && SqlFunc.Contains(i.ticketcode, queryBillEntity.ticketcode))
-                                                                                                    .ToPageList(queryBillEntity.pageindex + 1, queryBillEntity.pagesize, ref totalCount);
+                                                                                                    && SqlFunc.Contains(i.ticketcode, ticketcode))
+                                                                                                    .ToPageList(pageindex + 1, pagesize, ref totalCount);
                                     if (billEntities != null)
                                     {
                                         logger.Info("获取对应状态的单据信息 billEntities:" + billEntities.ToString());
@@ -1132,8 +1148,9 @@ namespace ZlPos.Bizlogic
                                             billEntities[i].paydetails = payDetailEntities;
                                             billEntities[i].discountdetails = disCountDetailEntities;
                                         }
-                                        billAndCountEntity.count = totalCount;
-                                        billAndCountEntity.billEntityList = billEntities;
+                                        result = JsonConvert.SerializeObject(new { count = totalCount, billEntityList = billEntities });
+                                        //billAndCountEntity.count = totalCount;
+                                        //billAndCountEntity.billEntityList = billEntities;
                                         //result = JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
                                     }
                                 }
@@ -1151,9 +1168,9 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Error("getAllSaleBillByParams : json 解析异常", e);
                 }
-                string finalAllBills = JsonConvert.SerializeObject(billAndCountEntity);
+                //string finalAllBills = JsonConvert.SerializeObject(billAndCountEntity);
                 //browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + finalAllBills + "')");
-                ExecuteCallback("getAllSaleBillByParamsCallBack", billAndCountEntity);
+                ExecuteCallback("getAllSaleBillByParamsCallBack", result);
             });
         }
         #endregion
@@ -2074,7 +2091,7 @@ namespace ZlPos.Bizlogic
                                                                                     .WhereIF(level == 3, i => i.category3code == categoryCode)
                                                                                     .WhereIF(level == 4, i => i.category4code == categoryCode)
                                                                                     .OrderBy(i => i.spucode, SqlSugar.OrderByType.Asc)
-                                                                                    .ToPageList(pageindex, pagesize);
+                                                                                    .ToPageList(pageindex + 1, pagesize);
                         }
 
                     }
@@ -2117,7 +2134,7 @@ namespace ZlPos.Bizlogic
                                                                 && i.del == "0"
                                                                 && i.updownstatus == "1")
                                                                 .OrderBy(i => i.spucode, OrderByType.Asc)
-                                                                .ToPageList(pageindex, pagesize);
+                                                                .ToPageList(pageindex + 1, pagesize);
                     }
                 }
                 catch (Exception e)
@@ -2125,7 +2142,7 @@ namespace ZlPos.Bizlogic
                     logger.Error("GetAllCommodity err", e);
                 }
             }
-            return JsonConvert.SerializeObject(sPUEntities??new List<ViewModelSPUEntity>());
+            return JsonConvert.SerializeObject(sPUEntities ?? new List<ViewModelSPUEntity>());
         }
         #endregion
 
@@ -2309,163 +2326,43 @@ namespace ZlPos.Bizlogic
                         var total = 0;
                         //ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
                         //                                                    it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
-
-
-
-                        if ("barcode".Equals(type))
-                        {
-
-                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
-                            {
-                                JoinType.Left,spu.spucode == bc.spucode
-                                                && bc.del == "0"
-                                                && bc.shopcode == userEntity.shopcode
-                            })
-                            .Where((spu, bc) =>
-                                spu.shopcode == userEntity.shopcode
-                                && spu.branchcode == userEntity.branchcode
-                                && spu.commoditystatus == "0"
-                                && spu.del == "0"
-                                && spu.updownstatus == "1"
-                                && SqlFunc.Contains(bc.barcode, keyword))
-                                .OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
-                                .GroupBy((spu, bc) => spu.spucode)
-                                .Select((spu, bc) => new SPUEntity
-                                {
-                                    uid = spu.uid,
-                                    commodityname = spu.commodityname,
-                                    commoditypic = spu.commoditypic,
-                                    saleprice = spu.saleprice,
-                                    spucode = spu.spucode,
-                                })
-                                .ToPageList(pageindex + 1, pagesize, ref total);
-
-                            //foreach (var item in commodities)
-                            //{
-                            //    if (item.barcode.Contains(keyword))
-                            //    {
-                            //        commodityEntities.Add(item);
-                            //    }
-                            //}
-
-                        }
-                        else if ("spucode".Equals(type))
-                        {
-                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
-                            {
-                                JoinType.Left,spu.spucode == bc.spucode
-                                                && bc.del == "0"
-                                                && bc.shopcode == userEntity.shopcode
-                            })
-                            .Where((spu, bc) =>
-                                spu.shopcode == userEntity.shopcode
-                                && spu.branchcode == userEntity.branchcode
-                                && spu.commoditystatus == "0"
-                                && spu.del == "0"
-                                && spu.updownstatus == "1"
-                                && SqlFunc.Contains(spu.spucode, keyword)
-                              ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
-                              .GroupBy((spu, bc) => spu.spucode)
-                              .Select((spu, bc) => new SPUEntity
-                              {
-                                  uid = spu.uid,
-                                  commodityname = spu.commodityname,
-                                  commoditypic = spu.commoditypic,
-                                  saleprice = spu.saleprice,
-                                  spucode = spu.spucode,
-                              })
-                              .ToPageList(pageindex + 1, pagesize, ref total);
-                        }
-                        else if ("commodityname".Equals(type))
-                        {
-                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
-                            {
-                                JoinType.Left,spu.spucode == bc.spucode
-                                                && bc.del == "0"
-                                                && bc.shopcode == userEntity.shopcode
-                            })
-                            .Where((spu, bc) =>
-                                spu.shopcode == userEntity.shopcode
-                                && spu.branchcode == userEntity.branchcode
-                                && spu.commoditystatus == "0"
-                                && spu.del == "0"
-                                && spu.updownstatus == "1"
-                                && SqlFunc.Contains(spu.commodityname, keyword)
-                              ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
-                              .GroupBy((spu, bc) => spu.spucode)
-                              .Select((spu, bc) => new SPUEntity
-                              {
-                                  uid = spu.uid,
-                                  commodityname = spu.commodityname,
-                                  commoditypic = spu.commoditypic,
-                                  saleprice = spu.saleprice,
-                                  spucode = spu.spucode,
-                              })
-                              .ToPageList(pageindex + 1, pagesize, ref total);
-                        }
-                        else if ("mnemonic".Equals(type))
-                        {
-
-                            spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
-                            {
-                                JoinType.Left,spu.spucode == bc.spucode
-                                                && bc.del == "0"
-                                                && bc.shopcode == userEntity.shopcode
-                            })
-                            .Where((spu, bc) =>
-                                spu.shopcode == userEntity.shopcode
-                                && spu.branchcode == userEntity.branchcode
-                                && spu.commoditystatus == "0"
-                                && spu.del == "0"
-                                && spu.updownstatus == "1"
-                                && SqlFunc.Contains(spu.mnemonic, keyword)
-                              ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
-                              .GroupBy((spu, bc) => spu.spucode)
-                              .Select((spu, bc) => new SPUEntity
-                              {
-                                  uid = spu.uid,
-                                  commodityname = spu.commodityname,
-                                  commoditypic = spu.commoditypic,
-                                  saleprice = spu.saleprice,
-                                  spucode = spu.spucode,
-                              })
-                              .ToPageList(pageindex + 1, pagesize, ref total);
-                        }
-                        else if ("saleprice".Equals(type))
+                        if ("saleprice".Equals(type))
                         {
                             if (!keyword.Contains("."))
                             {
                                 keyword = keyword + ".00";
-
-                                spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
-                                {
-                                    JoinType.Left,spu.spucode == bc.spucode
-                                                    && bc.del == "0"
-                                                    && bc.shopcode == userEntity.shopcode
-                                })
-                                .Where((spu, bc) =>
-                                    spu.shopcode == userEntity.shopcode
-                                    && spu.branchcode == userEntity.branchcode
-                                    && spu.commoditystatus == "0"
-                                    && spu.del == "0"
-                                    && spu.updownstatus == "1"
-                                    && spu.saleprice == keyword
-                                  ).OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
-                                  .GroupBy((spu, bc) => spu.spucode)
-                                  .Select((spu, bc) => new SPUEntity
-                                  {
-                                      uid = spu.uid,
-                                      commodityname = spu.commodityname,
-                                      commoditypic = spu.commoditypic,
-                                      saleprice = spu.saleprice,
-                                      spucode = spu.spucode,
-                                  })
-                                  .ToPageList(pageindex + 1, pagesize, ref total);
-
-
                             }
                         }
 
+                        spuEntityList = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
+                        {
+                                JoinType.Left,spu.spucode == bc.spucode
+                                                && bc.del == "0"
+                                                && bc.shopcode == userEntity.shopcode
+                        })
+                        .Where((spu, bc) =>
+                            spu.shopcode == userEntity.shopcode
+                            && spu.branchcode == userEntity.branchcode
+                            && spu.commoditystatus == "0"
+                            && spu.del == "0"
+                            && spu.updownstatus == "1")
+                            //&& SqlFunc.Contains(bc.barcode, keyword))
+                            .WhereIF("barcode".Equals(type), (spu, bc) => SqlFunc.Contains(bc.barcode, keyword))
+                            .WhereIF("spucode".Equals(type), (spu, bc) => SqlFunc.Contains(spu.spucode, keyword))
+                            .WhereIF("commodityname".Equals(type), (spu, bc) => SqlFunc.Contains(spu.commodityname, keyword))
+                            .WhereIF("mnemonic".Equals(type), (spu, bc) => SqlFunc.Contains(spu.mnemonic, keyword))
+                            .WhereIF("saleprice".Equals(type), (spu, bc) => spu.saleprice == keyword)
+                            .OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                            .GroupBy((spu, bc) => spu.spucode)
+                            .Select((spu, bc) => new SPUEntity
+                            {
+                                uid = spu.uid,
+                                commodityname = spu.commodityname,
+                                commoditypic = spu.commoditypic,
+                                saleprice = spu.saleprice,
+                                spucode = spu.spucode,
+                            })
+                            .ToPageList(pageindex + 1, pagesize, ref total);
                     }
                 }
                 catch (Exception e)
@@ -2488,15 +2385,12 @@ namespace ZlPos.Bizlogic
 
 
         #region GetSPUList
+
         /// <summary>
-        /// 商品档案
+        /// 商品档案 多规格合并
         /// </summary>
-        /// <param name="level"></param>
-        /// <param name="keyword"></param>
-        /// <param name="categorycode"></param>
-        /// <param name="pageindex"></param>
-        /// <param name="pagesize"></param>
-        public void GetSPUList(int level, string keyword, string categorycode, int pageindex, int pagesize)
+        /// <param name="s"></param>
+        public void GetSPUList(string s)
         {
             Task.Factory.StartNew(() =>
             {
@@ -2504,50 +2398,54 @@ namespace ZlPos.Bizlogic
                 int total = 0;
                 if (_LoginUserManager.Login)
                 {
+                    dynamic dyc = JsonConvert.DeserializeObject(s);
+                    int level = dyc.level;
+                    string keyword = dyc.keyword;
+                    string categorycode = dyc.categorycode;
+                    int pageindex = dyc.pageindex;
+                    int pagesize = dyc.pagesize;
                     UserEntity userEntity = _LoginUserManager.UserEntity;
                     try
                     {
                         using (var db = SugarDao.Instance)
                         {
                             var lst = db.Queryable<SPUEntity, BarCodeEntity>((spu, bc) => new object[]
-                                        {
+                                       {
                                             JoinType.Left,spu.spucode == bc.spucode
                                                             && bc.del == "0"
                                                             && bc.shopcode == userEntity.shopcode,
-                                        })
-                                        .Where((spu, bc) =>
-                                            spu.shopcode == userEntity.shopcode
-                                            && spu.branchcode == userEntity.branchcode
-                                            && spu.commoditystatus == "0"
-                                            && spu.del == "0"
-                                            && spu.updownstatus == "1"
-                                            //&& SqlFunc.Contains(spu key, categorycode)
-                                            //&& SqlFunc.Contains(pInfo.GetValue(spu,null).ToString(),categorycode)
-                                            && (SqlFunc.Contains(spu.commodityname, keyword) || SqlFunc.Contains(spu.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword)))
-                                            .WhereIF(level == 1, (spu, bc) => SqlFunc.Contains(spu.category1code, categorycode))
-                                            .WhereIF(level == 2, (spu, bc) => SqlFunc.Contains(spu.category2code, categorycode))
-                                            .WhereIF(level == 3, (spu, bc) => SqlFunc.Contains(spu.category3code, categorycode))
-                                            .WhereIF(level == 4, (spu, bc) => SqlFunc.Contains(spu.category4code, categorycode))
-                                            .OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
-                                            .GroupBy((spu, bc) => spu.spucode)
-                                            .Select((spu, bc) => new //SPUEntity
-                                            {
-                                                uid = spu.uid,
-                                                spucode = spu.spucode,
-                                                barcode = bc.barcode,
-                                                commodityname = spu.commodityname,
-                                                speclevel = spu.speclevel,
-                                                categoryname = spu.categoryname,
-                                                unitname = spu.unitname,
-                                                saleprice = spu.saleprice,
-                                                //spec = spu.spec,
-                                                pricing = spu.pricing,
-                                                specvalues01 = spu.specvalues01,
-                                                specvalues02 = spu.specvalues02,
-                                                specvalues03 = spu.specvalues03,
-                                                spec = spu.speccode01 + "_" + spu.speccode02 + "_" + spu.speccode03
-                                            })
+                                       })
+                                       .Where((spu, bc) =>
+                                           spu.shopcode == userEntity.shopcode
+                                           && spu.branchcode == userEntity.branchcode
+                                           && spu.commoditystatus == "0"
+                                           && spu.del == "0"
+                                           && spu.updownstatus == "1"
+                                           && (SqlFunc.Contains(spu.commodityname, keyword) || SqlFunc.Contains(spu.mnemonic, keyword) || SqlFunc.Contains(bc.barcode, keyword)))
+                                           .WhereIF(level == 1, (spu, bc) => SqlFunc.Contains(spu.category1code, categorycode))
+                                           .WhereIF(level == 2, (spu, bc) => SqlFunc.Contains(spu.category2code, categorycode))
+                                           .WhereIF(level == 3, (spu, bc) => SqlFunc.Contains(spu.category3code, categorycode))
+                                           .WhereIF(level == 4, (spu, bc) => SqlFunc.Contains(spu.category4code, categorycode))
+                                           .OrderBy((spu, bc) => spu.spucode, OrderByType.Asc)
+                                           .GroupBy((spu, bc) => spu.spucode)
+                                           .Select((spu, bc) => new //SPUEntity
+                                           {
+                                               uid = spu.uid,
+                                               spucode = spu.spucode,
+                                               barcode = bc.barcode,
+                                               commodityname = spu.commodityname,
+                                               speclevel = spu.speclevel,
+                                               categoryname = spu.categoryname,
+                                               unitname = spu.unitname,
+                                               saleprice = spu.saleprice,
+                                               //spec = spu.spec,
+                                               pricing = spu.pricing,
+                                               specvalues01 = spu.specvalues01,
+                                               specvalues02 = spu.specvalues02,
+                                               specvalues03 = spu.specvalues03,
+                                           })
                                             .ToPageList(pageindex + 1, pagesize, ref total);
+
                             responseEntity.code = ResponseCode.SUCCESS;
                             responseEntity.data = new { count = total, commodityEntities = lst };
                         }
@@ -2564,15 +2462,12 @@ namespace ZlPos.Bizlogic
         #endregion
 
         #region GetSKUList 
+
         /// <summary>
         /// 商品档案
         /// </summary>
-        /// <param name="level"></param>
-        /// <param name="keyword"></param>
-        /// <param name="categorycode"></param>
-        /// <param name="pageindex"></param>
-        /// <param name="pagesize"></param>
-        public void GetSKUList(int level, string keyword, string categorycode, int pageindex, int pagesize)
+        /// <param name="s"></param>
+        public void GetSKUList(string s)
         {
             Task.Factory.StartNew(() =>
             {
@@ -2581,6 +2476,12 @@ namespace ZlPos.Bizlogic
                 if (_LoginUserManager.Login)
                 {
                     UserEntity userEntity = _LoginUserManager.UserEntity;
+                    dynamic dyc = JsonConvert.DeserializeObject(s);
+                    int level = dyc.level;
+                    string keyword = dyc.keyword;
+                    string categorycode = dyc.categorycode;
+                    int pageindex = dyc.pageindex;
+                    int pagesize = dyc.pagesize;
                     try
                     {
                         using (var db = SugarDao.Instance)
@@ -2590,7 +2491,7 @@ namespace ZlPos.Bizlogic
                                             JoinType.Left,sku.skucode == bc.skucode
                                                             && bc.del == "0"
                                                             && bc.shopcode == userEntity.shopcode,
-                                            JoinType.Left,sku.spucode == spu.spucode
+                                            JoinType.Left,sku.spucode == spu.spucode && spu.shopcode == userEntity.shopcode && spu.branchcode == userEntity.branchcode && spu.commoditystatus == "0" && spu.del == "0"
                                          })
                                         .Where((sku, bc, spu) =>
                                             sku.shopcode == userEntity.shopcode
@@ -2622,19 +2523,11 @@ namespace ZlPos.Bizlogic
                                                 categoryname = spu.categoryname,
                                                 unitname = spu.unitname,
 
-                                                spec = sku.specvalue01 + "_" + sku.specvalue02 + "_" + sku.specvalue03
+                                                //spec = sku.sepc
                                             })
                                             .ToPageList(pageindex + 1, pagesize, ref total);
 
-                            //foreach (var item in lst)
-                            //{
-                            //    item.spec = (string.IsNullOrEmpty(item.specvalue01) ? "" : item.specvalue01 + "_") +
-                            //                (string.IsNullOrEmpty(item.specvalue02) ? "" : item.specvalue02 + "_") +
-                            //                item.specvalue03;
-                            //}
-                            //lst.spec = (string.isnullorempty(lst.specvalue01) ? "" : lst.specvalue01 + "_") +
-                            //            (string.isnullorempty(lst.specvalue02) ? "" : lst.specvalue02 + "_") +
-                            //            data.specvalue03;
+
                             responseEntity.code = ResponseCode.SUCCESS;
                             responseEntity.data = new { count = total, commodityEntities = lst };
                         }
@@ -2647,19 +2540,6 @@ namespace ZlPos.Bizlogic
                     ExecuteCallback("getSKUListCallBack", responseEntity);
                 }
             });
-        }
-
-        public static void ForeachPropertyValues(Object o)
-        {
-            if (o == null)
-            {
-                o = new { };
-            }
-            PropertyInfo[] p1 = o.GetType().GetProperties();
-            foreach (PropertyInfo pi in p1)
-            {
-                Console.WriteLine(pi.Name + ":" + pi.GetValue(o, null));
-            }
         }
         #endregion
 
@@ -4848,7 +4728,7 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
-        #region
+        #region GetWeightCommodity
         /// <summary>
         /// 获取条码称重量
         /// </summary>
@@ -4856,11 +4736,7 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                //ResponseEntity responseEntity = new ResponseEntity();
                 DbManager dbManager = DBUtils.Instance.DbManager;
-                //List<SKUEntity> commodityEntityList = null;
-                //List<CommodityPriceEntity> commodityPriceEntityList = null;
-                //List<PluMessageEntity> pluMessageEntityList = null;
                 try
                 {
                     string shopcode = _LoginUserManager.UserEntity.shopcode;
@@ -4869,7 +4745,7 @@ namespace ZlPos.Bizlogic
                     {
                         var lst = db.Queryable<SKUEntity, BarCodeEntity, SPUEntity>((sku, bc, spu) => new object[]{
                             JoinType.Left,sku.skucode == bc.skucode && bc.del == "0" && bc.shopcode == shopcode,
-                            JoinType.Left,sku.spucode == spu.spucode
+                            JoinType.Left,sku.spucode == spu.spucode && spu.shopcode == shopcode && spu.branchcode == branchcode && spu.commoditystatus == "0" && spu.del == "0"
                         })
                         .Where((sku, bc, spu) =>
                             sku.shopcode == shopcode
@@ -4891,7 +4767,9 @@ namespace ZlPos.Bizlogic
                             pricing = spu.pricing,
                             uid = sku.uid,
                             plu = spu.plu,
-                            validtime = spu.validtime
+                            validtime = spu.validtime,
+                            mnemonic = spu.mnemonic,
+                            categorycode = spu.categorycode
                         })
                         .ToList();
                         ExecuteCallback("getWeightCommodityCallBack", lst);
@@ -4902,15 +4780,9 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info("db err>>" + e.Message + e.StackTrace);
                 }
-
-
-                //responseEntity.data = commodityEntityList;
-                //mWebViewHandle.Invoke("getWeightCommodityCallBack", responseEntity);
-                //browser.ExecuteScriptAsync("getWeightCommodityCallBack('" + JsonConvert.SerializeObject(commodityEntityList) + "')");
                 ExecuteCallback<List<SKUEntity>>("getWeightCommodityCallBack", null);
             });
             return;
-            //return JsonConvert.SerializeObject(commodityEntityList);
         }
         #endregion
 
@@ -5290,21 +5162,6 @@ namespace ZlPos.Bizlogic
                                     responseEntity.data = base64;
                                 }
                             }
-
-                            //using (MemoryStream ms2 = new MemoryStream(Convert.FromBase64String(base64)))
-                            //{
-                            //    System.Drawing.Bitmap bmp2 = new System.Drawing.Bitmap(ms2);
-                            //    Form form = new Form();
-                            //    PictureBox pictureBox = new PictureBox();
-                            //    pictureBox.Load(bmp2);
-                            //    form.Controls.Add(bmp2);
-
-                            //    form.Show();
-
-
-                            //    //bmp2.Save(filePath + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                            //}
                         }
                     }
                     else
@@ -5388,6 +5245,35 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region DropCommodity
+        /// <summary>
+        /// 删除商品数据
+        /// </summary>
+        public void DropCommodity()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                var rs = ResponseCode.Failed;
+                try
+                {
+                    logger.Warn("-------------**********执行删除商品数据接口*********--------");
+                    UpgradingSchema.DeleteTable(new string[] { "CategoryEntity", "MemberEntity", "PayTypeEntity", "AssistantsEntity", "CashierEntity", "SupplierEntity", "CommodityInfoVM", "BarCodeEntity", "SKUEntity", "SPUEntity" });
+                    rs = ResponseCode.SUCCESS;
+                    CommodityCacheManager.Instance.cleanCache();
+                    logger.Warn("---------------**********删除商品数据成功*********-----------");
+                }
+                catch (Exception e)
+                {
+                    logger.Warn("---------------**********删除商品数据失败*********-----------");
+                    logger.Error("DorpCommodity err", e);
+                    rs = ResponseCode.Failed;
+                }
+                ExecuteCallback("dropCommodityCallBack", new ResponseEntity { code = rs });
+
+            });
+        }
+        #endregion
+
         /// <summary>
         /// 获取数据库缓存数据大小
         /// </summary>
@@ -5397,7 +5283,6 @@ namespace ZlPos.Bizlogic
             long size = 0;
             try
             {
-
                 string path = Path.Combine(Application.StartupPath, "DataBase\\zlCloudPos.db");
                 var fileInfo = new FileInfo(path);
 
@@ -5545,17 +5430,17 @@ namespace ZlPos.Bizlogic
         /// <param name="CallbackMethod"></param>
         /// <param name="state"></param>
         private void ExecuteCallback<T>(string CallbackMethod, T state)
-        {
-            browser.ExecuteScriptAsync(CallbackMethod + "('" + JsonConvert.SerializeObject(state) + "')");
-        }
+            where T : class, new() => browser.ExecuteScriptAsync(CallbackMethod + "('" + JsonConvert.SerializeObject(state ?? new T()) + "')");
 
+
+        private void ExecuteCallback(string CallbackMethod, string str)
+             => browser.ExecuteScriptAsync(CallbackMethod + "('" + str + "')");
         /// <summary>
         /// 多线程方式回调
         /// </summary>
         /// <param name="state"></param>
         private void CallbackMethod(object state)
         {
-
             object[] paramsArr = (object[])state;
             string methodName = paramsArr[0] as string;
             ResponseEntity responseEntity = paramsArr[1] as ResponseEntity;
