@@ -128,5 +128,9 @@ namespace ZlPos.Models
         public string specname02 { get; set; }
         [SugarColumn(IsNullable = true)]
         public string specname03 { get; set; }
+
+        //add 2018年12月28日  
+        [SugarColumn(IsNullable = true)]
+        public string memberpriceflag { get; set; }
     }
 }

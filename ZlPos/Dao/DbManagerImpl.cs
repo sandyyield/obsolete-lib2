@@ -456,12 +456,12 @@ namespace ZlPos.Dao
             {
                 if (array == null)
                 {
-                    logger.Info("BulkSaveOrUpdateCommodityPriceEntityList:commoditys is null");
+                    logger.Info("BulkSaveOrUpdate:array is null");
                     return;
                 }
                 if (array.Length == 0)
                 {
-                    logger.Info("BulkSaveOrUpdateCommodityPriceEntityList:commoditys coult is 0");
+                    logger.Info("BulkSaveOrUpdate:array coult is 0");
                     return;
                 }
                 using (var db = SugarDao.Instance)
@@ -504,6 +504,7 @@ namespace ZlPos.Dao
 
                             DataTable dtUpdate = dt3.Clone();
                             DataTable dtInsert = dt3.Clone();
+
                             foreach (DataRow item in dt3.Rows)
                             {
                                 if (dataFilter.Contains(item[primaryKey]))
@@ -546,7 +547,7 @@ namespace ZlPos.Dao
             }
             catch (Exception e)
             {
-                logger.Error("BulkSaveOrUpdate<T>:" + e.Message + e.StackTrace);
+                logger.Error("BulkSaveOrUpdate<T> err",e);
             }
         }
 

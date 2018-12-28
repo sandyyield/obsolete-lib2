@@ -2324,8 +2324,6 @@ namespace ZlPos.Bizlogic
                     using (var db = SugarDao.Instance)
                     {
                         var total = 0;
-                        //ShopConfigEntity shopConfigEntity = db.Queryable<ShopConfigEntity>().Where(
-                        //                                                    it => it.id == int.Parse(userEntity.shopcode) + int.Parse(userEntity.branchcode)).First();
                         if ("saleprice".Equals(type))
                         {
                             if (!keyword.Contains("."))
@@ -2370,16 +2368,8 @@ namespace ZlPos.Bizlogic
                     logger.Error(e.StackTrace);
                 }
             }
-            if (spuEntityList == null)
-            {
-                spuEntityList = new List<SPUEntity>();
-            }
-            //if (commodityEntities.Count > 50)
-            //{
-            //    commodityEntities = commodityEntities.GetRange(0, 50);
-            //}
 
-            return JsonConvert.SerializeObject(spuEntityList);
+            return JsonConvert.SerializeObject(spuEntityList ?? new List<SPUEntity>());
         }
         #endregion
 
@@ -2443,6 +2433,14 @@ namespace ZlPos.Bizlogic
                                                specvalues01 = spu.specvalues01,
                                                specvalues02 = spu.specvalues02,
                                                specvalues03 = spu.specvalues03,
+
+                                               memberprice = spu.memberprice,
+                                               memberpricelv1 = spu.memberpricelv1,
+                                               memberpricelv2 = spu.memberpricelv2,
+                                               memberpricelv3 = spu.memberpricelv3,
+                                               memberpricelv4 = spu.memberpricelv4,
+                                               memberpricelv5 = spu.memberpricelv5,
+                                               memberpricelv6 = spu.memberpricelv6
                                            })
                                             .ToPageList(pageindex + 1, pagesize, ref total);
 
@@ -2523,6 +2521,13 @@ namespace ZlPos.Bizlogic
                                                 categoryname = spu.categoryname,
                                                 unitname = spu.unitname,
 
+                                                memberprice = sku.memberprice,
+                                                memberpricelv1 = sku.memberpricelv1,
+                                                memberpricelv2 = sku.memberpricelv2,
+                                                memberpricelv3 = sku.memberpricelv3,
+                                                memberpricelv4 = sku.memberpricelv4,
+                                                memberpricelv5 = sku.memberpricelv5,
+                                                memberpricelv6 = sku.memberpricelv6
                                                 //spec = sku.sepc
                                             })
                                             .ToPageList(pageindex + 1, pagesize, ref total);
@@ -2636,6 +2641,37 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region GetBarcodesBySKUCode
+        public string GetBarcodesBySKUCode(string skucode)
+        {
+            string result = "";
+            if (_LoginUserManager.Login)
+            {
+                var userEntity = _LoginUserManager.UserEntity;
+                try
+                {
+                    using (var db = SugarDao.Instance)
+                    {
+                        var lst = db.Queryable<BarCodeEntity>().Where(i => i.shopcode == userEntity.shopcode
+                                                                && i.del == "0"
+                                                                && i.skucode == skucode)
+                                                                .ToList();
+                        if (lst.Any())
+                        {
+                            lst.ForEach(i => result += i.barcode + ",");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("GetBarcodesBySKUCode err", e);
+                }
+            }
+            return result.Trim(',') ;
+        }
+
+        #endregion
+
         #region GetPayPriority
         /// <summary>
         /// 获取支付优先级
@@ -2683,6 +2719,11 @@ namespace ZlPos.Bizlogic
 
         //public void SetSecondScreenWebView()
 
+        #region GetEnvUrlHead
+        /// <summary>
+        /// 获取不同环境接口地址
+        /// </summary>
+        /// <returns></returns>
         public string GetEnvUrlHead()
         {
             string url = "";
@@ -2708,6 +2749,7 @@ namespace ZlPos.Bizlogic
             }
             return url;
         }
+        #endregion
 
         #region VersionUpdate
         /// <summary>
@@ -2921,15 +2963,6 @@ namespace ZlPos.Bizlogic
         #region SetBJQPrinter (这个接口由于windows上usb设备为广播形式所以不需要实现 直接返回ture就完事了)
         public void SetBJQPrinter(string json)
         {
-            //ResponseEntity responseEntity = new ResponseEntity();
-            //Task.Factory.StartNew(() =>
-            //{
-            //    BJQPrinterManager.Instance.PrintNumber = int.Parse(JsonConvert.DeserializeObject<PrinterConfigEntity>(s).printernumber);
-            //    responseEntity.code = ResponseCode.SUCCESS;
-            //    responseEntity.msg = "windows不需要设置";
-            //    mWebViewHandle?.Invoke("setBJQPrinterCallBack", responseEntity);
-            //});
-
             ResponseEntity responseEntity = new ResponseEntity();
             Task.Factory.StartNew(() =>
             {
@@ -2942,30 +2975,6 @@ namespace ZlPos.Bizlogic
                                                 {
                                                     CacheManager.InsertBJQprint(json);
                                                     mWebViewHandle.Invoke("setBJQPrinterCallBack", result as ResponseEntity);
-                                                    //保存缓存
-                                                    //if (result.code == ResponseCode.SUCCESS)
-                                                    //{
-                                                    //    //添加缓存
-
-                                                    //    CacheManager.InsertBJQprint(json);
-                                                    //    if (BJQPrinterManager.Instance.Init)
-                                                    //    {
-                                                    //        switch (BJQPrinterManager.Instance.PrinterTypeEnum)
-                                                    //        {
-                                                    //            case "usb":
-                                                    //                GPrinterUtils.Instance.printUSBTest();
-                                                    //                break;
-                                                    //            case "port":
-                                                    //                break;
-                                                    //            case "bluetooth":
-                                                    //                break;
-                                                    //        }
-                                                    //    }
-                                                    //}
-                                                    //else
-                                                    //{
-                                                    //    mWebViewHandle.Invoke("setGPrinterCallBack", result);
-                                                    //}
                                                 });
                 }
                 catch (Exception e)
@@ -4732,7 +4741,7 @@ namespace ZlPos.Bizlogic
         /// <summary>
         /// 获取条码称重量
         /// </summary>
-        public void GetWeightCommodity()
+        public void GetWeightCommodity(string s)
         {
             Task.Factory.StartNew(() =>
             {
@@ -4741,6 +4750,11 @@ namespace ZlPos.Bizlogic
                 {
                     string shopcode = _LoginUserManager.UserEntity.shopcode;
                     string branchcode = _LoginUserManager.UserEntity.branchcode;
+                    dynamic dyc = JsonConvert.DeserializeObject(s);
+                    int level = dyc.level;
+                    string keyword = dyc.keyword;
+                    string categorycode = dyc.categorycode;
+
                     using (var db = SugarDao.Instance)
                     {
                         var lst = db.Queryable<SKUEntity, BarCodeEntity, SPUEntity>((sku, bc, spu) => new object[]{
@@ -4754,7 +4768,11 @@ namespace ZlPos.Bizlogic
                             && sku.updownstatus == "1"
                             && sku.del == "0"
                             && (sku.pricing == "1" || sku.pricing == "2")
-                        )
+                            && (SqlFunc.Contains(sku.commodityname, keyword) || SqlFunc.Contains(sku.mnemonic, keyword) || SqlFunc.Contains(sku.plu, keyword)))
+                        .WhereIF(level == 1, (spu, bc) => SqlFunc.Contains(spu.category1code, categorycode))
+                        .WhereIF(level == 2, (spu, bc) => SqlFunc.Contains(spu.category2code, categorycode))
+                        .WhereIF(level == 3, (spu, bc) => SqlFunc.Contains(spu.category3code, categorycode))
+                        .WhereIF(level == 4, (spu, bc) => SqlFunc.Contains(spu.category4code, categorycode))
                         .GroupBy((sku, bc, spu) => sku.skucode)
                         .Select((sku, bc, spu) => new
                         {
@@ -5212,7 +5230,7 @@ namespace ZlPos.Bizlogic
         /// <summary>
         /// 更新已上传日志信息
         /// </summary>
-        public void UpdataOperationLogs(string operationString) 
+        public void UpdataOperationLogs(string operationString)
         {
             if (!string.IsNullOrEmpty(operationString))
             {

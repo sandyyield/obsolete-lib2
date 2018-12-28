@@ -181,5 +181,9 @@ namespace ZlPos.Models
         //从barcode表中查出
         [SugarColumn(IsIgnore = true)]
         public string barcode { get; set; }
+
+        //add 2018年12月28日  
+        [SugarColumn(IsNullable = true)]
+        public string memberpriceflag { get; set; }
     }
 }
