@@ -1674,13 +1674,13 @@ namespace ZlPos.Bizlogic
             ResponseEntity responseEntity = new ResponseEntity();
             Task.Factory.StartNew(() =>
             {
+
                 if (_LoginUserManager.Login)
                 {
                     UserEntity userEntity = _LoginUserManager.UserEntity;
                     try
                     {
                         DbManager dbManager = DBUtils.Instance.DbManager;
-
                         List<SKUEntity> skuCacheLst = new List<SKUEntity>();
                         List<SPUEntity> spuLst = JsonConvert.DeserializeObject<List<SPUEntity>>(commodityListString);
                         foreach (var item in spuLst)
@@ -1691,7 +1691,6 @@ namespace ZlPos.Bizlogic
                         {
                             dbManager.BulkSaveOrUpdate(spuLst, "uid");
                         }
-
                         if (skuCacheLst != null)
                         {
                             dbManager.BulkSaveOrUpdate(skuCacheLst, "uid");
@@ -1776,47 +1775,60 @@ namespace ZlPos.Bizlogic
 
                         using (var db = SugarDao.Instance)
                         {
-                            int count1 = db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                            if (!string.IsNullOrEmpty(memberprice))
                             {
-                                memberpricelv1 = memberprice,
-                                memberpricelv2 = memberprice,
-                                memberpricelv3 = memberprice,
-                                memberpricelv4 = memberprice,
-                                memberpricelv5 = memberprice,
-                                memberpricelv6 = memberprice,
-                                saleprice = saleprice
-                            })
-                             .Where(i => i.shopcode == userEntity.shopcode
-                            && i.branchcode == userEntity.branchcode
-                            && i.spucode == spucode)
-                            .ExecuteCommand();
+                                db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                                {
+                                    memberpricelv1 = memberprice,
+                                    memberpricelv2 = memberprice,
+                                    memberpricelv3 = memberprice,
+                                    memberpricelv4 = memberprice,
+                                    memberpricelv5 = memberprice,
+                                    memberpricelv6 = memberprice
+                                })
+                                .Where(i => i.shopcode == userEntity.shopcode
+                                && i.branchcode == userEntity.branchcode
+                                && i.spucode == spucode)
+                                .ExecuteCommand();
 
-                            int count2 = db.Updateable<SKUEntity>().UpdateColumns(i => new SKUEntity
+                                db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                                {
+                                    memberpricelv1 = memberprice,
+                                    memberpricelv2 = memberprice,
+                                    memberpricelv3 = memberprice,
+                                    memberpricelv4 = memberprice,
+                                    memberpricelv5 = memberprice,
+                                    memberpricelv6 = memberprice
+                                })
+                                .Where(i => i.shopcode == userEntity.shopcode
+                                && i.branchcode == userEntity.branchcode
+                                && i.spucode == spucode)
+                                .ExecuteCommand();
+                            }
+                            if (!string.IsNullOrEmpty(saleprice))
                             {
-                                memberpricelv1 = memberprice,
-                                memberpricelv2 = memberprice,
-                                memberpricelv3 = memberprice,
-                                memberpricelv4 = memberprice,
-                                memberpricelv5 = memberprice,
-                                memberpricelv6 = memberprice,
-                                saleprice = saleprice
-                            })
-                             .Where(i => i.shopcode == userEntity.shopcode
-                            && i.branchcode == userEntity.branchcode
-                            && i.spucode == spucode)
-                            .ExecuteCommand();
+                                db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                                {
+                                    saleprice = saleprice
+                                })
+                                .Where(i => i.shopcode == userEntity.shopcode
+                                && i.branchcode == userEntity.branchcode
+                                && i.spucode == spucode)
+                                .ExecuteCommand();
 
-                            if (count1 >= 1 && count2 >= 0)
-                            {
-                                responseEntity.code = ResponseCode.SUCCESS;
-                                responseEntity.msg = "更新成功";
-                                CommodityCacheManager.Instance.cleanCache();
+                                db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                                {
+                                    saleprice = saleprice
+                                })
+                                .Where(i => i.shopcode == userEntity.shopcode
+                                && i.branchcode == userEntity.branchcode
+                                && i.spucode == spucode)
+                                .ExecuteCommand();
                             }
-                            else
-                            {
-                                responseEntity.code = ResponseCode.Failed;
-                                responseEntity.msg = "未找到指定商品";
-                            }
+
+                            responseEntity.code = ResponseCode.SUCCESS;
+                            responseEntity.msg = "更新成功";
+                            CommodityCacheManager.Instance.cleanCache();
                         }
                     }
                     catch (Exception e)
@@ -2667,7 +2679,7 @@ namespace ZlPos.Bizlogic
                     logger.Error("GetBarcodesBySKUCode err", e);
                 }
             }
-            return result.Trim(',') ;
+            return result.Trim(',');
         }
 
         #endregion
@@ -5201,7 +5213,7 @@ namespace ZlPos.Bizlogic
         /// 保存操作日志信息
         /// </summary>
         /// <param name="operation"></param>
-        public void SaveOperationLogs(string operation) => DBUtils.Instance.DbManager.SaveOrUpdate(JsonConvert.DeserializeObject<OperationLogEntity>(operation));
+        public void SaveOperationLogs(string operation) => DBUtils.Instance.DbManager.Insert(JsonConvert.DeserializeObject<OperationLogEntity>(operation));
         #endregion
 
         #region GetOperationLogs

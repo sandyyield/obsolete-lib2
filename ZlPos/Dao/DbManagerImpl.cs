@@ -500,7 +500,7 @@ namespace ZlPos.Dao
                             DataTable dt3 = query1.CopyToDataTable();
 
                             var dataFilter = from r in dt2.AsEnumerable()
-                                             select r.Field<string>(primaryKey);
+                                             select r.Field<dynamic>(primaryKey);
 
                             DataTable dtUpdate = dt3.Clone();
                             DataTable dtInsert = dt3.Clone();
