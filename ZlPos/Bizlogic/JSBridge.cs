@@ -1791,7 +1791,7 @@ namespace ZlPos.Bizlogic
                                 && i.spucode == spucode)
                                 .ExecuteCommand();
 
-                                db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                                db.Updateable<SKUEntity>().UpdateColumns(i => new SKUEntity
                                 {
                                     memberpricelv1 = memberprice,
                                     memberpricelv2 = memberprice,
@@ -1816,7 +1816,7 @@ namespace ZlPos.Bizlogic
                                 && i.spucode == spucode)
                                 .ExecuteCommand();
 
-                                db.Updateable<SPUEntity>().UpdateColumns(i => new SPUEntity
+                                db.Updateable<SKUEntity>().UpdateColumns(i => new SKUEntity
                                 {
                                     saleprice = saleprice
                                 })
@@ -1824,6 +1824,8 @@ namespace ZlPos.Bizlogic
                                 && i.branchcode == userEntity.branchcode
                                 && i.spucode == spucode)
                                 .ExecuteCommand();
+
+
                             }
 
                             responseEntity.code = ResponseCode.SUCCESS;
