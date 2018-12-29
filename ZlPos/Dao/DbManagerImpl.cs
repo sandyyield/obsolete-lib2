@@ -595,5 +595,100 @@ namespace ZlPos.Dao
                 logger.Error("Insert db err :", e);
             }
         }
+
+        /// <summary>
+        /// 优化速度的bluksave加强版
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        public void BulkSaveOrUpdateTurbo<T>(List<T> array, string primaryKey = "id") where T : class, new()
+        {
+            try
+            {
+                if (!array.Any())
+                {
+                    logger.Info("BulkSaveOrUpdateTurbo err : array none");
+                    return;
+                }
+                using (var db = SugarDao.Instance)
+                {
+                    //数据处理
+                    if (!db.DbMaintenance.IsAnyTable(typeof(T).Name, false))
+                    {
+                        db.CodeFirst.InitTables(typeof(T));
+                        //第一次建表直接插入完事
+                        db.Insertable(array).Where(true, true).ExecuteCommand();
+                        //return;
+
+                    }
+                    else
+                    {
+                        var lst1 = array;
+                        var lst2 = db.Queryable<T>().ToList();
+                        DataTable dt1 = ConvertUtils.ToDataTable(lst1);
+                        DataTable dt2 = ConvertUtils.ToDataTable(lst2);
+
+                        //var query = lst1.Except(t2, new SKUComparer());
+
+                        //差集(所有值 非只主键）
+                        IEnumerable<DataRow> query1 = dt1.AsEnumerable().Except(dt2.AsEnumerable(), DataRowComparer.Default);
+                        //还是用转成list性能比较快 
+                        //var query1 = new List<T>();// dt1.AsEnumerable().Except(dt2.AsEnumerable(), DataRowComparer.Default).ToList();
+                        //两个数据源的差集集合
+                        if (query1.Any())
+                        {
+                            DataTable dt3 = query1.CopyToDataTable();
+
+                            var dataFilter = from r in dt2.AsEnumerable()
+                                             select r.Field<dynamic>(primaryKey);
+
+                            DataTable dtUpdate = dt3.Clone();
+                            DataTable dtInsert = dt3.Clone();
+
+                            foreach (DataRow item in dt3.Rows)
+                            {
+                                if (dataFilter.Contains(item[primaryKey]))
+                                {
+                                    dtUpdate.Rows.Add(item.ItemArray);
+                                }
+                                else
+                                {
+                                    dtInsert.Rows.Add(item.ItemArray);
+                                }
+                            }
+
+                            //需要更新的数据
+                            var lsUpdate = ConvertUtils.ToList<T>(dtUpdate).ToArray();
+                            if (lsUpdate.Count() > 0)
+                            {
+                                db.Updateable(lsUpdate).ExecuteCommand();
+                            }
+
+                            var lsInsert = ConvertUtils.ToList<T>(dtInsert).ToArray();
+                            if (lsInsert.Count() > 0)
+                            {
+                                db.Insertable(lsInsert).Where(true, true).ExecuteCommand();
+                            }
+
+                            dtUpdate.Clear(); dtUpdate.Dispose(); dtUpdate = null;
+                            dtInsert.Clear(); dtInsert.Dispose(); dtInsert = null;
+
+                            dt3.Clear(); dt3.Dispose(); dt3 = null;
+
+                        }
+
+
+                        else
+                        {
+                            logger.Info("BulkSaveOrUpdate<T>：Array error");
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("BulkSaveOrUpdate<T> err", e);
+            }
+        }
     }
 }

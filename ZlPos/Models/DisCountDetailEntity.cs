@@ -34,5 +34,9 @@ namespace ZlPos.Models
         public string saleactivitytypecode { get; set; }
         [SugarColumn(IsNullable = true)]
         public string activitycode { get; set; }
+
+        //add 2018年12月29日
+        [SugarColumn(IsNullable = true)]
+        public string usercouponcode { get; set; }
     }
 }
