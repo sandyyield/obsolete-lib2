@@ -82,6 +82,8 @@ namespace ZlPos.Bizlogic
         //标识当前环境
         private string _Env = "";
 
+        private List<SPUEntity> _CommodityPool = new List<SPUEntity>();
+
         /// <summary>
         /// 委托方式托管回调
         /// </summary>
@@ -166,6 +168,11 @@ namespace ZlPos.Bizlogic
         #endregion 
 
         public string GetDeviceModel() => "WINDOWS";
+
+        /// <summary>
+        /// 开启debug模式
+        /// </summary>
+        public void OpenDebugModel() => AppContext.Instance.Debug = true;
 
         //这个接口后面用于环境适配
         public string GetEnv()
@@ -1666,6 +1673,68 @@ namespace ZlPos.Bizlogic
 
         }
         #endregion
+
+        /// <summary>
+        /// 发送商品数据
+        /// </summary>
+        /// <param name="s"></param>
+        public void SendCommodityList(string s)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (_LoginUserManager.Login)
+                {
+                    try
+                    {
+
+                        var spuLst = JsonConvert.DeserializeObject<List<SPUEntity>>(s);
+                        if (spuLst.Any())
+                        {
+                            _CommodityPool.AddRange(spuLst);
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        logger.Error("SendCommodityList err ", e);
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// 处理商品数据
+        /// </summary>
+        public void ExecuteCommodityDataProcess()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (_LoginUserManager.Login)
+                {
+                    try
+                    {
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        var skuCacheLst = new List<SKUEntity>();
+                        var spuLst = _CommodityPool;
+                        if (spuLst.Any())
+                        {
+                            spuLst.ForEach(i => skuCacheLst.AddRange(i.recskulist));
+                            dbManager.BulkSaveOrUpdate(spuLst, "uid");
+                            if (skuCacheLst.Any())
+                            {
+                                dbManager.BulkSaveOrUpdate(skuCacheLst, "uid");
+                            }
+                            ExecuteCallback("ExecuteCommodityDataProcess", new ResponseEntity { code = ResponseCode.SUCCESS });
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        logger.Error("ExecuteCommodityDataProcess err", e);
+                        ExecuteCallback("ExecuteCommodityDataProcess", new ResponseEntity { code = ResponseCode.Failed });
+                    }
+                }
+            });
+        }
+
 
         //add 2018年9月3日
         #region SaveCommodityList
