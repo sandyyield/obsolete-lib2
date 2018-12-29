@@ -137,5 +137,9 @@ namespace ZlPos.Models
         //add 2018年12月21日
         [SugarColumn(IsNullable = true)]
         public string consumecreditmoney { get; set; }
+
+        //add 2018年12月29日
+        [SugarColumn(IsNullable = true)]
+        public string usercouponcode { get; set; }
     }
 }
