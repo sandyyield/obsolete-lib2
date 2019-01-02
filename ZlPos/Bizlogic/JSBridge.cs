@@ -82,7 +82,9 @@ namespace ZlPos.Bizlogic
         //标识当前环境
         private string _Env = "";
 
-        private List<SPUEntity> _CommodityPool = new List<SPUEntity>();
+        private List<SPUEntity> _SPUPool = new List<SPUEntity>();
+        private List<BarCodeEntity> _BarcodesPool = new List<BarCodeEntity>();
+        private List<SKUEntity> _SKUPool = new List<SKUEntity>();
 
         /// <summary>
         /// 委托方式托管回调
@@ -1062,6 +1064,7 @@ namespace ZlPos.Bizlogic
                                 billEntities[i].discountdetails = disCountDetailEntities;
                             }
                             allBill = JsonConvert.SerializeObject(billEntities);
+                            //allBill = Convert.ToBase64String(Encoding.Default.GetBytes(JsonConvert.SerializeObject(JsonConvert.SerializeObject(billEntities)));
                             //return JsonConvert.SerializeObject(billEntities);
                             //browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target +  "','" + allBill + "')");
                         }
@@ -1072,7 +1075,6 @@ namespace ZlPos.Bizlogic
                     logger.Error(e.Message + e.StackTrace);
                 }
                 browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
-                //return "";
             });
         }
         #endregion
@@ -1675,7 +1677,7 @@ namespace ZlPos.Bizlogic
         #endregion
 
         /// <summary>
-        /// 发送商品数据
+        /// 接口商品数据
         /// </summary>
         /// <param name="s"></param>
         public void SendCommodityList(string s)
@@ -1690,10 +1692,11 @@ namespace ZlPos.Bizlogic
                         var spuLst = JsonConvert.DeserializeObject<List<SPUEntity>>(s);
                         if (spuLst.Any())
                         {
-                            _CommodityPool.AddRange(spuLst);
+                            _SPUPool.AddRange(spuLst);
+                            spuLst.ForEach(i => _SKUPool.AddRange(i.recskulist));
                         }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         logger.Error("SendCommodityList err ", e);
                     }
@@ -1702,9 +1705,36 @@ namespace ZlPos.Bizlogic
         }
 
         /// <summary>
+        /// 接收条码数据
+        /// </summary>
+        /// <param name="s"></param>
+        public void SendBarcodesList(string s)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (_LoginUserManager.Login)
+                {
+                    try
+                    {
+
+                        var barcodeLst = JsonConvert.DeserializeObject<List<BarCodeEntity>>(s);
+                        if (barcodeLst.Any())
+                        {
+                            _BarcodesPool.AddRange(barcodeLst);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("SendBarcodesList err ", e);
+                    }
+                }
+            });
+        }
+
+        /// <summary>
         /// 处理商品数据
         /// </summary>
-        public void ExecuteCommodityDataProcess()
+        public void ExecuteDataProcess()
         {
             Task.Factory.StartNew(() =>
             {
@@ -1713,24 +1743,33 @@ namespace ZlPos.Bizlogic
                     try
                     {
                         DbManager dbManager = DBUtils.Instance.DbManager;
-                        var skuCacheLst = new List<SKUEntity>();
-                        var spuLst = _CommodityPool;
+                        var spuLst = _SPUPool;
+                        var skuLst = _SKUPool;
+                        var barcodeLst = _BarcodesPool;
                         if (spuLst.Any())
                         {
-                            spuLst.ForEach(i => skuCacheLst.AddRange(i.recskulist));
+                            //spuLst.ForEach(i => skuCacheLst.AddRange(i.recskulist));
                             dbManager.BulkSaveOrUpdate(spuLst, "uid");
-                            if (skuCacheLst.Any())
-                            {
-                                dbManager.BulkSaveOrUpdate(skuCacheLst, "uid");
-                            }
-                            ExecuteCallback("ExecuteCommodityDataProcess", new ResponseEntity { code = ResponseCode.SUCCESS });
+                            dbManager.BulkSaveOrUpdate(skuLst, "uid");
+                            //if (skuCacheLst.Any())
+                            //{
+                            //    dbManager.BulkSaveOrUpdate(skuCacheLst, "uid");
+                            //}
                         }
+                        if (barcodeLst.Any())
+                        {
+                            dbManager.BulkSaveOrUpdate(barcodeLst, "uid");
+                        }
+                        ExecuteCallback("executeDataProcessCallBack", new ResponseEntity { code = ResponseCode.SUCCESS });
+
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
-                        logger.Error("ExecuteCommodityDataProcess err", e);
-                        ExecuteCallback("ExecuteCommodityDataProcess", new ResponseEntity { code = ResponseCode.Failed });
+                        logger.Error("ExecuteDataProcess err", e);
+                        ExecuteCallback("executeDataProcessCallBack", new ResponseEntity { code = ResponseCode.Failed });
                     }
+                    _SPUPool.Clear();
+                    _BarcodesPool.Clear();
                 }
             });
         }
@@ -2537,6 +2576,7 @@ namespace ZlPos.Bizlogic
                         responseEntity.code = ResponseCode.Failed;
                     }
                     ExecuteCallback("getSPUListCallBack", responseEntity);
+                    //ExecuteCallback("getSPUListCallBack", Convert.ToBase64String(Encoding.Default.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                 }
             });
         }
@@ -2626,6 +2666,7 @@ namespace ZlPos.Bizlogic
                         responseEntity.code = ResponseCode.Failed;
                     }
                     ExecuteCallback("getSKUListCallBack", responseEntity);
+                    //ExecuteCallback("getSKUListCallBack", Convert.ToBase64String(Encoding.Default.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                 }
             });
         }
@@ -4874,6 +4915,7 @@ namespace ZlPos.Bizlogic
                         })
                         .ToList();
                         ExecuteCallback("getWeightCommodityCallBack", lst);
+                        //ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.Default.GetBytes(JsonConvert.SerializeObject(lst))));
                         return;
                     }
                 }
@@ -4881,7 +4923,7 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info("db err>>" + e.Message + e.StackTrace);
                 }
-                ExecuteCallback<List<SKUEntity>>("getWeightCommodityCallBack", null);
+                ExecuteCallback("getWeightCommodityCallBack", new List<SKUEntity>());
             });
             return;
         }
