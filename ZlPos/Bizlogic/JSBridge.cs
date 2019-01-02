@@ -1676,6 +1676,13 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        public void ClearLoadDataCache()
+        {
+            _SPUPool.Clear();
+            _SKUPool.Clear();
+            _BarcodesPool.Clear();
+        }
+
         /// <summary>
         /// 接口商品数据
         /// </summary>
