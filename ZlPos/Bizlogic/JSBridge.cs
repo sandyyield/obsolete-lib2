@@ -1748,13 +1748,8 @@ namespace ZlPos.Bizlogic
                         var barcodeLst = _BarcodesPool;
                         if (spuLst.Any())
                         {
-                            //spuLst.ForEach(i => skuCacheLst.AddRange(i.recskulist));
                             dbManager.BulkSaveOrUpdate(spuLst, "uid");
                             dbManager.BulkSaveOrUpdate(skuLst, "uid");
-                            //if (skuCacheLst.Any())
-                            //{
-                            //    dbManager.BulkSaveOrUpdate(skuCacheLst, "uid");
-                            //}
                         }
                         if (barcodeLst.Any())
                         {

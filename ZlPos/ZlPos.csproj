@@ -131,6 +131,7 @@
     <Compile Include="Bizlogic\RegHelper.cs" />
     <Compile Include="Bizlogic\ToledoUtils.cs" />
     <Compile Include="Bizlogic\UpdateBiz.cs" />
+    <Compile Include="Bizlogic\ZipHelper.cs" />
     <Compile Include="Core\DataProcessor.cs" />
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Core\MenuHandler.cs" />
