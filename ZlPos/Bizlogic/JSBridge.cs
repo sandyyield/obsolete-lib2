@@ -276,15 +276,15 @@ namespace ZlPos.Bizlogic
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.Failed;
-                                    ExecuteCallback("networkChangeCallBack", responseEntity);
-                                    i = 1;
-                                    continue;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
                                 }
                                 //即当前网络发生变化时
                                 if (isConnectInternet != _NetworkStatus)
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.Failed;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
+
                                 }
                             }
                             else
@@ -295,18 +295,15 @@ namespace ZlPos.Bizlogic
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.SUCCESS;
-                                    ExecuteCallback("networkChangeCallBack", responseEntity);
-                                    i = 1;
-                                    continue;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
                                 }
                                 if (isConnectInternet != _NetworkStatus)
                                 {
                                     _NetworkStatus = isConnectInternet;
                                     responseEntity.code = ResponseCode.SUCCESS;
+                                    mWebViewHandle?.Invoke("networkChangeCallBack", responseEntity);
                                 }
-
                             }
-                            ExecuteCallback("networkChangeCallBack", responseEntity);
                         }
                         catch (Exception e)
                         {
@@ -1049,9 +1046,9 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Error(e.Message + e.StackTrace);
                 }
-                //browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
+                browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
                 //Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst)));
-                ExecuteCallback("getAllSaleBillCallBack", target + "','" + Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(allBill))));
+                //ExecuteCallback("getAllSaleBillCallBack", target + "','" + Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(allBill).Trim('\"'))));
             });
         }
         #endregion
@@ -1992,7 +1989,7 @@ namespace ZlPos.Bizlogic
         {
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            SPUEntity spuEntity = null;
+            ViewModelSPUEntity spuEntity = null;
             if (_LoginUserManager.Login)
             {
                 UserEntity userEntity = _LoginUserManager.UserEntity;
@@ -2000,7 +1997,7 @@ namespace ZlPos.Bizlogic
                 {
                     using (var db = SugarDao.Instance)
                     {
-                        var spulst = db.Queryable<ViewModelSPUEntity>().Where(i => i.shopcode == userEntity.shopcode
+                        spuEntity = db.Queryable<ViewModelSPUEntity>().Where(i => i.shopcode == userEntity.shopcode
                             && i.branchcode == userEntity.branchcode
                             && i.commoditystatus == "0"
                             && i.del == "0"
@@ -2009,26 +2006,10 @@ namespace ZlPos.Bizlogic
                         )
                         .First();
 
-                        if (spulst != null)
+                        if (spuEntity != null)
                         {
-                            return JsonConvert.SerializeObject(spulst);
+                            return JsonConvert.SerializeObject(spuEntity);
                         }
-                        //var spulst = db.Queryable<SPUEntity, SKUEntity>((spu, sku) => new object[] {
-                        //    JoinType.Left,spu.spucode == sku.spucode
-                        //})
-                        //.Where((spu, sku) => spu.shopcode == userEntity.shopcode
-                        //    //add 2018年11月15日
-                        //    && spu.branchcode == userEntity.branchcode
-                        //    && spu.commoditystatus == "0"
-                        //    && spu.del == "0"
-                        //    && spu.updownstatus == "1"
-                        //    && spu.spucode == spuCode
-                        //)
-                        //.Select(spu => new
-                        //{
-                        //    recskulist = SqlFunc.Subqueryable<SKUEntity>().Where(i => i.spucode == spuCode).Select()
-                        //})
-                        //.First();
                     }
                 }
                 catch (Exception e)
@@ -2160,18 +2141,18 @@ namespace ZlPos.Bizlogic
             string key = level + "_" + categoryCode;
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
-            CommodityCacheManager commodityCacheManager = CommodityCacheManager.Instance;
+            //CommodityCacheManager commodityCacheManager = CommodityCacheManager.Instance;
             List<SPUEntity> spuEntityList = new List<SPUEntity>();
             if (_LoginUserManager.Login)
             {
-                if (commodityCacheManager != null
-                        && commodityCacheManager.CommodityMap != null
-                        && !(commodityCacheManager.CommodityMap.Count == 0)
-                        && commodityCacheManager.CommodityMap.ContainsKey(categoryCode))
-                {
-                    spuEntityList = commodityCacheManager.CommodityMap[categoryCode];
-                }
-                else
+                //if (commodityCacheManager != null
+                //        && commodityCacheManager.CommodityMap != null
+                //        && !(commodityCacheManager.CommodityMap.Count == 0)
+                //        && commodityCacheManager.CommodityMap.ContainsKey(categoryCode))
+                //{
+                //    spuEntityList = commodityCacheManager.CommodityMap[categoryCode];
+                //}
+                //else
                 {
                     UserEntity userEntity = _LoginUserManager.UserEntity;
                     try
@@ -2196,10 +2177,10 @@ namespace ZlPos.Bizlogic
                     {
                         logger.Error("GetCommodityByCategoryCode err", e);
                     }
-                    if (commodityCacheManager.CommodityMap != null)
-                    {
-                        commodityCacheManager.CommodityMap.Add(categoryCode, spuEntityList);
-                    }
+                    //if (commodityCacheManager.CommodityMap != null)
+                    //{
+                    //    commodityCacheManager.CommodityMap.Add(categoryCode, spuEntityList);
+                    //}
                 }
             }
             return JsonConvert.SerializeObject(spuEntityList);
@@ -2550,8 +2531,9 @@ namespace ZlPos.Bizlogic
                         logger.Error("getSPUList err", e);
                         responseEntity.code = ResponseCode.Failed;
                     }
-                    ExecuteCallback("getSPUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
+                    //ExecuteCallback("getSPUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                     //ExecuteCallback("getSPUListCallBack", ZipHelper.GZipCompressString(JsonConvert.SerializeObject(responseEntity)));
+                    ExecuteCallback("getSPUListCallBack", responseEntity);
                 }
             });
         }
@@ -2640,8 +2622,8 @@ namespace ZlPos.Bizlogic
                         logger.Error("GetSKUList err", e);
                         responseEntity.code = ResponseCode.Failed;
                     }
-                    //ExecuteCallback("getSKUListCallBack", responseEntity);
-                    ExecuteCallback("getSKUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
+                    ExecuteCallback("getSKUListCallBack", responseEntity);
+                    //ExecuteCallback("getSKUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                 }
             });
         }
@@ -4889,8 +4871,8 @@ namespace ZlPos.Bizlogic
                             categorycode = spu.categorycode
                         })
                         .ToList();
-                        //ExecuteCallback("getWeightCommodityCallBack", lst);
-                        ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst))));
+                        ExecuteCallback("getWeightCommodityCallBack", lst);
+                        //ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst))));
                         return;
                     }
                 }
@@ -4898,7 +4880,8 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info("db err>>" + e.Message + e.StackTrace);
                 }
-                ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new List<SKUEntity>()))));
+                ExecuteCallback("getWeightCommodityCallBack", new List<SKUEntity>());
+                //ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new List<SKUEntity>()))));
             });
             return;
         }

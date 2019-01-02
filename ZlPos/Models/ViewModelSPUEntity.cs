@@ -176,7 +176,10 @@ namespace ZlPos.Models
         {
             get
             {
-                return base.CreateMapping<SKUEntity>().Where(i => i.spucode == this.spucode).ToList();
+                return base.CreateMapping<SKUEntity>().Where(i => i.spucode == this.spucode 
+                                                                && i.shopcode == this.shopcode 
+                                                                && i.branchcode == this.branchcode
+                                                                && i.del == "0").ToList();
             }
         }
 
