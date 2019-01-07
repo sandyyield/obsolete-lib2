@@ -5057,6 +5057,10 @@ namespace ZlPos.Bizlogic
         {
             try
             {
+                if (_SecondScreenWebView != null)
+                {
+                    _SecondScreenWebView.GetBrowser().CloseBrowser(true);
+                }
                 browser.GetBrowser().CloseBrowser(true);
             }
             catch (Exception e)
@@ -5068,13 +5072,21 @@ namespace ZlPos.Bizlogic
             {
                 if (browser != null)
                 {
+                    if (_SecondScreenWebView != null)
+                    {
+                        _SecondScreenWebView.Dispose();
+                    }
                     browser.Dispose();
-                    Cef.Shutdown();
                 }
             }
             catch (Exception e)
             {
                 logger.Error("finish shutdown:", e);
+            }
+            finally
+            {
+                Cef.Shutdown();
+                logger.Error("程序已经关闭");
             }
         }
         #endregion
