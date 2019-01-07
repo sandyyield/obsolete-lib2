@@ -195,7 +195,7 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetVersionInfo()
         {
-            return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            return new Version(System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).FileVersion).ToString();
         }
         #endregion
 
