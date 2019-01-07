@@ -18,10 +18,10 @@ namespace ZlPos.Core
 
                 if (KeyType.RawKeyDown == type)
                 {
-                    if (windowsKeyCode == (int)Keys.F5)
-                    {
-                        browser.Reload(); //此处可以添加想要实现的代码段
-                    }
+                    //if (windowsKeyCode == (int)Keys.F5)
+                    //{
+                    //    browser.Reload(); //此处可以添加想要实现的代码段
+                    //}
                     if (windowsKeyCode == (int)Keys.F12)
                     {
                         browser.ShowDevTools();

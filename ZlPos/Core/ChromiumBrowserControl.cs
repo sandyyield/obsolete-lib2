@@ -21,6 +21,7 @@ using ZlPos.Bean;
 using ZlPos.Config;
 using ZlPos.Forms;
 using Newtonsoft.Json;
+using ZlPos.Manager;
 
 namespace ZlPos.Core
 {
@@ -113,12 +114,14 @@ namespace ZlPos.Core
                 PrinterConfigEntity printerConfigEntity;
                 string bqStr = string.Empty;
                 string bjqStr = string.Empty;
+                CustomerShowConfigEntity customerShowConfigEntity;
                 //先从数据库取出上次缓存的配置
                 using (var db = SugarDao.Instance)
                 {
                     printerConfigEntity = db.Queryable<PrinterConfigEntity>().First();
                     bqStr = CacheManager.GetGprint() as string;//contextEntity.gprint;
                     bjqStr = CacheManager.GetBJQprint() as string;
+                    customerShowConfigEntity = db.Queryable<CustomerShowConfigEntity>().First();
                 }
                 if (printerConfigEntity != null)
                 {
@@ -142,6 +145,18 @@ namespace ZlPos.Core
 
                     BJQPrinterSetter BJQprinterSetter = new BJQPrinterSetter();
                     BJQprinterSetter.setPrinter(bjqPrinter, p: (result) => { });
+                }
+                if(customerShowConfigEntity != null)
+                {
+                    serialPort serialport = new serialPort(customerShowConfigEntity.port, customerShowConfigEntity.intBaud);
+                    logger.Info("SetCustomerShow: port =" + customerShowConfigEntity.port + "baud:" + customerShowConfigEntity.intBaud);
+                    serialport.init();
+                    if (serialport.Open(customerShowConfigEntity.port, Int32.Parse(customerShowConfigEntity.intBaud)))
+                    {
+                        serialport.Close();
+                        CustomerShowManager.Instance.Init = true;
+                        CustomerShowManager.Instance.SerialPort = serialport;
+                    }
                 }
 
             }
