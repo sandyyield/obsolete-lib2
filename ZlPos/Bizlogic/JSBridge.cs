@@ -3421,7 +3421,7 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 dynamic dyc = JsonConvert.DeserializeObject(json);
-                string s = dyc.s;
+                string s = dyc.content;
                 string printerType = dyc.printerType;
                 string width = dyc.width;
                 string height = dyc.height;
@@ -3538,7 +3538,7 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 dynamic dyc = JsonConvert.DeserializeObject(json);
-                string s = dyc.s;
+                string s = dyc.content;
                 string printerType = dyc.printerType;
                 string width = dyc.width;
                 string height = dyc.height;
