@@ -450,5 +450,41 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+
+        #region AutoLaunchSetting cache
+        public static string getAutoLaunchSetting()
+        {
+            using (var db = SugarDao.Instance)
+            {
+                if (db.DbMaintenance.IsAnyTable("ContextEntity", false))
+                {
+                    ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                    if (contextEntity == null)
+                    {
+                        return "";
+                    }
+                    return contextEntity.AutoLaunchSetting;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public static void setAutoLaunchSetting(string v)
+        {
+            using (var db = SugarDao.Instance)
+            {
+                ContextEntity contextEntity = db.Queryable<ContextEntity>().First();
+                if (contextEntity == null)
+                {
+                    contextEntity = new ContextEntity();
+                }
+                contextEntity.AutoLaunchSetting = v;
+                DBUtils.Instance.DbManager.SaveOrUpdate(contextEntity);
+            }
+        }
+        #endregion
     }
 }

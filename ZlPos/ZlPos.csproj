@@ -136,8 +136,10 @@
     <Compile Include="Core\KeyBoardHander.cs" />
     <Compile Include="Core\MenuHandler.cs" />
     <Compile Include="Core\MyDownLoadFile.cs" />
+    <Compile Include="Core\WinAPI.cs" />
     <Compile Include="Dao\DbHelper.cs" />
     <Compile Include="Dao\UpgradingSchema.cs" />
+    <Compile Include="Enums\AutoLaunchEnums.cs" />
     <Compile Include="Enums\SyncScaleStatus.cs" />
     <Compile Include="Forms\SecondScreenFrm.cs">
       <SubType>Form</SubType>

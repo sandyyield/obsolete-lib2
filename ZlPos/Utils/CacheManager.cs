@@ -110,5 +110,17 @@ namespace ZlPos.Utils
         {
             return ContextCache.getPrintModelSetting();
         }
+
+        #region  AutoLaunchSetting
+        public static void InsertAutoLaunchSetting(string obj)
+        {
+            ContextCache.setAutoLaunchSetting(obj);
+        }
+
+        public static string GetAutoLaunchSetting()
+        {
+            return ContextCache.getAutoLaunchSetting();
+        }
+        #endregion
     }
 }

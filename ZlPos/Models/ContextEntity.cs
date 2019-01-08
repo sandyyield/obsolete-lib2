@@ -56,5 +56,8 @@ namespace ZlPos.Models
         //add 2018年12月6日 保存小票模板
         [SugarColumn(IsNullable = true)]
         public string PrintModelSetting { get; set; }
+
+        [SugarColumn(IsNullable = true)]
+        public string AutoLaunchSetting { get; set; }
     }
 }

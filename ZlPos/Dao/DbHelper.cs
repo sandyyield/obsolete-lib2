@@ -181,9 +181,10 @@ namespace ZlPos.Dao
                         UpgradingSchema.UpgradingVersion<MemberEntity>(new string[] { "levelcode" });
                         //变化大的直接删表吧
                         UpgradingSchema.DeleteTable(new string[] { "BarCodeEntity", "CategoryEntity", "CommodityInfoVM" });
-
                         break;
-
+                    case 21:
+                        UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "AutoLaunchSetting" });
+                        break;
                 }
                 //生成数据库配置文件
                 CreateConfig();

@@ -1663,25 +1663,25 @@ namespace ZlPos.Bizlogic
         /// <param name="s"></param>
         public void SendCommodityList(string s)
         {
-            
-                if (_LoginUserManager.Login)
-                {
-                    try
-                    {
 
-                        var spuLst = JsonConvert.DeserializeObject<List<SPUEntity>>(s);
-                        if (spuLst.Any())
-                        {
-                            _SPUPool.AddRange(spuLst);
-                            spuLst.ForEach(i => _SKUPool.AddRange(i.recskulist));
-                        }
-                    }
-                    catch (Exception e)
+            if (_LoginUserManager.Login)
+            {
+                try
+                {
+
+                    var spuLst = JsonConvert.DeserializeObject<List<SPUEntity>>(s);
+                    if (spuLst.Any())
                     {
-                        logger.Error("SendCommodityList err ", e);
+                        _SPUPool.AddRange(spuLst);
+                        spuLst.ForEach(i => _SKUPool.AddRange(i.recskulist));
                     }
                 }
-            
+                catch (Exception e)
+                {
+                    logger.Error("SendCommodityList err ", e);
+                }
+            }
+
         }
 
         /// <summary>
@@ -1690,22 +1690,22 @@ namespace ZlPos.Bizlogic
         /// <param name="s"></param>
         public void SendBarcodesList(string s)
         {
-                if (_LoginUserManager.Login)
+            if (_LoginUserManager.Login)
+            {
+                try
                 {
-                    try
+                    var barcodeLst = JsonConvert.DeserializeObject<List<BarCodeEntity>>(s);
+                    if (barcodeLst.Any())
                     {
-                        var barcodeLst = JsonConvert.DeserializeObject<List<BarCodeEntity>>(s);
-                        if (barcodeLst.Any())
-                        {
-                            _BarcodesPool.AddRange(barcodeLst);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error("SendBarcodesList err ", e);
+                        _BarcodesPool.AddRange(barcodeLst);
                     }
                 }
-            
+                catch (Exception e)
+                {
+                    logger.Error("SendBarcodesList err ", e);
+                }
+            }
+
         }
 
         /// <summary>
@@ -3416,10 +3416,16 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="s"></param>
         /// <param name="printerType"></param>
-        public void PrintTemplet(string s, string printerType, string width, string height)
+        public void PrintTemplet(string json)//string s, string printerType, string width, string height)
         {
             Task.Factory.StartNew(() =>
             {
+                dynamic dyc = JsonConvert.DeserializeObject(json);
+                string s = dyc.s;
+                string printerType = dyc.printerType;
+                string width = dyc.width;
+                string height = dyc.height;
+                string number = dyc.number;
                 ResponseEntity responseEntity = new ResponseEntity();
                 if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
                 {
@@ -3427,9 +3433,11 @@ namespace ZlPos.Bizlogic
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = "打印参数或打印类型为空";
                     mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+                    return;
                 }
                 try
                 {
+
 
                     if (CacheManager.GetGprint() as string != null || CacheManager.GetBJQprint() != null)
                     {
@@ -3450,45 +3458,48 @@ namespace ZlPos.Bizlogic
                             {
                                 //if (GPrinterManager.Instance.Init)
                                 //{
-                                switch (printerType)
+                                for (int i = 0; i < Int32.Parse(number); i++)
                                 {
-                                    case "SPBQ":
-                                    case "DDBQ":
-                                        if (!string.IsNullOrEmpty(CacheManager.GetGprint() as string))
-                                        {
-                                            GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
-                                            responseEntity.code = ResponseCode.SUCCESS;
-                                        }
-                                        else
-                                        {
+                                    switch (printerType)
+                                    {
+                                        case "SPBQ":
+                                        case "DDBQ":
+                                            if (!string.IsNullOrEmpty(CacheManager.GetGprint() as string))
+                                            {
+                                                GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
+                                                responseEntity.code = ResponseCode.SUCCESS;
+                                            }
+                                            else
+                                            {
+                                                responseEntity.code = ResponseCode.Failed;
+                                                responseEntity.msg = "请设置标签打印机";
+                                            }
+                                            break;
+                                        case "BJQ":
+                                            if (!string.IsNullOrEmpty(CacheManager.GetBJQprint() as string))
+                                            {
+                                                GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
+                                                responseEntity.code = ResponseCode.SUCCESS;
+                                            }
+                                            else
+                                            {
+                                                responseEntity.code = ResponseCode.Failed;
+                                                responseEntity.msg = "请设置标价签打印机";
+                                            }
+                                            break;
+                                        default:
+                                            logger.Error("非法打印机类型");
                                             responseEntity.code = ResponseCode.Failed;
-                                            responseEntity.msg = "请设置标签打印机";
-                                        }
-                                        break;
-                                    case "BJQ":
-                                        if (!string.IsNullOrEmpty(CacheManager.GetBJQprint() as string))
-                                        {
-                                            GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
-                                            responseEntity.code = ResponseCode.SUCCESS;
-                                        }
-                                        else
-                                        {
-                                            responseEntity.code = ResponseCode.Failed;
-                                            responseEntity.msg = "请设置标价签打印机";
-                                        }
-                                        break;
-                                    default:
-                                        logger.Error("非法打印机类型");
-                                        responseEntity.code = ResponseCode.Failed;
-                                        responseEntity.msg = "非法打印机类型";
-                                        break;
+                                            responseEntity.msg = "非法打印机类型";
+                                            break;
+                                    }
+                                    //}
+                                    //else
+                                    //{
+                                    //    responseEntity.code = ResponseCode.Failed;
+                                    //    responseEntity.msg = "请设置标签打印机";
+                                    //}
                                 }
-                                //}
-                                //else
-                                //{
-                                //    responseEntity.code = ResponseCode.Failed;
-                                //    responseEntity.msg = "请设置标签打印机";
-                                //}
                             }
                             else
                             {
@@ -3522,10 +3533,16 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="s"></param>
         /// <param name="printerType"></param>
-        public void PrintTempletDrive(string s, string printerType, string width, string height)
+        public void PrintTempletDrive(string json)//string s, string printerType, string width, string height)
         {
             Task.Factory.StartNew(() =>
             {
+                dynamic dyc = JsonConvert.DeserializeObject(json);
+                string s = dyc.s;
+                string printerType = dyc.printerType;
+                string width = dyc.width;
+                string height = dyc.height;
+                string number = dyc.number;
                 ResponseEntity responseEntity = new ResponseEntity();
                 if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
                 {
@@ -3533,41 +3550,45 @@ namespace ZlPos.Bizlogic
                     responseEntity.code = ResponseCode.Failed;
                     responseEntity.msg = "打印参数或打印类型为空";
                     mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+                    return;
                 }
                 try
                 {
-                    switch (printerType)
+                    for (int i = 0; i < Int32.Parse(number); i++)
                     {
-                        case "SPBQ":
-                        case "DDBQ":
-                            if (!string.IsNullOrEmpty(CacheManager.GetGprint() as string))
-                            {
-                                GPrinterUtils.Instance.BQPrintTempletDrive(s, width, height, PrinterManager.Instance.DriveBQPrinter);
-                                responseEntity.code = ResponseCode.SUCCESS;
-                            }
-                            else
-                            {
+                        switch (printerType)
+                        {
+                            case "SPBQ":
+                            case "DDBQ":
+                                if (!string.IsNullOrEmpty(CacheManager.GetGprint() as string))
+                                {
+                                    GPrinterUtils.Instance.BQPrintTempletDrive(s, width, height, PrinterManager.Instance.DriveBQPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                }
+                                else
+                                {
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "请设置标签打印机";
+                                }
+                                break;
+                            case "BJQ":
+                                if (!string.IsNullOrEmpty(CacheManager.GetBJQprint() as string))
+                                {
+                                    GPrinterUtils.Instance.BJQPrintTempletDrive(s, width, height, PrinterManager.Instance.DriveBJQPrinter);
+                                    responseEntity.code = ResponseCode.SUCCESS;
+                                }
+                                else
+                                {
+                                    responseEntity.code = ResponseCode.Failed;
+                                    responseEntity.msg = "请设置标价签打印机";
+                                }
+                                break;
+                            default:
+                                logger.Error("非法打印机类型");
                                 responseEntity.code = ResponseCode.Failed;
-                                responseEntity.msg = "请设置标签打印机";
-                            }
-                            break;
-                        case "BJQ":
-                            if (!string.IsNullOrEmpty(CacheManager.GetBJQprint() as string))
-                            {
-                                GPrinterUtils.Instance.BJQPrintTempletDrive(s, width, height, PrinterManager.Instance.DriveBJQPrinter);
-                                responseEntity.code = ResponseCode.SUCCESS;
-                            }
-                            else
-                            {
-                                responseEntity.code = ResponseCode.Failed;
-                                responseEntity.msg = "请设置标价签打印机";
-                            }
-                            break;
-                        default:
-                            logger.Error("非法打印机类型");
-                            responseEntity.code = ResponseCode.Failed;
-                            responseEntity.msg = "非法打印机类型";
-                            break;
+                                responseEntity.msg = "非法打印机类型";
+                                break;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -5072,7 +5093,7 @@ namespace ZlPos.Bizlogic
             {
                 if (browser != null)
                 {
-                    if(_SecondScreenWebView != null)
+                    if (_SecondScreenWebView != null)
                     {
                         _SecondScreenWebView.Dispose();
                     }
@@ -5225,8 +5246,70 @@ namespace ZlPos.Bizlogic
 
         #endregion
 
+        #region CheckLocalTime
+        /// <summary>
+        /// 设置系统时间
+        /// </summary>
+        /// <param name="time"></param>
+        public void CheckLocalTime(string time)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+                dtFormat.ShortDatePattern = "yyyy-MM-dd HH:mm:ss";
+                DateTime t = Convert.ToDateTime(time, dtFormat);
+                if (WinAPI.SetSysTime(t))
+                {
+                    ExecuteCallback("checkLocalTime", new ResponseEntity { code = ResponseCode.SUCCESS });
+                }
+                else
+                {
+                    ExecuteCallback("checkLocalTime", new ResponseEntity { code = ResponseCode.Failed });
+                }
 
-        #region 
+            });
+        }
+        #endregion
+
+        #region SetAutoLaunch
+        public void SetAutoLaunch(string str)
+        {
+            try
+            {
+                var path = Application.ExecutablePath;
+                var rk = Microsoft.Win32.Registry.LocalMachine;
+                var rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+                switch (str)
+                {
+                    case "1"://AutoLaunchEnums.Open:
+                        rk2.SetValue("ZlPos2ShutDown", path + " -AutoRun");
+                        break;
+                    case "2"://AutoLaunchEnums.Close:
+                        rk2.SetValue("ZlPos2ShutDown", false);
+                        break;
+                    default:
+                        break;
+                }
+                rk2.Close();
+                rk.Close();
+                CacheManager.InsertAutoLaunchSetting(str);
+
+            }
+            catch (Exception e)
+            {
+                logger.Error("SetAutoLaunch err", e);
+            }
+        }
+        #endregion
+
+        #region GetAutoLaunch
+        public string GetAutoLaunch()
+        {
+            return CacheManager.GetAutoLaunchSetting() ?? "";
+        }
+        #endregion
+
+        #region GetBase64
 
         public void GetBase64()
         {
