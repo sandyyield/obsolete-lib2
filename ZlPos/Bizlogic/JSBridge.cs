@@ -1046,9 +1046,9 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Error(e.Message + e.StackTrace);
                 }
-                browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
+                //browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
                 //Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst)));
-                //ExecuteCallback("getAllSaleBillCallBack", target + "','" + Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(allBill).Trim('\"'))));
+                ExecuteCallback("getAllSaleBillCallBack", target + "','" + Convert.ToBase64String(Encoding.UTF8.GetBytes(allBill)));
             });
         }
         #endregion
@@ -1713,6 +1713,7 @@ namespace ZlPos.Bizlogic
         /// </summary>
         public void ExecuteDataProcess()
         {
+            logger.Info("Enter ExecuteDataProcess");
             Task.Factory.StartNew(() =>
             {
                 if (_LoginUserManager.Login)
@@ -1723,11 +1724,13 @@ namespace ZlPos.Bizlogic
                         var spuLst = _SPUPool;
                         var skuLst = _SKUPool;
                         var barcodeLst = _BarcodesPool;
+                        logger.Info("正在存储商品数据");
                         if (spuLst.Any())
                         {
                             dbManager.BulkSaveOrUpdate(spuLst, "uid");
                             dbManager.BulkSaveOrUpdate(skuLst, "uid");
                         }
+                        logger.Info("正在存储条码数据");
                         if (barcodeLst.Any())
                         {
                             dbManager.BulkSaveOrUpdate(barcodeLst, "uid");
@@ -1740,8 +1743,12 @@ namespace ZlPos.Bizlogic
                         logger.Error("ExecuteDataProcess err", e);
                         ExecuteCallback("executeDataProcessCallBack", new ResponseEntity { code = ResponseCode.Failed });
                     }
-                    _SPUPool.Clear();
-                    _BarcodesPool.Clear();
+                    finally
+                    {
+                        _SPUPool.Clear();
+                        _BarcodesPool.Clear();
+                        logger.Info("清理商品和条码内存镜像");
+                    }
                 }
             });
         }
@@ -2531,9 +2538,9 @@ namespace ZlPos.Bizlogic
                         logger.Error("getSPUList err", e);
                         responseEntity.code = ResponseCode.Failed;
                     }
-                    //ExecuteCallback("getSPUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
+                    ExecuteCallback("getSPUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                     //ExecuteCallback("getSPUListCallBack", ZipHelper.GZipCompressString(JsonConvert.SerializeObject(responseEntity)));
-                    ExecuteCallback("getSPUListCallBack", responseEntity);
+                    //ExecuteCallback("getSPUListCallBack", responseEntity);
                 }
             });
         }
@@ -2622,8 +2629,8 @@ namespace ZlPos.Bizlogic
                         logger.Error("GetSKUList err", e);
                         responseEntity.code = ResponseCode.Failed;
                     }
-                    ExecuteCallback("getSKUListCallBack", responseEntity);
-                    //ExecuteCallback("getSKUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
+                    //ExecuteCallback("getSKUListCallBack", responseEntity);
+                    ExecuteCallback("getSKUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                 }
             });
         }
@@ -3420,23 +3427,23 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                dynamic dyc = JsonConvert.DeserializeObject(json);
-                string s = dyc.content;
-                string printerType = dyc.printerType;
-                string width = dyc.width;
-                string height = dyc.height;
-                string number = dyc.number;
                 ResponseEntity responseEntity = new ResponseEntity();
-                if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
-                {
-                    logger.Info("PrintTemplet json or printertype is null.");
-                    responseEntity.code = ResponseCode.Failed;
-                    responseEntity.msg = "打印参数或打印类型为空";
-                    mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
-                    return;
-                }
                 try
                 {
+                    dynamic dyc = JsonConvert.DeserializeObject(json);
+                    string s = dyc.content;
+                    string printerType = dyc.printerType;
+                    string width = dyc.width;
+                    string height = dyc.height;
+                    string number = dyc.number;
+                    if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
+                    {
+                        logger.Info("PrintTemplet json or printertype is null.");
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印参数或打印类型为空";
+                        mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+                        return;
+                    }
 
 
                     if (CacheManager.GetGprint() as string != null || CacheManager.GetBJQprint() != null)
@@ -3537,23 +3544,24 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                dynamic dyc = JsonConvert.DeserializeObject(json);
-                string s = dyc.content;
-                string printerType = dyc.printerType;
-                string width = dyc.width;
-                string height = dyc.height;
-                string number = dyc.number;
                 ResponseEntity responseEntity = new ResponseEntity();
-                if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
-                {
-                    logger.Info("PrintTempletDrive json or printertype is null.");
-                    responseEntity.code = ResponseCode.Failed;
-                    responseEntity.msg = "打印参数或打印类型为空";
-                    mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
-                    return;
-                }
                 try
                 {
+                    dynamic dyc = JsonConvert.DeserializeObject(json);
+                    string s = dyc.content;
+                    string printerType = dyc.printerType;
+                    string width = dyc.width;
+                    string height = dyc.height;
+                    string number = dyc.number;
+                    if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
+                    {
+                        logger.Info("PrintTempletDrive json or printertype is null.");
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印参数或打印类型为空";
+                        mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+                        return;
+                    }
+
                     for (int i = 0; i < Int32.Parse(number); i++)
                     {
                         switch (printerType)
@@ -4892,8 +4900,8 @@ namespace ZlPos.Bizlogic
                             categorycode = spu.categorycode
                         })
                         .ToList();
-                        ExecuteCallback("getWeightCommodityCallBack", lst);
-                        //ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst))));
+                        //ExecuteCallback("getWeightCommodityCallBack", lst);
+                        ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst))));
                         return;
                     }
                 }
@@ -4901,8 +4909,8 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info("db err>>" + e.Message + e.StackTrace);
                 }
-                ExecuteCallback("getWeightCommodityCallBack", new List<SKUEntity>());
-                //ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new List<SKUEntity>()))));
+                //ExecuteCallback("getWeightCommodityCallBack", new List<SKUEntity>());
+                ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new List<SKUEntity>()))));
             });
             return;
         }
