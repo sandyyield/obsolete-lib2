@@ -1046,9 +1046,9 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Error(e.Message + e.StackTrace);
                 }
-                browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
+                //browser.ExecuteScriptAsync("getAllSaleBillCallBack('" + target + "','" + allBill + "')");
                 //Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst)));
-                //ExecuteCallback("getAllSaleBillCallBack", target + "','" + Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(allBill).Trim('\"'))));
+                ExecuteCallback("getAllSaleBillCallBack", target + "','" + Convert.ToBase64String(Encoding.UTF8.GetBytes(allBill)));
             });
         }
         #endregion
@@ -2531,9 +2531,9 @@ namespace ZlPos.Bizlogic
                         logger.Error("getSPUList err", e);
                         responseEntity.code = ResponseCode.Failed;
                     }
-                    //ExecuteCallback("getSPUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
+                    ExecuteCallback("getSPUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                     //ExecuteCallback("getSPUListCallBack", ZipHelper.GZipCompressString(JsonConvert.SerializeObject(responseEntity)));
-                    ExecuteCallback("getSPUListCallBack", responseEntity);
+                    //ExecuteCallback("getSPUListCallBack", responseEntity);
                 }
             });
         }
@@ -2622,8 +2622,8 @@ namespace ZlPos.Bizlogic
                         logger.Error("GetSKUList err", e);
                         responseEntity.code = ResponseCode.Failed;
                     }
-                    ExecuteCallback("getSKUListCallBack", responseEntity);
-                    //ExecuteCallback("getSKUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
+                    //ExecuteCallback("getSKUListCallBack", responseEntity);
+                    ExecuteCallback("getSKUListCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
                 }
             });
         }
@@ -4871,8 +4871,8 @@ namespace ZlPos.Bizlogic
                             categorycode = spu.categorycode
                         })
                         .ToList();
-                        ExecuteCallback("getWeightCommodityCallBack", lst);
-                        //ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst))));
+                        //ExecuteCallback("getWeightCommodityCallBack", lst);
+                        ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lst))));
                         return;
                     }
                 }
@@ -4880,8 +4880,8 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info("db err>>" + e.Message + e.StackTrace);
                 }
-                ExecuteCallback("getWeightCommodityCallBack", new List<SKUEntity>());
-                //ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new List<SKUEntity>()))));
+                //ExecuteCallback("getWeightCommodityCallBack", new List<SKUEntity>());
+                ExecuteCallback("getWeightCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new List<SKUEntity>()))));
             });
             return;
         }
