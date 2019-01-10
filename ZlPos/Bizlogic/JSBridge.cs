@@ -1742,6 +1742,7 @@ namespace ZlPos.Bizlogic
                     }
                     _SPUPool.Clear();
                     _BarcodesPool.Clear();
+                    _SKUPool.Clear();
                 }
             });
         }
