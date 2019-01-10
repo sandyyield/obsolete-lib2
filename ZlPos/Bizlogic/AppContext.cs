@@ -58,11 +58,12 @@ namespace ZlPos.Bizlogic
 
             DatebaseVersion = Convert.ToInt32(ConfigurationManager.AppSettings["DatabaseVersion"]);
 
+            //2019年1月9日  直接不分xp和win7
             UpdateUrl = ConfigurationManager.AppSettings["WIN7UpdateUrl"];
-            if (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor == 1)
-            {
-                UpdateUrl = ConfigurationManager.AppSettings["XPUpdateUrl"];
-            }
+            //if (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor == 1)
+            //{
+            //    UpdateUrl = ConfigurationManager.AppSettings["XPUpdateUrl"];
+            //}
 
             XmlFile = ConfigurationManager.AppSettings["UpdateXmlFile"];
 
