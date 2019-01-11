@@ -5659,12 +5659,16 @@ namespace ZlPos.Bizlogic
         /// <typeparam name="T"></typeparam>
         /// <param name="CallbackMethod"></param>
         /// <param name="state"></param>
-        private void ExecuteCallback<T>(string CallbackMethod, T state)
+        public void ExecuteCallback<T>(string CallbackMethod, T state)
             where T : class, new() => browser.ExecuteScriptAsync(CallbackMethod + "('" + JsonConvert.SerializeObject(state ?? new T()) + "')");
 
 
-        private void ExecuteCallback(string CallbackMethod, string str)
+        public void ExecuteCallback(string CallbackMethod, string str)
              => browser.ExecuteScriptAsync(CallbackMethod + "('" + str + "')");
+
+        public void ExecuteCallback(string CallbackMethod)
+            => browser.ExecuteScriptAsync(CallbackMethod + "()");
+
         /// <summary>
         /// 多线程方式回调
         /// </summary>

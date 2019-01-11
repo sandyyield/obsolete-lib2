@@ -292,8 +292,11 @@ namespace ZlPos.Forms
                 if (m.LParam != null && m.LParam == Marshal.StringToHGlobalAnsi("CloseZlPos"))
                 {
                     hostApp.Finish();
-                    
                     return;
+                }
+                if(m.LParam != null && m.LParam == Marshal.StringToHGlobalAnsi("Updating"))
+                {
+                    hostApp.ExecuteCallback("updatingCallBack");
                 }
             }
             
