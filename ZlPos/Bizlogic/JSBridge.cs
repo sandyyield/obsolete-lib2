@@ -1668,14 +1668,12 @@ namespace ZlPos.Bizlogic
                         var barcodeLst = _BarcodesPool;
                         if (spuLst.Any())
                         {
-                            UpgradingSchema.DeleteTableWithoutBackup(new string[] { "SpuEntity", "SkuEntity" });
-                            dbManager.BulkSaveOrUpdate(spuLst, "uid");
-                            dbManager.BulkSaveOrUpdate(skuLst, "uid");
+                            dbManager.BulkSaveOrUpdateTurbo(spuLst, "uid");
+                            dbManager.BulkSaveOrUpdateTurbo(skuLst, "uid");
                         }
                         if (barcodeLst.Any())
                         {
-                            UpgradingSchema.DeleteTableWithoutBackup(new string[] { "BarCodeEntity" });
-                            dbManager.BulkSaveOrUpdate(barcodeLst, "uid");
+                            dbManager.BulkSaveOrUpdateTurbo(barcodeLst, "uid");
                         }
                         ExecuteCallback("fixDataCallBack", new ResponseEntity { code = ResponseCode.SUCCESS });
 

@@ -613,7 +613,7 @@ namespace ZlPos.Dao
                 using (var db = SugarDao.Instance)
                 {
                     //先del
-                    UpgradingSchema.DeleteTableWithoutBackup(new string[] { typeof(T).Name });
+                    UpgradingSchema.DeleteTableWithoutBackup(new string[] { typeof(T).Name, "CommodityInfoVM" });
                     //数据处理
                     if (!db.DbMaintenance.IsAnyTable(typeof(T).Name, false))
                     {
