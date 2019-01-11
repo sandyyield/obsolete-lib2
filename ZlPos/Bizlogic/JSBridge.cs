@@ -1650,6 +1650,45 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        /// <summary>
+        /// 修复数据
+        /// </summary>
+        public void FixData()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (_LoginUserManager.Login)
+                {
+                    try
+                    {
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        var spuLst = _SPUPool;
+                        var skuLst = _SKUPool;
+                        var barcodeLst = _BarcodesPool;
+                        if (spuLst.Any())
+                        {
+                            dbManager.BulkSaveOrUpdateTurbo(spuLst, "uid");
+                            dbManager.BulkSaveOrUpdateTurbo(skuLst, "uid");
+                        }
+                        if (barcodeLst.Any())
+                        {
+                            dbManager.BulkSaveOrUpdateTurbo(barcodeLst, "uid");
+                        }
+                        ExecuteCallback("fixDataCallBack", new ResponseEntity { code = ResponseCode.SUCCESS });
+
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("FixData err", e);
+                        ExecuteCallback("fixDataCallBack", new ResponseEntity { code = ResponseCode.Failed });
+                    }
+                    _SPUPool.Clear();
+                    _BarcodesPool.Clear();
+                    _SKUPool.Clear();
+                }
+            });
+        }
+
         public void ClearLoadDataCache()
         {
             _SPUPool.Clear();

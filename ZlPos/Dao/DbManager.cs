@@ -15,6 +15,7 @@ namespace ZlPos.Dao
         void Delete<T>(T payDetailEntity) where T : class, new();
         bool IsTableExist<T>(T table) where T:class,new();
         void Insert<T>(T entity) where T : class, new();
+        void BulkSaveOrUpdateTurbo<T>(List<T> array, string primaryKey = "id") where T : class, new();
         //void SaveOrUpdateCommodityEntities(CommodityEntity[] commodityEntity);
         //void BulkSaveOrUpdateBarCodes(BarCodeEntity2[] barCodeEntity2);
     }
