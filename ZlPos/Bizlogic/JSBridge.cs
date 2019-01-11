@@ -1650,13 +1650,59 @@ namespace ZlPos.Bizlogic
         }
         #endregion
 
+        #region FixData
+        /// <summary>
+        /// 修复数据
+        /// </summary>
+        public void FixData()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (_LoginUserManager.Login)
+                {
+                    try
+                    {
+                        DbManager dbManager = DBUtils.Instance.DbManager;
+                        var spuLst = _SPUPool;
+                        var skuLst = _SKUPool;
+                        var barcodeLst = _BarcodesPool;
+                        if (spuLst.Any())
+                        {
+                            UpgradingSchema.DeleteTableWithoutBackup(new string[] { "SpuEntity", "SkuEntity" });
+                            dbManager.BulkSaveOrUpdate(spuLst, "uid");
+                            dbManager.BulkSaveOrUpdate(skuLst, "uid");
+                        }
+                        if (barcodeLst.Any())
+                        {
+                            UpgradingSchema.DeleteTableWithoutBackup(new string[] { "BarCodeEntity" });
+                            dbManager.BulkSaveOrUpdate(barcodeLst, "uid");
+                        }
+                        ExecuteCallback("fixDataCallBack", new ResponseEntity { code = ResponseCode.SUCCESS });
+
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("FixData err", e);
+                        ExecuteCallback("fixDataCallBack", new ResponseEntity { code = ResponseCode.Failed });
+                    }
+                    _SPUPool.Clear();
+                    _BarcodesPool.Clear();
+                    _SKUPool.Clear();
+                }
+            });
+        }
+        #endregion
+
+        #region ClearLoadDataCache
         public void ClearLoadDataCache()
         {
             _SPUPool.Clear();
             _SKUPool.Clear();
             _BarcodesPool.Clear();
         }
+        #endregion
 
+        #region SendCommodityList
         /// <summary>
         /// 接口商品数据
         /// </summary>
@@ -1683,7 +1729,9 @@ namespace ZlPos.Bizlogic
             }
 
         }
+        #endregion
 
+        #region SendBarcodesList
         /// <summary>
         /// 接收条码数据
         /// </summary>
@@ -1707,7 +1755,9 @@ namespace ZlPos.Bizlogic
             }
 
         }
+        #endregion
 
+        #region ExecuteDataProcess
         /// <summary>
         /// 处理商品数据
         /// </summary>
@@ -1752,7 +1802,7 @@ namespace ZlPos.Bizlogic
                 }
             });
         }
-
+        #endregion
 
         //add 2018年9月3日
         #region SaveCommodityList

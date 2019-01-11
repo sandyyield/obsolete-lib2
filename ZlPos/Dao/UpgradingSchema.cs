@@ -39,6 +39,27 @@ namespace ZlPos.Dao
             }
         }
 
+        public static void DeleteTableWithoutBackup(string[] tableNameList)
+        {
+            try
+            {
+                using (var db = SugarDao.Instance)
+                {
+                    foreach (var tableName in tableNameList)
+                    {
+                        if (db.DbMaintenance.IsAnyTable(tableName, false))
+                        {
+                            db.DbMaintenance.DropTable(tableName);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+
         public static void FixColumns<T>(string[] newColumns)
              where T : class, new()
         {
