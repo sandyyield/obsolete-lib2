@@ -1678,6 +1678,9 @@ namespace ZlPos.Bizlogic
                         if (spuLst.Any())
                         {
                             dbManager.BulkSaveOrUpdateTurbo(spuLst, "uid");
+                            //_SKUPool.ForEach(i => { if (string.IsNullOrEmpty(i.uid){
+                            //        MessageBox.Show("")
+                            //})})
                             dbManager.BulkSaveOrUpdateTurbo(skuLst, "uid");
                         }
                         if (barcodeLst.Any())
@@ -1825,11 +1828,12 @@ namespace ZlPos.Bizlogic
                 try
                 {
                     dynamic dyc = JsonConvert.DeserializeObject(s);
-
                     var SpuuidsItem = dyc.spuuids;
                     var barcodeuidsItem = dyc.barcodeuids;
                     var spuUids = new List<string>();
                     var barcodeUids = new List<string>();
+
+                    var skuUids = new List<string>();
                     foreach (var i in SpuuidsItem)
                     {
                         spuUids.AddRange(i.uids.ToString().Trim(',').Split(','));
@@ -1838,9 +1842,10 @@ namespace ZlPos.Bizlogic
                     {
                         barcodeUids.AddRange(i.uids.ToString().Trim(',').Split(','));
                     }
-                    var skuUids = (from r in _SPUPool.AsEnumerable()
-                                   where spuUids.Contains(r.uid)
-                                   select r.uid).ToList();
+                    var skulst = from r in _SPUPool.AsEnumerable()
+                                 where spuUids.Contains(r.uid)
+                                 select r.recskulist;
+                    skulst.ToList().First().ForEach(i => skuUids.Add(i.uid));
                     DBUtils.Instance.DbManager.BulkCopy(_SPUPool, spuUids);
                     DBUtils.Instance.DbManager.BulkCopy(_SKUPool, skuUids);
                     DBUtils.Instance.DbManager.BulkCopy(_BarcodesPool, barcodeUids);
@@ -2597,7 +2602,7 @@ namespace ZlPos.Bizlogic
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(barcodelist, "uid");
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(spu.recskulist, "uid");
                         responseEntity.data = skulist;
-                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.code = ResponseCode.SUCCESS;
                         responseEntity.msg = "下拉数据成功";
                     }
                 }

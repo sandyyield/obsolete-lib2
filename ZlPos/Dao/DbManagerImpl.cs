@@ -649,7 +649,7 @@ namespace ZlPos.Dao
                     }
                     else
                     {
-                        var d1 = db.Deleteable<T1>().In(primaryKeys).ExecuteCommand();
+                        var d1 = db.Deleteable<T1>().In<T2>(primaryKeys).ExecuteCommand();
                         db.Insertable(array).Where(true).ExecuteCommand();
                     }
                 }
