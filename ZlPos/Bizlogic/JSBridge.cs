@@ -2578,7 +2578,6 @@ namespace ZlPos.Bizlogic
         {
             Task.Factory.StartNew(() =>
             {
-                var t0 = DateTime.Now;
                 var responseEntity = new ResponseEntity();
                 dynamic dyc = JsonConvert.DeserializeObject(s);
 
@@ -2594,16 +2593,9 @@ namespace ZlPos.Bizlogic
                 {
                     using (var db = SugarDao.Instance)
                     {
-                        var t2 = DateTime.Now;
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(categorylist, "id");
-                        var t3 = DateTime.Now;
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(barcodelist, "uid");
-                        var t4 = DateTime.Now;
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(spu.recskulist, "uid");
-                        var t5 = DateTime.Now;
-
-
-                        logger.Info("t1-t0=>" + t1.Subtract(t0).Milliseconds + "t5-t2=>" + t5.Subtract(t2).Milliseconds + "t3-t2" + t3.Subtract(t2).Milliseconds);
                         responseEntity.data = skulist;
                         responseEntity.code = ResponseCode.Failed;
                     }
