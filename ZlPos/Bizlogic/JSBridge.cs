@@ -2682,7 +2682,10 @@ namespace ZlPos.Bizlogic
                                                memberpricelv3 = spu.memberpricelv3,
                                                memberpricelv4 = spu.memberpricelv4,
                                                memberpricelv5 = spu.memberpricelv5,
-                                               memberpricelv6 = spu.memberpricelv6
+                                               memberpricelv6 = spu.memberpricelv6,
+
+                                               branchname = spu.branchname,
+                                               brandname = spu.brandname
                                            })
                                             .ToPageList(pageindex + 1, pagesize, ref total);
 
@@ -2771,7 +2774,10 @@ namespace ZlPos.Bizlogic
                                                 memberpricelv3 = sku.memberpricelv3,
                                                 memberpricelv4 = sku.memberpricelv4,
                                                 memberpricelv5 = sku.memberpricelv5,
-                                                memberpricelv6 = sku.memberpricelv6
+                                                memberpricelv6 = sku.memberpricelv6,
+
+                                                branchname = sku.branchname,
+                                                brandname = spu.brandname
                                                 //spec = sku.sepc
                                             })
                                             .ToPageList(pageindex + 1, pagesize, ref total);

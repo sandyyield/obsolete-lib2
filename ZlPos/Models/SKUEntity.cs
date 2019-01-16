@@ -132,5 +132,9 @@ namespace ZlPos.Models
         //add 2018年12月28日  
         [SugarColumn(IsNullable = true)]
         public string memberpriceflag { get; set; }
+
+        //add 2019年1月16日 （其实是2019年1月9日
+        [SugarColumn(IsNullable = true)]
+        public string brandname { get; set; }
     }
 }
