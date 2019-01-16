@@ -628,5 +628,47 @@ namespace ZlPos.Dao
             }
         }
 
+        public void BulkCopy<T1,T2>(List<T1> array, List<T2> primaryKeys) 
+            where T1 : class, new()
+        {
+
+            try
+            {
+                if (!array.Any())
+                {
+                    logger.Info("BulkSaveOrUpdateTurbo err : array none");
+                    return;
+                }
+                using (var db = SugarDao.Instance)
+                {
+                    //数据处理
+                    if (!db.DbMaintenance.IsAnyTable(typeof(T1).Name, false))
+                    {
+                        db.CodeFirst.InitTables(typeof(T1));
+                        db.Insertable(array).Where(true, true).ExecuteCommand();
+                    }
+                    else
+                    {
+                        var d1 = db.Deleteable<T1>().In(primaryKeys).ExecuteCommand();
+                        db.Insertable(array).Where(true).ExecuteCommand();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("BulkCopy err", e);
+            }
+            //if (!db.DbMaintenance.IsAnyTable(typeof(SPUEntity).Name, false))
+            //{
+            //    db.CodeFirst.InitTables(typeof(SPUEntity));
+            //    db.Insertable(_SPUPool).Where(true, true).ExecuteCommand();
+            //}
+            //else
+            //{
+            //    var d1 = db.Deleteable<SPUEntity>().In<string>(spuUids).ExecuteCommand();
+            //    db.Insertable(_SPUPool).Where(true).ExecuteCommand();
+            //}
+
+        }
     }
 }

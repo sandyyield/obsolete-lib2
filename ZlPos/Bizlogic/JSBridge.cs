@@ -865,6 +865,7 @@ namespace ZlPos.Bizlogic
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
                     //mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
                     ExecuteCallback("saveOneSaleBillCallBack", responseEntity);
+                    return;
                 }
                 DbManager dbManager = DBUtils.Instance.DbManager;
 
@@ -877,6 +878,7 @@ namespace ZlPos.Bizlogic
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(CallbackMethod), new object[] { "saveOneSaleBillCallBack", responseEntity });
                     //mWebViewHandle.Invoke("saveOneSaleBillCallBack", responseEntity);
                     ExecuteCallback("saveOneSaleBillCallBack", responseEntity);
+                    return;
                 }
                 try
                 {
@@ -902,7 +904,7 @@ namespace ZlPos.Bizlogic
                 }
                 catch (Exception e)
                 {
-                    logger.Error("保存销售单据接口： 异常");
+                    logger.Error("保存销售单据接口： 异常" + JsonConvert.SerializeObject(billEntity), e);
                 }
                 List<BillCommodityEntity> commoditys = billEntity.commoditys;
                 List<PayDetailEntity> paydetails = billEntity.paydetails;
@@ -937,7 +939,7 @@ namespace ZlPos.Bizlogic
                         }
                         catch (Exception e)
                         {
-                            logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException", e);
+                            logger.Error("保存销售单据接口：dbManager.saveOrUpdate(billCommodityEntity)--DbException:" + JsonConvert.SerializeObject(billCommodityEntity), e);
                         }
                     }
                 }
@@ -961,7 +963,7 @@ namespace ZlPos.Bizlogic
                     }
                     catch (Exception e)
                     {
-                        logger.Info("payDetail save err>>" + e.Message + e.StackTrace);
+                        logger.Error("payDetail save err>>" + JsonConvert.SerializeObject(paydetails), e);
                     }
                 }
 
@@ -971,9 +973,16 @@ namespace ZlPos.Bizlogic
                 }
                 else
                 {
-                    foreach (DisCountDetailEntity disCountDetailEntity in discountdetails)
+                    try
                     {
-                        dbManager.SaveOrUpdate(disCountDetailEntity);
+                        foreach (DisCountDetailEntity disCountDetailEntity in discountdetails)
+                        {
+                            dbManager.SaveOrUpdate(disCountDetailEntity);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("save DisCountDetailEntity err" + JsonConvert.SerializeObject(discountdetails), e);
                     }
                 }
 
@@ -1794,10 +1803,64 @@ namespace ZlPos.Bizlogic
                     finally
                     {
                         _SPUPool.Clear();
+                        _SKUPool.Clear();
                         _BarcodesPool.Clear();
                         logger.Info("清理商品和条码内存镜像");
                     }
                 }
+            });
+        }
+        #endregion
+
+        #region ExecuteDataTurbo
+        /// <summary>
+        /// 通过Uid列表删除 然后直接插入
+        /// </summary>
+        /// <param name="s"></param>
+        public void ExecuteDataTurbo(string s)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                try
+                {
+                    dynamic dyc = JsonConvert.DeserializeObject(s);
+
+                    var SpuuidsItem = dyc.spuuids;
+                    var barcodeuidsItem = dyc.barcodeuids;
+                    var spuUids = new List<string>();
+                    var barcodeUids = new List<string>();
+                    foreach(var i in SpuuidsItem)
+                    {
+                        spuUids.AddRange(i.uids.ToString().Trim(',').Split(','));
+                    }
+                    foreach (var i in barcodeuidsItem)
+                    {
+                        barcodeUids.AddRange(i.uids.ToString().Trim(',').Split(','));
+                    }
+                    var skuUids = (from r in _SPUPool.AsEnumerable()
+                                   where spuUids.Contains(r.uid)
+                                   select r.uid).ToList();
+                    DBUtils.Instance.DbManager.BulkCopy(_SPUPool, spuUids);
+                    DBUtils.Instance.DbManager.BulkCopy(_SKUPool, skuUids);
+                    DBUtils.Instance.DbManager.BulkCopy(_BarcodesPool, barcodeUids);
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "数据保存成功";
+                }
+                catch (Exception e)
+                {
+                    logger.Error("ExecuteDataTurbo err", e);
+                    responseEntity.code = ResponseCode.SUCCESS;
+                    responseEntity.msg = "数据保存失败";
+                }
+                finally
+                {
+                    _SPUPool.Clear();
+                    _SKUPool.Clear();
+                    _BarcodesPool.Clear();
+                    logger.Info("清理商品和条码内存镜像");
+                }
+                ExecuteCallback("executeDataTurboCallBack", responseEntity);
             });
         }
         #endregion
@@ -2503,6 +2566,58 @@ namespace ZlPos.Bizlogic
             }
 
             return JsonConvert.SerializeObject(spuEntityList ?? new List<SPUEntity>());
+        }
+        #endregion
+
+        #region InsertCommodity
+        /// <summary>
+        /// 插入商品
+        /// </summary>
+        /// <param name="s"></param>
+        public void InsertCommodity(string s)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                var t0 = DateTime.Now;
+                var responseEntity = new ResponseEntity();
+                dynamic dyc = JsonConvert.DeserializeObject(s);
+
+                //这个东西没用 如果非要返回需要加base64
+                List<SKUEntity> skulist = dyc.skulist;
+
+                SPUEntity spu = dyc.commodity;
+                List<CategoryEntity> categorylist = dyc.categorylist;
+                List<BarCodeEntity> barcodelist = dyc.barcodelist;
+
+                var t1 = DateTime.Now;
+                try
+                {
+                    using (var db = SugarDao.Instance)
+                    {
+                        var t2 = DateTime.Now;
+                        DBUtils.Instance.DbManager.BulkSaveOrUpdate(categorylist, "id");
+                        var t3 = DateTime.Now;
+                        DBUtils.Instance.DbManager.BulkSaveOrUpdate(barcodelist, "uid");
+                        var t4 = DateTime.Now;
+                        DBUtils.Instance.DbManager.BulkSaveOrUpdate(spu.recskulist, "uid");
+                        var t5 = DateTime.Now;
+
+
+                        logger.Info("t1-t0=>" + t1.Subtract(t0).Milliseconds + "t5-t2=>" + t5.Subtract(t2).Milliseconds + "t3-t2" + t3.Subtract(t2).Milliseconds);
+                        responseEntity.data = skulist;
+                        responseEntity.code = ResponseCode.Failed;
+                    }
+                }
+                catch (Exception e)
+                {
+                    responseEntity.code = ResponseCode.Failed;
+                    logger.Error("InsertCommodity err", e);
+                }
+                ExecuteCallback("insertCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
+
+            });
+
+
         }
         #endregion
 
