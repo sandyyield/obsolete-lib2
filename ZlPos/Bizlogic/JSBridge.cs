@@ -1830,7 +1830,7 @@ namespace ZlPos.Bizlogic
                     var barcodeuidsItem = dyc.barcodeuids;
                     var spuUids = new List<string>();
                     var barcodeUids = new List<string>();
-                    foreach(var i in SpuuidsItem)
+                    foreach (var i in SpuuidsItem)
                     {
                         spuUids.AddRange(i.uids.ToString().Trim(',').Split(','));
                     }
@@ -2579,18 +2579,18 @@ namespace ZlPos.Bizlogic
             Task.Factory.StartNew(() =>
             {
                 var responseEntity = new ResponseEntity();
-                dynamic dyc = JsonConvert.DeserializeObject(s);
-
-                //这个东西没用 如果非要返回需要加base64
-                List<SKUEntity> skulist = dyc.skulist;
-
-                SPUEntity spu = dyc.commodity;
-                List<CategoryEntity> categorylist = dyc.categorylist;
-                List<BarCodeEntity> barcodelist = dyc.barcodelist;
-
-                var t1 = DateTime.Now;
                 try
                 {
+                    dynamic dyc = JsonConvert.DeserializeObject(s);
+
+                    //这个东西没用 如果非要返回需要加base64
+                    List<SKUEntity> skulist = dyc.skulist.ToObject<List<SKUEntity>>();
+
+                    SPUEntity spu = dyc.commodity.ToObject<SPUEntity>();
+                    List<CategoryEntity> categorylist = dyc.categorylist.ToObject<List<CategoryEntity>>();
+                    List<BarCodeEntity> barcodelist = dyc.barcodelist.ToObject<List<BarCodeEntity>>();
+
+                    var t1 = DateTime.Now;
                     using (var db = SugarDao.Instance)
                     {
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(categorylist, "id");
@@ -2598,11 +2598,13 @@ namespace ZlPos.Bizlogic
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(spu.recskulist, "uid");
                         responseEntity.data = skulist;
                         responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "下拉数据成功";
                     }
                 }
                 catch (Exception e)
                 {
                     responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = "下拉数据失败";
                     logger.Error("InsertCommodity err", e);
                 }
                 ExecuteCallback("insertCommodityCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseEntity))));
@@ -3578,6 +3580,107 @@ namespace ZlPos.Bizlogic
         /// </summary>
         /// <param name="s"></param>
         /// <param name="printerType"></param>
+        public void PrintTemplet(string s, string printerType, string width, string height)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                ResponseEntity responseEntity = new ResponseEntity();
+                try
+                {
+                    if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(printerType))
+                    {
+                        logger.Info("PrintTemplet json or printertype is null.");
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "打印参数或打印类型为空";
+                        mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+                        return;
+                    }
+                    if (CacheManager.GetGprint() as string != null || CacheManager.GetBJQprint() != null)
+                    {
+                        List<string> usblist = GPrinterUtils.Instance.FindUSBPrinter();
+                        if (usblist == null)
+                        {
+                            responseEntity.code = ResponseCode.Failed;
+                            responseEntity.msg = "未发现可用USB设备";
+                        }
+                        else
+                        {
+                            //每次都先设置完再打印
+                            if (GPrinterUtils.Instance.Connect_Printer())
+                            {
+
+                                switch (printerType)
+                                {
+                                    case "SPBQ":
+                                    case "DDBQ":
+                                        if (!string.IsNullOrEmpty(CacheManager.GetGprint() as string))
+                                        {
+                                            GPrinterUtils.Instance.BQPrintTemplet(s, width, height);
+                                            responseEntity.code = ResponseCode.SUCCESS;
+                                        }
+                                        else
+                                        {
+                                            responseEntity.code = ResponseCode.Failed;
+                                            responseEntity.msg = "请设置标签打印机";
+                                        }
+                                        break;
+                                    case "BJQ":
+                                        if (!string.IsNullOrEmpty(CacheManager.GetBJQprint() as string))
+                                        {
+                                            GPrinterUtils.Instance.BJQPrintTemplet(s, width, height);
+                                            responseEntity.code = ResponseCode.SUCCESS;
+                                        }
+                                        else
+                                        {
+                                            responseEntity.code = ResponseCode.Failed;
+                                            responseEntity.msg = "请设置标价签打印机";
+                                        }
+                                        break;
+                                    default:
+                                        logger.Error("非法打印机类型");
+                                        responseEntity.code = ResponseCode.Failed;
+                                        responseEntity.msg = "非法打印机类型";
+                                        break;
+                                }
+                                //}
+                                //else
+                                //{
+                                //    responseEntity.code = ResponseCode.Failed;
+                                //    responseEntity.msg = "请设置标签打印机";
+                                //}
+                            }
+                            else
+                            {
+                                responseEntity.code = ResponseCode.Failed;
+                                responseEntity.msg = "连接标签打印机失败";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        responseEntity.code = ResponseCode.Failed;
+                        responseEntity.msg = "请设置标签打印机或标价签打印机";
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error("PrintTemplet err >> ", e);
+                    responseEntity.code = ResponseCode.Failed;
+                    responseEntity.msg = e.Message;
+                }
+
+                mWebViewHandle.Invoke("printTempletCallBack", responseEntity);
+            });
+
+        }
+        #endregion
+
+        #region PrintTemplet
+        /// <summary>
+        /// 标签 标价签模板打印
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="printerType"></param>
         public void PrintTemplet(string json)//string s, string printerType, string width, string height)
         {
             Task.Factory.StartNew(() =>
@@ -3612,9 +3715,6 @@ namespace ZlPos.Bizlogic
                         }
                         else
                         {
-                            //GPrinterManager.Instance.usbDeviceArrayList = usblist;
-                            //GPrinterManager.Instance.Init = true;
-                            //GPrinterManager.Instance.PrinterTypeEnum = "usb";
                             //每次都先设置完再打印
                             if (GPrinterUtils.Instance.Connect_Printer())
                             {
@@ -5033,7 +5133,8 @@ namespace ZlPos.Bizlogic
                             && sku.updownstatus == "1"
                             && sku.del == "0"
                             && (sku.pricing == "1" || sku.pricing == "2")
-                            && (SqlFunc.Contains(sku.commodityname, keyword) || SqlFunc.Contains(sku.mnemonic, keyword) || SqlFunc.Contains(sku.plu, keyword)))
+                            && (SqlFunc.Contains(sku.commodityname, keyword) || SqlFunc.Contains(sku.mnemonic, keyword) || SqlFunc.Contains(sku.plu, keyword))
+                            )
                         .WhereIF(level == 1, (spu, bc) => SqlFunc.Contains(spu.category1code, categorycode))
                         .WhereIF(level == 2, (spu, bc) => SqlFunc.Contains(spu.category2code, categorycode))
                         .WhereIF(level == 3, (spu, bc) => SqlFunc.Contains(spu.category3code, categorycode))
