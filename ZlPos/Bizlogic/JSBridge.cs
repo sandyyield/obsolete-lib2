@@ -1115,6 +1115,7 @@ namespace ZlPos.Bizlogic
                                                                                                     && i.shopcode == shopcode
                                                                                                     && i.branchcode == branchCode
                                                                                                     && SqlFunc.Contains(i.ticketcode, ticketcode))
+                                                                                                    .OrderBy(i => i.insertTime, OrderByType.Desc)
                                                                                                     .ToPageList(pageindex + 1, pagesize, ref totalCount);
                                     if (billEntities != null)
                                     {
@@ -4791,12 +4792,43 @@ namespace ZlPos.Bizlogic
                 case "ACS_TM_TOLEDO":
                     SyncCommoditytoBarcodeScale_TOLEDO(ss);
                     break;
+                case "ACS_TM_DhScalePlu":
+                    SyncCommoditytoBarcodeScale_DhScalePlu(ss);
+                    break;
                 default:
                     break;
             }
         }
         #endregion
 
+        #region SyncCommoditytoBarcodeScale_DhScalePlu
+        private void SyncCommoditytoBarcodeScale_DhScalePlu(string ss)
+        {
+            logger.Info("syncCommoditytoBarcodeScale_dahua(" + ss + ")");
+            SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
+            IPAddress ip = IPAddress.Parse(syncScaleVM.ip);
+            List<PluMessageEntity> pluMessageEntities = syncScaleVM.pluMessageEntityList;
+            int clear = syncScaleVM.clean;
+
+            Action<string, int> sendMessage = (syncScaleStatus, point) =>
+            {
+                SyncScaleEntity syncScaleEntity = new SyncScaleEntity();
+                syncScaleEntity.status = syncScaleStatus;
+                syncScaleEntity.point = point;
+                Task.Factory.StartNew(() =>
+                {
+                    browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
+                });
+            };
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback((state) =>
+            {
+
+
+            }), new object[] { });
+        }
+
+        #endregion
 
         #region SyncCommoditytoBarcodeScale_TOLEDO
         private void SyncCommoditytoBarcodeScale_TOLEDO(string ss)

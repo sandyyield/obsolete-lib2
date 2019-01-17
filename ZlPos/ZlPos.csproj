@@ -314,6 +314,10 @@
     <None Include="DataBase\dbinit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Library\DHScalePlu\dhip.ini" />
+    <None Include="Library\DHScalePlu\dhplupathname.ini" />
+    <None Include="Library\DHScalePlu\dhpluversion.ini" />
+    <None Include="Library\DHScalePlu\DhScalePluNet.lib" />
     <None Include="Library\TOLEDO\MTScaleKey.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -335,6 +339,12 @@
     <Content Include="Library\Aclas\AclasSDK.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Library\DHScalePlu\DHDATASEND.dll" />
+    <Content Include="Library\DHScalePlu\DhPluDownload.exe" />
+    <Content Include="Library\DHScalePlu\dhplunet.dll" />
+    <Content Include="Library\DHScalePlu\DhScalePluNet.dll" />
+    <Content Include="Library\DHScalePlu\DhSet.exe" />
+    <Content Include="Library\DHScalePlu\Dhspn.h" />
     <Content Include="Library\InTheHand.Net.Personal.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
