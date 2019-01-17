@@ -1115,6 +1115,7 @@ namespace ZlPos.Bizlogic
                                                                                                     && i.shopcode == shopcode
                                                                                                     && i.branchcode == branchCode
                                                                                                     && SqlFunc.Contains(i.ticketcode, ticketcode))
+                                                                                                    .OrderBy(i=>i.insertTime,OrderByType.Desc)
                                                                                                     .ToPageList(pageindex + 1, pagesize, ref totalCount);
                                     if (billEntities != null)
                                     {
