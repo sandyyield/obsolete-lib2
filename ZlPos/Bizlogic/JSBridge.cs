@@ -2601,6 +2601,7 @@ namespace ZlPos.Bizlogic
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(categorylist, "id");
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(barcodelist, "uid");
                         DBUtils.Instance.DbManager.BulkSaveOrUpdate(spu.recskulist, "uid");
+                        DBUtils.Instance.DbManager.SaveOrUpdate(spu);
                         responseEntity.data = skulist;
                         responseEntity.code = ResponseCode.SUCCESS;
                         responseEntity.msg = "下拉数据成功";
