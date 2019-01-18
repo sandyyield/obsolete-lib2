@@ -96,7 +96,7 @@ namespace ZlPos.Utils
             }
             r2[len] = 0x0D;
             r2[len + 1] = 0x0A;
-            r2[len + 2] = 0x03;
+            //r2[len + 2] = 0x03;
             return r2;
         }
 
