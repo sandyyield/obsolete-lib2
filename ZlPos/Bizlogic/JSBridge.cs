@@ -4795,6 +4795,9 @@ namespace ZlPos.Bizlogic
                 case "ACS_TM_DhScalePlu":
                     SyncCommoditytoBarcodeScale_DhScalePlu(ss);
                     break;
+                case "ACS_TM_bolunsi":
+                    SyncCommoditytoBarcodeScale_bolunsi(ss);
+                    break;
                 default:
                     break;
             }
@@ -5050,6 +5053,131 @@ namespace ZlPos.Bizlogic
                         try
                         {
                             //socket.Shutdown(SocketShutdown.Both);
+                            socket.Close();
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Info("socket close err>>" + e.Message + e.StackTrace);
+                        }
+                        sendMessage(SyncScaleStatus.PLU_SYNCED, 0);
+                        logger.Info("同步完成");
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("socket 超时异常", ex);
+                        sendMessage(SyncScaleStatus.SOCKET_ERR, 0);
+                    }
+                }
+                else
+                {
+                    socket.Close();
+                    sendMessage(SyncScaleStatus.SOCKET_NO_OPEN, 0);
+                }
+            }), new object[] { });
+            return;
+        }
+        #endregion
+
+        #region SyncCommoditytoBarcodeScale_bolunsi
+        /// <summary>
+        /// 同步条码称方法
+        /// </summary>
+        /// <param name="ss"> @ ip:同步到秤的ip地址 @ pluMessageEntityList: @ clear:是否全量同步          1:全量</param>
+        public void SyncCommoditytoBarcodeScale_bolunsi(string ss)
+        {
+            logger.Info("SyncCommoditytoBarcodeScale_bolunsi(" + ss + ")");
+            SyncScaleVM syncScaleVM = JsonConvert.DeserializeObject<SyncScaleVM>(ss);
+            IPAddress ip = IPAddress.Parse(syncScaleVM.ip);
+            List<PluMessageEntity> pluMessageEntities = syncScaleVM.pluMessageEntityList;
+            int clear = syncScaleVM.clean;
+
+
+            Action<string, int> sendMessage = (syncScaleStatus, point) =>
+            {
+                SyncScaleEntity syncScaleEntity = new SyncScaleEntity();
+                syncScaleEntity.status = syncScaleStatus;
+                syncScaleEntity.point = point;
+                Task.Factory.StartNew(() =>
+                {
+                    browser.ExecuteScriptAsync("syncCommoditytoBarcodeScaleCallBack('" + JsonConvert.SerializeObject(syncScaleEntity) + "')");
+                });
+            };
+
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback((state) =>
+            {
+                Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                bool isConnect = false;
+                try
+                {
+                    sendMessage(SyncScaleStatus.SOCKET_OPENING, 0);
+
+                    socket.Connect(new IPEndPoint(ip, 4001));
+                    logger.Info("尝试打开socket...");
+                    if (socket.Connected)
+                    {
+                        logger.Info("socket is connect...");
+                        sendMessage(SyncScaleStatus.SOCKET_OPENED, 0);
+                        isConnect = true;
+                        logger.Info("socket打开成功...");
+                    }
+                    else
+                    {
+                        int i = 0;
+                        while (!isConnect && i < 10)
+                        {
+                            i++;
+                            socket.Connect(new IPEndPoint(ip, 4001));
+                            Thread.Sleep(100);
+                            if (socket.Connected)
+                            {
+                                logger.Info("sockt is connected");
+                                isConnect = true;
+                                sendMessage(SyncScaleStatus.SOCKET_OPENED, 0);
+                                logger.Info("socket 打开成功");
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Info("SyncCommoditytoBarcodeScale异常>>" + e.Message + e.StackTrace);
+                }
+                if (isConnect)
+                {
+                    try
+                    {
+                        socket.SendTimeout = 5000;
+                        socket.ReceiveTimeout = 5000;
+                        //if (clear == 1)
+                        //{
+                        //    sendMessage(SyncScaleStatus.PLU_CLEANING, 0);
+                        //    sendMessage_btye(StringConvert.convertStringToBytesForTMCBLS("!0IA"), socket);
+                        //    sendMessage_btye(StringConvert.convertStringToBytesForTMCBLS("!0HA"), socket);
+                        //    logger.Info("正在清除历史数据");
+                        //    Thread.Sleep(20000);
+                        //}
+                        sendMessage(SyncScaleStatus.PLU_CLEANED, 0);
+                        sendMessage(SyncScaleStatus.PLU_SYNCING, 0);
+                        logger.Info("开始同步");
+                        //string barcodeStyle = CacheManager.GetBarcodeStyle();
+                        //string style = "!0O01050301" + barcodeStyle + "000100000100010001000000000000000001";
+                        //sendMessage_btye(StringConvert.convertStringToBytesForTMCBLS(style), socket);
+                        //string branchName = "!0Z01A" + StringConvert.getWordCode(_LoginUserManager.UserEntity.branchname) + "0000B";
+                        //sendMessage_btye(StringConvert.convertStringToBytesForTMCBLS(branchName), socket);
+                        for (int i = 0; i < pluMessageEntities.Count; i++)
+                        {
+                            string shopInfo = CommodityToPLU_BLS(pluMessageEntities[i]);
+                            if (!string.IsNullOrEmpty(shopInfo))
+                            {
+                                sendMessage_btye(StringConvert.convertStringToBytesForTMCBLS(shopInfo), socket);
+                                sendMessage(SyncScaleStatus.PLU_SYNCING, i + 1);
+                            }
+                            logger.Info("正在同步第" + (i + 1) + "条商品数据");
+                            Thread.Sleep(500);
+                        }
+                        try
+                        {
                             socket.Close();
                         }
                         catch (Exception e)
@@ -5369,6 +5497,58 @@ namespace ZlPos.Bizlogic
                 throw e;
             }
         }
+        #endregion
+
+        #region CommodityToPLU_BLS
+        /// <summary>
+        /// 将单条商品信息转换成条码秤PLU码
+        /// </summary>
+        /// <param name="pluMessageEntity"></param>
+        /// <returns></returns>
+        private string CommodityToPLU_BLS(PluMessageEntity pluMessageEntity)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder("!0V");
+                if (Int32.Parse(pluMessageEntity.plu) > 4000 || Int32.Parse(pluMessageEntity.plu) < 1)
+                {
+                    return "";
+                }
+                sb.Append(formatCode(pluMessageEntity.plu, 4)); //PLU序号
+                sb.Append("A");
+                Regex r = new Regex("^[0-9]\\d*$");
+                if (!r.Match(pluMessageEntity.barcode).Success)
+                {
+                    logger.Info("barcode非法---barcode:" + pluMessageEntity.barcode);
+                    return "";
+                }
+                sb.Append(formatCode(pluMessageEntity.barcode, 7)); //商品代码
+                sb.Append(formatCode(Math.Round(float.Parse(pluMessageEntity.price) * 100) + "", 6)); //商品价格，分/Kg
+                sb.Append(pluMessageEntity.type); //0:称重，1:计件，2:定重
+                sb.Append("000000"); //特殊信息
+                sb.Append(formatCode(pluMessageEntity.indate, 3)); //有效期
+                sb.Append("22"); //店名号
+                sb.Append("22"); //部门号
+                sb.Append("0000000000000"); //数字代号
+                sb.Append(formatCode(pluMessageEntity.tare, 5)); //皮重
+                sb.Append("00"); //标签号
+                sb.Append("00"); //不打折
+                sb.Append("000000000000000000000000");
+                sb.Append("B");
+                sb.Append(wordCheck(pluMessageEntity.commodityName));
+                sb.Append("C");
+                sb.Append(wordCheck(pluMessageEntity.commodityName));
+                sb.Append("D");
+                sb.Append(wordCheck(pluMessageEntity.commodityName));
+                sb.Append("E");
+                return sb.ToString();
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         #endregion
 
         #region OnDesktop

@@ -100,6 +100,29 @@ namespace ZlPos.Utils
             return r2;
         }
 
+        internal static byte[] convertStringToBytesForTMCBLS(string str)
+        {
+            char[] chars = str.ToCharArray();
+            byte[] r1 = new byte[chars.Length];
+            for (int i = 0; i < chars.Length; i++)
+            {
+                //byte[] arr = HexUtils.HexStringToByte(chars[i].ToString());   //hexStringToBytes2(Convert.ToInt32(chars[i]).ToString());
+                byte[] arr = HexUtils.HexStringToByte(String.Format("{0:X}", Convert.ToInt32(chars[i])));
+                r1[i] = arr[0];
+            }
+
+            int len = r1.Length;
+            byte[] r2 = new byte[len + 3];
+            for (int i = 0; i < len; i++)
+            {
+                r2[i] = r1[i];
+            }
+            r2[len] = 0x0D;
+            r2[len + 1] = 0x0A;
+            return r2;
+        }
+
+
         //public static byte[] hexStringToBytes2(string hexString)
         //{
         //    if (string.IsNullOrEmpty(hexString))
