@@ -1846,7 +1846,7 @@ namespace ZlPos.Bizlogic
                     var skulst = from r in _SPUPool.AsEnumerable()
                                  where spuUids.Contains(r.uid)
                                  select r.recskulist;
-                    skulst.ToList().First().ForEach(i => skuUids.Add(i.uid));
+                    skulst.ToList().ForEach(x=>x.ForEach(i => skuUids.Add(i.uid)));
                     DBUtils.Instance.DbManager.BulkCopy(_SPUPool, spuUids);
                     DBUtils.Instance.DbManager.BulkCopy(_SKUPool, skuUids);
                     DBUtils.Instance.DbManager.BulkCopy(_BarcodesPool, barcodeUids);
@@ -2154,6 +2154,7 @@ namespace ZlPos.Bizlogic
         /// <returns></returns>
         public string GetCommodityByBarcode(string barcode)
         {
+            logger.Info("enter GetCommodityByBarcode  barcode : " + barcode);
             ResponseEntity responseEntity = new ResponseEntity();
             DbManager dbManager = DBUtils.Instance.DbManager;
             List<SKUEntity> skuEntities = new List<SKUEntity>();
