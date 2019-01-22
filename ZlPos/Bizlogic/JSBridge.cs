@@ -1163,7 +1163,7 @@ namespace ZlPos.Bizlogic
                 }
                 //string finalAllBills = JsonConvert.SerializeObject(billAndCountEntity);
                 //browser.ExecuteScriptAsync("getAllSaleBillByParamsCallBack('" + finalAllBills + "')");
-                ExecuteCallback("getAllSaleBillByParamsCallBack", result);
+                ExecuteCallback("getAllSaleBillByParamsCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(result)));
             });
         }
         #endregion
@@ -1204,38 +1204,18 @@ namespace ZlPos.Bizlogic
                         using (var db = SugarDao.Instance)
                         {
                             string id = _LoginUserManager.UserEntity.userid;
-                            List<BillEntity> billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
+                            var billEntities = db.Queryable<BillEntity>().Where(i => i.insertTime >= startDateTime
                                                                                             && i.cashierid == id
                                                                                             && i.insertTime <= endDateTime
                                                                                             && (i.ticketstatue == "cached" || i.ticketstatue == "updated")
                                                                                             && i.shopcode == shopcode
                                                                                             && i.branchcode == branchCode)
                                                                                             .OrderBy(i => i.insertTime, OrderByType.Desc)
-                                                                                            .ToList();
+                                                                                            //.ToList();
+                                                                                            .ToPageList(pageindex + 1, pagesize);
                             if (billEntities != null)
                             {
-                                //for (int i = 0; i < billEntities.Count; i++)
-                                //{
-                                //    List<BillCommodityEntity> billCommodityEntities = db.Queryable<BillCommodityEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                //    List<PayDetailEntity> payDetailEntities = db.Queryable<PayDetailEntity>().Where(x => x.ticketcode == billEntities[i].ticketcode).ToList();
-                                //    if (billCommodityEntities == null)
-                                //    {
-                                //        billCommodityEntities = new List<BillCommodityEntity>();
-                                //    }
-                                //    else
-                                //    {
-
-                                //    }
-                                //    if (payDetailEntities == null)
-                                //    {
-                                //        payDetailEntities = new List<PayDetailEntity>();
-                                //    }
-                                //    billEntities[i].commoditys = billCommodityEntities;
-                                //    billEntities[i].paydetails = payDetailEntities;
-                                //}
-                                //return JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
-                                result = JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize));
-                                //browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + JsonConvert.SerializeObject(_DataProcessor.PaginationData(billEntities, pageindex, pagesize)) + "')");
+                                result = JsonConvert.SerializeObject(billEntities);
                             }
                         }
                     }
@@ -1244,7 +1224,8 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info(e.Message + e.StackTrace);
                 }
-                browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + result + "','" + pageindex + "','" + pagesize + "')");
+                //browser.ExecuteScriptAsync("getSelectTimeSaleBillByPaginationCallBack('" + Convert.ToBase64String(Encoding.UTF8.GetBytes(result)) + "','" + pageindex + "','" + pagesize + "')");
+                ExecuteCallback("getSelectTimeSaleBillByPaginationCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(result)) + "','" + pageindex + "','" + pagesize);
             });
 
             //return result;
@@ -1366,7 +1347,8 @@ namespace ZlPos.Bizlogic
                 {
                     logger.Info(e.Message + e.StackTrace);
                 }
-                browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + result + "')");
+                //browser.ExecuteScriptAsync("getSelectTimeSaleBillCallBack('" + Convert.ToBase64String(Encoding.UTF8.GetBytes(result)) + "')");
+                ExecuteCallback("getSelectTimeSaleBillCallBack", Convert.ToBase64String(Encoding.UTF8.GetBytes(result)));
             });
         }
         #endregion

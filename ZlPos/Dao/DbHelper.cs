@@ -185,6 +185,9 @@ namespace ZlPos.Dao
                     case 21:
                         UpgradingSchema.UpgradingVersion<ContextEntity>(new string[] { "AutoLaunchSetting" });
                         break;
+                    case 22:
+                        UpgradingSchema.DeleteTable(new string[] { "SKUEntity", "SPUEntity", "BarCodeEntity", "CommodityInfoVM" });
+                        break;
                 }
                 //生成数据库配置文件
                 CreateConfig();
